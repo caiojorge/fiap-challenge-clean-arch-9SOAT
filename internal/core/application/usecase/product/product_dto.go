@@ -1,6 +1,22 @@
-package dto
+package usecase
 
 import "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
+
+type RegisterProductInputDTO struct {
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Category    string  `json:"category"`
+	Price       float64 `json:"price"`
+}
+
+func (dto *RegisterProductInputDTO) ToEntity() *entity.Product {
+	return &entity.Product{
+		Name:        dto.Name,
+		Description: dto.Description,
+		Category:    dto.Category,
+		Price:       dto.Price,
+	}
+}
 
 type CreateProductDTO struct {
 	Name        string  `json:"name"`

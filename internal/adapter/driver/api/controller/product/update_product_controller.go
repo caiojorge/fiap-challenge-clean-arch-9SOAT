@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/adapter/driver/api/dto"
 	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product"
 	"github.com/gin-gonic/gin"
 )
@@ -28,8 +27,8 @@ func NewUpdateProductController(ctx context.Context, usecase portsusecase.Update
 // @Accept  json
 // @Produce  json
 // @Param id path string true "Product id"
-// @Param Product body dto.CreateProductDTO true "Product data"
-// @Success 200 {object} dto.ProductDTO
+// @Param Product body usecase.CreateProductDTO true "Product data"
+// @Success 200 {object} usecase.ProductDTO
 // @Failure 400 {object} string "Invalid data"
 // @Failure 404 {object} string "Product not found"
 // @Router /products/{id} [put]
@@ -40,7 +39,7 @@ func (r *UpdateProductController) PutUpdateProduct(c *gin.Context) {
 		return
 	}
 
-	var dto dto.ProductDTO
+	var dto portsusecase.ProductDTO
 
 	if err := c.BindJSON(&dto); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})

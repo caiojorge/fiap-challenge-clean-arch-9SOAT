@@ -27,7 +27,7 @@ func NewDeleteProductController(ctx context.Context, usecase portsusecase.Delete
 // @Accept  json
 // @Produce  json
 // @Param id path string true "Product id"
-// @Success 200 {object} dto.ProductDTO
+// @Success 200 {object} usecase.ProductDTO
 // @Failure 400 {object} string "Invalid data"
 // @Router /products/{id} [delete]
 func (r *DeleteProductController) DeleteProduct(c *gin.Context) {

@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/adapter/driver/api/dto"
 	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product"
 	"github.com/gin-gonic/gin"
 )
@@ -33,29 +32,29 @@ func NewRegisterProductController(ctx context.Context, usecase portsusecase.Regi
 // @Tags Products
 // @Accept json
 // @Produce json
-// @Param        request   body     dto.CreateProductDTO  true  "cria novo produto"
-// @Success 200 {object} dto.ProductDTO
+// @Param        request   body     portsusecase.CreateProductDTO  true  "cria novo produto"
+// @Success 200 {object} usecase.ProductDTO
 // @Failure 400 {object} string "invalid data"
 // @Failure 409 {object} string "product already exists"
 // @Failure 500 {object} string "internal server error"
 // @Router /products [post]
 func (r *RegisterProductController) PostRegisterProduct(c *gin.Context) {
-	var dto dto.ProductDTO
+	var dto portsusecase.RegisterProductInputDTO
 
 	if err := c.BindJSON(&dto); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
 		return
 	}
 
-	entity, err := dto.ToEntity()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
-		return
-	}
+	// entity, err := dto.ToEntity()
+	// if err != nil {
+	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
+	// 	return
+	// }
 
 	// Nesse cenário, o ID informado será ignorado e um novo ID será gerado
 	fmt.Println("controller: Criando product: " + dto.Name)
-	err = r.usecase.RegisterProduct(r.ctx, entity)
+	productId, err := r.usecase.RegisterProduct(r.ctx, &dto)
 	if err != nil {
 		if err == ErrAlreadyExists {
 			c.JSON(http.StatusConflict, gin.H{"error": "product already exists"})
@@ -65,9 +64,9 @@ func (r *RegisterProductController) PostRegisterProduct(c *gin.Context) {
 		return
 	}
 
-	dto.FromEntity(*entity)
+	//dto.FromEntity(*entity)
 
-	log.Println("Product created: ", dto.ID)
+	log.Println("Product created: ", productId)
 
 	c.JSON(http.StatusOK, dto)
 }

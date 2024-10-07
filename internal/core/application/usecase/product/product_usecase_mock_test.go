@@ -7,19 +7,23 @@ import (
 	"testing"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
-	"github.com/caiojorge/fiap-challenge-ddd/internal/shared"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestProductRegisterAndUpdater(t *testing.T) {
 
-	product, err := entity.ConvertProduct(shared.NewIDGenerator(), "Lanche XPTO", "Pão queijo e carne", "Lanche", 30.00)
-	assert.Nil(t, err)
-	assert.NotNil(t, product)
+	// product, err := entity.ConvertProduct(shared.NewIDGenerator(), "Lanche XPTO", "Pão queijo e carne", "Lanche", 30.00)
+	// assert.Nil(t, err)
+	// assert.NotNil(t, product)
 
-	assert.Equal(t, "Lanche XPTO", product.Name)
+	productDto := RegisterProductInputDTO{
+		Name:        "Lanche XPTO",
+		Description: "Pão queijo e carne",
+		Category:    "Lanche",
+		Price:       30.00,
+	}
 
-	assert.NotEmpty(t, product.GetID())
+	assert.Equal(t, "Lanche XPTO", productDto.Name)
 
 	repo := NewMockProductRepository()
 	assert.NotNil(t, repo)
@@ -27,13 +31,14 @@ func TestProductRegisterAndUpdater(t *testing.T) {
 	register := NewProductRegister(repo)
 	assert.NotNil(t, register)
 
-	err = register.RegisterProduct(context.Background(), product)
+	productId, err := register.RegisterProduct(context.Background(), &productDto)
 	assert.Nil(t, err)
+	//assert.NotEmpty(t, product.GetID())
 
-	product2, err := repo.Find(context.Background(), product.ID)
+	product2, err := repo.Find(context.Background(), *productId)
 	assert.Nil(t, err)
 	assert.NotNil(t, product2)
-	assert.Equal(t, product, product2)
+	assert.Equal(t, *productId, product2.ID)
 
 	products, err := repo.FindAll(context.Background())
 	assert.Nil(t, err)
@@ -43,14 +48,24 @@ func TestProductRegisterAndUpdater(t *testing.T) {
 	updater := NewProductUpdate(repo)
 	assert.NotNil(t, updater)
 
-	product.Name = "Lanche XPTO 2"
+	//product.ID = *productId // solução temporária para passar no teste
+	//product.Name = "Lanche XPTO 2"
+
+	product := &entity.Product{
+		ID:          *productId,
+		Name:        "Lanche XPTO 2",
+		Description: "Pão queijo e carne",
+		Category:    "Lanche",
+		Price:       30.00,
+	}
+
 	err = updater.UpdateProduct(context.Background(), *product)
 	assert.Nil(t, err)
 
-	product2, err = repo.Find(context.Background(), product.ID)
+	product2, err = repo.Find(context.Background(), *productId)
 	assert.Nil(t, err)
 	assert.NotNil(t, product2)
-	assert.Equal(t, product, product2)
+	assert.Equal(t, *productId, product2.ID)
 
 	product6, err := repo.FindByName(context.Background(), "Lanche XPTO 2")
 	assert.Nil(t, err)

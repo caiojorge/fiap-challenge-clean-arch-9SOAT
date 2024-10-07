@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/adapter/driver/api/dto"
 	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product"
 	"github.com/gin-gonic/gin"
 )
@@ -27,7 +26,7 @@ func NewFindAllProductController(ctx context.Context, usecase portsusecase.FindA
 // @Tags Products
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} dto.ProductDTO
+// @Success 200 {array} usecase.ProductDTO
 // @Failure 400 {object} map[string]string "Invalida data"
 // @Failure 404 {object} map[string]string "No products foundr"
 // @Router /products [get]
@@ -44,8 +43,8 @@ func (cr *FindAllProductController) GetAllProducts(c *gin.Context) {
 		return
 	}
 
-	var dtoproducts []dto.ProductDTO
-	dto := dto.ProductDTO{}
+	var dtoproducts []portsusecase.ProductDTO
+	dto := portsusecase.ProductDTO{}
 	for _, entity := range entityProducts {
 		dto.FromEntity(*entity)
 		dtoproducts = append(dtoproducts, dto)

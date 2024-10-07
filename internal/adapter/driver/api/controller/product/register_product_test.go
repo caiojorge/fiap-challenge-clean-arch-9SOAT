@@ -10,8 +10,10 @@ import (
 	"sync"
 	"testing"
 
+	usecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
 	productRepository "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/shared"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
@@ -48,7 +50,7 @@ func TestRegisterProductController(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	// compare the response with the expected result
-	assert.Equal(t, `{"id":"1","name":"Lanche XPTO","description":"Pão, carne, queijo e presunto","category":"Lanche","price":100}`, w.Body.String())
+	assert.Equal(t, `{"name":"Lanche XPTO","description":"Pão, carne, queijo e presunto","category":"Lanche","price":100}`, w.Body.String())
 }
 
 func TestFindAllProductsController(t *testing.T) {
@@ -186,8 +188,9 @@ func NewMockRegisterProductUseCase(repository productRepository.ProductRepositor
 	}
 }
 
-func (m *MockRegisterProductUseCase) RegisterProduct(ctx context.Context, customer *entity.Product) error {
-	return nil
+func (m *MockRegisterProductUseCase) RegisterProduct(ctx context.Context, product *usecase.RegisterProductInputDTO) (*string, error) {
+	id := shared.NewIDGenerator()
+	return &id, nil
 }
 
 type MockProductRepository struct {

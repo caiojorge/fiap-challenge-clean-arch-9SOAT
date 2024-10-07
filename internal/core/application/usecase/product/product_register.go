@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
 	portsrepository "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository"
 )
 
@@ -20,26 +19,29 @@ func NewProductRegister(repository portsrepository.ProductRepository) *ProductRe
 }
 
 // RegisterProduct registra um novo cliente.
-func (cr *ProductRegisterUseCase) RegisterProduct(ctx context.Context, product *entity.Product) error {
+func (cr *ProductRegisterUseCase) RegisterProduct(ctx context.Context, product *RegisterProductInputDTO) (*string, error) {
 
-	fmt.Println("usecase: verifica se o produto existe: " + product.GetName())
-	entityFound, err := cr.repository.FindByName(ctx, product.GetName())
+	fmt.Println("usecase: verifica se o produto existe: " + product.Name)
+	entityFound, err := cr.repository.FindByName(ctx, product.Name)
 	if err != nil && err.Error() != "product not found" {
 		fmt.Println("usecase: err: " + err.Error())
-		return err
+		return nil, err
 	}
 
 	if entityFound != nil {
-		fmt.Println("usecase: producto já existe: " + product.GetName())
-		return errors.New("product already exists")
+		fmt.Println("usecase: producto já existe: " + product.Name)
+		return nil, errors.New("product already exists")
 	}
 
-	fmt.Println("usecase: Criando produto: " + product.GetName())
-	product.DefineID()
-	err = cr.repository.Create(ctx, product)
+	fmt.Println("usecase: Criando produto: " + product.Name)
+	entity := product.ToEntity()
+
+	entity.DefineID()
+
+	err = cr.repository.Create(ctx, entity)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return &entity.ID, nil
 }
