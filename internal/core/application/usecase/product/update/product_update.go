@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
 	portsrepository "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository"
 )
 
@@ -19,21 +18,24 @@ func NewProductUpdate(repository portsrepository.ProductRepository) *ProductUpda
 }
 
 // UpdateProduct atualiza um novo produto.
-func (cr *ProductUpdateUseCase) UpdateProduct(ctx context.Context, product entity.Product) error {
+func (cr *ProductUpdateUseCase) UpdateProduct(ctx context.Context, product UpdateProductInputDTO) (*UpdateProductOutputDTO, error) {
 
-	prd, err := cr.repository.Find(ctx, product.GetID())
+	prd, err := cr.repository.Find(ctx, product.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if prd == nil {
-		return errors.New("product not found")
+		return nil, errors.New("product not found")
 	}
 
-	err = cr.repository.Update(ctx, &product)
+	err = cr.repository.Update(ctx, product.ToEntity())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	output := &UpdateProductOutputDTO{}
+	output.FromEntity(*product.ToEntity())
+
+	return output, nil
 }

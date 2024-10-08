@@ -4,16 +4,16 @@ import (
 	"context"
 	"net/http"
 
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product"
+	updateusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/update"
 	"github.com/gin-gonic/gin"
 )
 
 type UpdateProductController struct {
-	usecase portsusecase.UpdateProductUseCase
+	usecase updateusecase.UpdateProductUseCase
 	ctx     context.Context
 }
 
-func NewUpdateProductController(ctx context.Context, usecase portsusecase.UpdateProductUseCase) *UpdateProductController {
+func NewUpdateProductController(ctx context.Context, usecase updateusecase.UpdateProductUseCase) *UpdateProductController {
 	return &UpdateProductController{
 		usecase: usecase,
 		ctx:     ctx,
@@ -39,7 +39,7 @@ func (r *UpdateProductController) PutUpdateProduct(c *gin.Context) {
 		return
 	}
 
-	var dto portsusecase.ProductDTO
+	var dto updateusecase.UpdateProductInputDTO
 
 	if err := c.BindJSON(&dto); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
@@ -50,17 +50,11 @@ func (r *UpdateProductController) PutUpdateProduct(c *gin.Context) {
 		dto.ID = id
 	}
 
-	product, err := dto.ToEntity()
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
-		return
-	}
-
-	err = r.usecase.UpdateProduct(r.ctx, *product)
+	output, err := r.usecase.UpdateProduct(r.ctx, dto)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, dto)
+	c.JSON(http.StatusOK, output)
 }

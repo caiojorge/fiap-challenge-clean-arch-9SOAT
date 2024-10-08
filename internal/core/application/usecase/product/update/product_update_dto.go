@@ -2,15 +2,26 @@ package usecase
 
 import "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
 
-type CreateProductDTO struct {
+// RegisterProductInputDTO para atender o use case de registro de produto
+type UpdateProductInputDTO struct {
+	ID          string  `json:"id"`
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
 	Category    string  `json:"category"`
 	Price       float64 `json:"price"`
 }
 
-// ProductDTO é o legado da versão anterior do código - será removido
-type ProductDTO struct {
+func (dto *UpdateProductInputDTO) ToEntity() *entity.Product {
+	return &entity.Product{
+		ID:          dto.ID,
+		Name:        dto.Name,
+		Description: dto.Description,
+		Category:    dto.Category,
+		Price:       dto.Price,
+	}
+}
+
+type UpdateProductOutputDTO struct {
 	ID          string  `json:"id,omitempty"`
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
@@ -18,17 +29,7 @@ type ProductDTO struct {
 	Price       float64 `json:"price"`
 }
 
-func (dto *ProductDTO) ToEntity() (*entity.Product, error) {
-	return &entity.Product{
-		ID:          dto.ID,
-		Name:        dto.Name,
-		Description: dto.Description,
-		Category:    dto.Category,
-		Price:       dto.Price,
-	}, nil
-}
-
-func (dto *ProductDTO) FromEntity(product entity.Product) {
+func (dto *UpdateProductOutputDTO) FromEntity(product entity.Product) {
 	dto.ID = product.ID
 	dto.Name = product.Name
 	dto.Description = product.Description

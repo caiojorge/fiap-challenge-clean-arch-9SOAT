@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product"
+	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/findall"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,29 +26,22 @@ func NewFindAllProductController(ctx context.Context, usecase portsusecase.FindA
 // @Tags Products
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} usecase.ProductDTO
+// @Success 200 {array} usecase.FindAllProductOutputDTO
 // @Failure 400 {object} map[string]string "Invalida data"
 // @Failure 404 {object} map[string]string "No products foundr"
 // @Router /products [get]
 func (cr *FindAllProductController) GetAllProducts(c *gin.Context) {
 
-	entityProducts, err := cr.usecase.FindAllProducts(cr.ctx)
+	outputs, err := cr.usecase.FindAllProducts(cr.ctx)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
 		return
 	}
 
-	if len(entityProducts) == 0 {
+	if len(outputs) == 0 {
 		c.JSON(http.StatusNotFound, gin.H{"error": "No products found"})
 		return
 	}
 
-	var dtoproducts []portsusecase.ProductDTO
-	dto := portsusecase.ProductDTO{}
-	for _, entity := range entityProducts {
-		dto.FromEntity(*entity)
-		dtoproducts = append(dtoproducts, dto)
-	}
-
-	c.JSON(http.StatusOK, dtoproducts)
+	c.JSON(http.StatusOK, outputs)
 }

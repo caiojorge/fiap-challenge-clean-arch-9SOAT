@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product"
+	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/register"
 	"github.com/gin-gonic/gin"
 )
 
@@ -32,29 +32,23 @@ func NewRegisterProductController(ctx context.Context, usecase portsusecase.Regi
 // @Tags Products
 // @Accept json
 // @Produce json
-// @Param        request   body     portsusecase.CreateProductDTO  true  "cria novo produto"
-// @Success 200 {object} usecase.ProductDTO
+// @Param        request   body     portsusecase.RegisterProductInputDTO  true  "cria novo produto"
+// @Success 200 {object} usecase.RegisterProductOutputDTO
 // @Failure 400 {object} string "invalid data"
 // @Failure 409 {object} string "product already exists"
 // @Failure 500 {object} string "internal server error"
 // @Router /products [post]
 func (r *RegisterProductController) PostRegisterProduct(c *gin.Context) {
-	var dto portsusecase.RegisterProductInputDTO
+	var input portsusecase.RegisterProductInputDTO
 
-	if err := c.BindJSON(&dto); err != nil {
+	if err := c.BindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
 		return
 	}
 
-	// entity, err := dto.ToEntity()
-	// if err != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
-	// 	return
-	// }
-
 	// Nesse cenário, o ID informado será ignorado e um novo ID será gerado
-	fmt.Println("controller: Criando product: " + dto.Name)
-	productId, err := r.usecase.RegisterProduct(r.ctx, &dto)
+	fmt.Println("controller: Criando product: " + input.Name)
+	output, err := r.usecase.RegisterProduct(r.ctx, &input)
 	if err != nil {
 		if err == ErrAlreadyExists {
 			c.JSON(http.StatusConflict, gin.H{"error": "product already exists"})
@@ -64,9 +58,7 @@ func (r *RegisterProductController) PostRegisterProduct(c *gin.Context) {
 		return
 	}
 
-	//dto.FromEntity(*entity)
+	log.Println("Product created: ", output)
 
-	log.Println("Product created: ", productId)
-
-	c.JSON(http.StatusOK, dto)
+	c.JSON(http.StatusOK, output)
 }

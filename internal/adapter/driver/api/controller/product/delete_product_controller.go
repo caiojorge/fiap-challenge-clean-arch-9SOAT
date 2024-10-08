@@ -4,16 +4,16 @@ import (
 	"context"
 	"net/http"
 
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product"
+	deleteusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/delete"
 	"github.com/gin-gonic/gin"
 )
 
 type DeleteProductController struct {
-	usecase portsusecase.DeleteProductUseCase
+	usecase deleteusecase.DeleteProductUseCase
 	ctx     context.Context
 }
 
-func NewDeleteProductController(ctx context.Context, usecase portsusecase.DeleteProductUseCase) *DeleteProductController {
+func NewDeleteProductController(ctx context.Context, usecase deleteusecase.DeleteProductUseCase) *DeleteProductController {
 	return &DeleteProductController{
 		usecase: usecase,
 		ctx:     ctx,

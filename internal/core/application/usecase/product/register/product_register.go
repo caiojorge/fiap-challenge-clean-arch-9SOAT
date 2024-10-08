@@ -19,7 +19,7 @@ func NewProductRegister(repository portsrepository.ProductRepository) *ProductRe
 }
 
 // RegisterProduct registra um novo cliente.
-func (cr *ProductRegisterUseCase) RegisterProduct(ctx context.Context, product *RegisterProductInputDTO) (*string, error) {
+func (cr *ProductRegisterUseCase) RegisterProduct(ctx context.Context, product *RegisterProductInputDTO) (*RegisterProductOutputDTO, error) {
 
 	fmt.Println("usecase: verifica se o produto existe: " + product.Name)
 	entityFound, err := cr.repository.FindByName(ctx, product.Name)
@@ -43,5 +43,8 @@ func (cr *ProductRegisterUseCase) RegisterProduct(ctx context.Context, product *
 		return nil, err
 	}
 
-	return &entity.ID, nil
+	output := RegisterProductOutputDTO{}
+	output.FromEntity(*entity)
+
+	return &output, nil
 }

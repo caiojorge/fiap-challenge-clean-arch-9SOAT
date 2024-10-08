@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
 	ports "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository"
 )
 
@@ -18,12 +17,20 @@ func NewProductFindAll(repository ports.ProductRepository) *ProductFindAllUseCas
 }
 
 // FindAllProducts busca todos os produtos.
-func (cr *ProductFindAllUseCase) FindAllProducts(ctx context.Context) ([]*entity.Product, error) {
+func (cr *ProductFindAllUseCase) FindAllProducts(ctx context.Context) ([]*FindAllProductOutputDTO, error) {
 
 	products, err := cr.repository.FindAll(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return products, nil
+	var output []*FindAllProductOutputDTO
+
+	for _, product := range products {
+		dto := &FindAllProductOutputDTO{}
+		dto.FromEntity(*product)
+		output = append(output, dto)
+	}
+
+	return output, nil
 }

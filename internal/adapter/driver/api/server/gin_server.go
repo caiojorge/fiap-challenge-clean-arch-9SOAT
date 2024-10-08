@@ -18,6 +18,10 @@ import (
 	usecasekitchen "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/kitchen"
 	usecaseorder "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/order"
 	usecaseproduct "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product"
+	usecaseproductdelete "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/delete"
+	usecaseproductfindall "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/findall"
+	usecaseproductregister "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/register"
+	usecaseproductupdater "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/update"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -70,10 +74,10 @@ func (s *GinServer) Initialization() *GinServer {
 
 	p := s.router.Group("/kitchencontrol/api/v1/products")
 	{
-		registerController := controllerproduct.NewRegisterProductController(ctx, usecaseproduct.NewProductRegister(productRepo))
+		registerController := controllerproduct.NewRegisterProductController(ctx, usecaseproductregister.NewProductRegister(productRepo))
 		p.POST("/", registerController.PostRegisterProduct)
 
-		findAllController := controllerproduct.NewFindAllProductController(ctx, usecaseproduct.NewProductFindAll(productRepo))
+		findAllController := controllerproduct.NewFindAllProductController(ctx, usecaseproductfindall.NewProductFindAll(productRepo))
 		p.GET("/", findAllController.GetAllProducts)
 
 		findByIDController := controllerproduct.NewFindProductByIDController(ctx, usecaseproduct.NewProductFindByID(productRepo))
@@ -82,10 +86,10 @@ func (s *GinServer) Initialization() *GinServer {
 		findByCategoryController := controllerproduct.NewFindProductByCategoryController(ctx, usecaseproduct.NewProductFindByCategory(productRepo))
 		p.GET("/category/:id", findByCategoryController.GetProductByCategory)
 
-		updateController := controllerproduct.NewUpdateProductController(ctx, usecaseproduct.NewProductUpdate(productRepo))
+		updateController := controllerproduct.NewUpdateProductController(ctx, usecaseproductupdater.NewProductUpdate(productRepo))
 		p.PUT("/:id", updateController.PutUpdateProduct)
 
-		deleteController := controllerproduct.NewDeleteProductController(ctx, usecaseproduct.NewProductDelete(productRepo))
+		deleteController := controllerproduct.NewDeleteProductController(ctx, usecaseproductdelete.NewProductDelete(productRepo))
 		p.DELETE("/:id", deleteController.DeleteProduct)
 
 	}
