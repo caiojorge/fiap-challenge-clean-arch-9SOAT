@@ -9,8 +9,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	usecasesimple "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product"
 	usecasefindall "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/findall"
+	usecasefindbyid "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/findbyid"
 	usecaseregister "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/register"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
@@ -157,7 +157,7 @@ func TestFindProductByIDController(t *testing.T) {
 		Return(nil, nil)
 
 	//repo := NewMockProductRepository()
-	mock := usecasesimple.NewProductFindByID(mockProductRepo)
+	mock := usecasefindbyid.NewProductFindByID(mockProductRepo)
 	controller := NewFindProductByIDController(context.Background(), mock)
 
 	register := usecaseregister.NewProductRegister(mockProductRepo)

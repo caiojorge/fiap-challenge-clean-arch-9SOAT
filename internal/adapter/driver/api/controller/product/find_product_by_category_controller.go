@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product"
+	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/findbycategory"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,7 +27,7 @@ func NewFindProductByCategoryController(ctx context.Context, usecase portsusecas
 // @Accept  json
 // @Produce  json
 // @Param id path string true "Product category"
-// @Success 200 {object} usecase.ProductDTO
+// @Success 200 {array} usecase.FindProductByCategoryOutputDTO
 // @Failure 404 {object} string "Product not found"
 // @Failure 500 {object} string "Product not found"
 // @Router /products/category/{id} [get]
@@ -52,12 +52,5 @@ func (cr *FindProductByCategoryController) GetProductByCategory(c *gin.Context) 
 		return
 	}
 
-	var dtoproducts []portsusecase.ProductDTO
-	dto := portsusecase.ProductDTO{}
-	for _, entity := range products {
-		dto.FromEntity(*entity)
-		dtoproducts = append(dtoproducts, dto)
-	}
-
-	c.JSON(http.StatusOK, dtoproducts)
+	c.JSON(http.StatusOK, products)
 }

@@ -17,9 +17,10 @@ import (
 	usecasecustomer "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/customer"
 	usecasekitchen "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/kitchen"
 	usecaseorder "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/order"
-	usecaseproduct "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product"
 	usecaseproductdelete "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/delete"
 	usecaseproductfindall "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/findall"
+	usecaseproductfindbycategory "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/findbycategory"
+	usecaseproductfindbyid "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/findbyid"
 	usecaseproductregister "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/register"
 	usecaseproductupdater "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/update"
 	"github.com/gin-gonic/gin"
@@ -80,10 +81,10 @@ func (s *GinServer) Initialization() *GinServer {
 		findAllController := controllerproduct.NewFindAllProductController(ctx, usecaseproductfindall.NewProductFindAll(productRepo))
 		p.GET("/", findAllController.GetAllProducts)
 
-		findByIDController := controllerproduct.NewFindProductByIDController(ctx, usecaseproduct.NewProductFindByID(productRepo))
+		findByIDController := controllerproduct.NewFindProductByIDController(ctx, usecaseproductfindbyid.NewProductFindByID(productRepo))
 		p.GET("/:id", findByIDController.GetProductByID)
 
-		findByCategoryController := controllerproduct.NewFindProductByCategoryController(ctx, usecaseproduct.NewProductFindByCategory(productRepo))
+		findByCategoryController := controllerproduct.NewFindProductByCategoryController(ctx, usecaseproductfindbycategory.NewProductFindByCategory(productRepo))
 		p.GET("/category/:id", findByCategoryController.GetProductByCategory)
 
 		updateController := controllerproduct.NewUpdateProductController(ctx, usecaseproductupdater.NewProductUpdate(productRepo))

@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
 	ports "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository"
 )
 
@@ -17,12 +16,21 @@ func NewProductFindByCategory(repository ports.ProductRepository) *ProductFindBy
 	}
 }
 
-func (cr *ProductFindByCategoryUseCase) FindProductByCategory(ctx context.Context, category string) ([]*entity.Product, error) {
+func (cr *ProductFindByCategoryUseCase) FindProductByCategory(ctx context.Context, category string) ([]*FindProductByCategoryOutputDTO, error) {
 
 	products, err := cr.repository.FindByCategory(ctx, category)
 	if err != nil {
 		return nil, err
 	}
 
-	return products, nil
+	var productsDTO []*FindProductByCategoryOutputDTO
+
+	for _, product := range products {
+		productDTO := &FindProductByCategoryOutputDTO{}
+		productDTO.FromEntity(*product)
+
+		productsDTO = append(productsDTO, productDTO)
+	}
+
+	return productsDTO, nil
 }

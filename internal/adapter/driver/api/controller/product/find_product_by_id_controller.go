@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product"
+	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/application/usecase/product/findbyid"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,7 +26,7 @@ func NewFindProductByIDController(ctx context.Context, usecase portsusecase.Find
 // @Accept  json
 // @Produce  json
 // @Param id path string true "Product id"
-// @Success 200 {object} usecase.ProductDTO
+// @Success 200 {object} usecase.FindProductByIDOutputDTO
 // @Failure 404 {object} string "Product not found"
 // @Router /products/{id} [get]
 func (cr *FindProductByIDController) GetProductByID(c *gin.Context) {
@@ -44,12 +44,5 @@ func (cr *FindProductByIDController) GetProductByID(c *gin.Context) {
 		return
 	}
 
-	dto := portsusecase.ProductDTO{}
-	if product == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
-		return
-	}
-
-	dto.FromEntity(*product)
-	c.JSON(http.StatusOK, dto)
+	c.JSON(http.StatusOK, product)
 }
