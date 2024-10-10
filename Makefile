@@ -52,5 +52,6 @@ coverage-html: test-coverage
 delete-identifiers:
 	find . -name "*.Identifier" -type f -delete
 
-gen-repository-mocks:
+mocks:
 	mockgen -source=internal/core/domain/repository/product_repository.go -destination=internal/core/domain/repository/mocks/mock_product_repository.go -package=mocksrepository
+	mockgen -source=internal/core/domain/repository/customer_repository.go -destination=internal/core/domain/repository/mocks/mock_customer_repository.go -package=mocksrepository

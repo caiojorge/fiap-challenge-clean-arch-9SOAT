@@ -4,9 +4,9 @@ import (
 	"log"
 
 	"github.com/caiojorge/fiap-challenge-ddd/docs"
-	infra "github.com/caiojorge/fiap-challenge-ddd/internal/adapter/driven/db"
-	"github.com/caiojorge/fiap-challenge-ddd/internal/adapter/driven/model"
-	"github.com/caiojorge/fiap-challenge-ddd/internal/adapter/driver/api/server"
+	infra "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/db"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/server"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
