@@ -10,7 +10,6 @@ import (
 	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
 	mocksrepository "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository/mocks"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/valueobject"
-	usecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/customer"
 	usecasefindbycpf "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/customer/findbycpf"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
@@ -56,7 +55,7 @@ func TestGetCustomerByCPF(t *testing.T) {
 	// Check the status code
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	var dto usecase.CustomerDTO
+	var dto usecasefindbycpf.CustomerFindByCpfOutputDTO
 	err = json.Unmarshal(w.Body.Bytes(), &dto)
 	assert.Nil(t, err)
 

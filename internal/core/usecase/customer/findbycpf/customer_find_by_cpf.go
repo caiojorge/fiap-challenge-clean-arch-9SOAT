@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
 	ports "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository"
 )
 
@@ -18,12 +17,15 @@ func NewCustomerFindByCPF(repository ports.CustomerRepository) *CustomerFindByCP
 }
 
 // RegisterCustomer registra um novo cliente.
-func (cr *CustomerFindByCPFUseCase) FindCustomerByCPF(ctx context.Context, cpf string) (*entity.Customer, error) {
+func (cr *CustomerFindByCPFUseCase) FindCustomerByCPF(ctx context.Context, cpf string) (*CustomerFindByCpfOutputDTO, error) {
 
 	customer, err := cr.repository.Find(ctx, cpf)
 	if err != nil {
 		return nil, err
 	}
 
-	return customer, nil
+	dto := &CustomerFindByCpfOutputDTO{}
+	dto.FromEntity(*customer)
+
+	return dto, nil
 }

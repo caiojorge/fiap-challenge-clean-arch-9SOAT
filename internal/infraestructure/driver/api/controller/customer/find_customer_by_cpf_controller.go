@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	usecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/customer"
 	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/customer/findbycpf"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/formatter"
 	"github.com/gin-gonic/gin"
@@ -28,7 +27,7 @@ func NewFindCustomerByCPFController(ctx context.Context, usecase portsusecase.Fi
 // @Accept  json
 // @Produce  json
 // @Param cpf path string true "Customer cpf"
-// @Success 200 {object} dto.CustomerDTO
+// @Success 200 {object} usecase.CustomerFindByCpfOutputDTO
 // @Failure 404 {object} map[string]string "Customer not found"
 // @Router /customers/{cpf} [get]
 func (cr *FindCustomerByCPFController) GetCustomerByCPF(c *gin.Context) {
@@ -46,12 +45,5 @@ func (cr *FindCustomerByCPFController) GetCustomerByCPF(c *gin.Context) {
 		return
 	}
 
-	dto := usecase.CustomerDTO{}
-	if customer == nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Customer not found"})
-		return
-	}
-
-	dto.FromEntity(*customer)
-	c.JSON(http.StatusOK, dto)
+	c.JSON(http.StatusOK, customer)
 }

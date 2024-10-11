@@ -4,9 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/valueobject"
-	dto "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/customer"
 	usecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/customer/update"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/formatter"
 	"github.com/gin-gonic/gin"
@@ -31,8 +28,8 @@ func NewUpdateCustomerController(ctx context.Context, usecase usecase.UpdateCust
 // @Accept  json
 // @Produce  json
 // @Param cpf path string true "Customer cpf"
-// @Param Customer body usecase.UpdateCustomerDTO true "Customer data"
-// @Success 200 {object} usecase.CustomerDTO
+// @Param Customer body usecase.CustomerUpdateOutputDTO true "Customer data"
+// @Success 200 {object} usecase.CustomerUpdateOutputDTO
 // @Failure 400 {object} map[string]string "Invalid data"
 // @Failure 404 {object} map[string]string "Customer not found"
 // @Router /customers/{cpf} [put]
@@ -43,7 +40,7 @@ func (r *UpdateCustomerController) PutUpdateCustomer(c *gin.Context) {
 		return
 	}
 
-	var dto dto.CustomerDTO
+	var dto usecase.CustomerUpdateInputDTO
 	if err := c.BindJSON(&dto); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"bind: error": "Invalid data"})
 		return
@@ -51,13 +48,7 @@ func (r *UpdateCustomerController) PutUpdateCustomer(c *gin.Context) {
 
 	dto.CPF = formatter.RemoveMaksFromCPF(cpf)
 
-	customer := entity.Customer{
-		CPF:   valueobject.CPF{Value: dto.CPF},
-		Name:  dto.Name,
-		Email: dto.Email,
-	}
-
-	err := r.usecase.UpdateCustomer(r.ctx, customer)
+	err := r.usecase.UpdateCustomer(r.ctx, dto)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"update: error": err.Error()})
 		return

@@ -46,7 +46,7 @@ func TestCustomerFindByCPF(t *testing.T) {
 	customer2, err := finder.FindCustomerByCPF(context.Background(), "123.456.789-09")
 	assert.Nil(t, err)
 	assert.NotNil(t, customer2)
-	assert.Equal(t, customer, customer2)
+	assert.Equal(t, customer.CPF.Value, customer2.CPF)
 
 }
 

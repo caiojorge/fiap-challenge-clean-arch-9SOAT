@@ -33,11 +33,4 @@ func TestGetConnection(t *testing.T) {
 	if connection == nil {
 		t.Error("Expected a non-nil SQLite connection, but got nil")
 	}
-
-	// Test with MySQL
-	// connection = db.GetConnection("mysql")
-	// if connection == nil {
-	// 	t.Error("Expected a non-nil MySQL connection, but got nil")
-	// }
-
 }

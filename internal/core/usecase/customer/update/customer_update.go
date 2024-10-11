@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
 	portsrepository "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository"
 )
 
@@ -19,10 +18,10 @@ func NewCustomerUpdate(repository portsrepository.CustomerRepository) *CustomerU
 }
 
 // RegisterCustomer registra um novo cliente.
-func (cr *CustomerUpdateUseCase) UpdateCustomer(ctx context.Context, customer entity.Customer) error {
+func (cr *CustomerUpdateUseCase) UpdateCustomer(ctx context.Context, customer CustomerUpdateInputDTO) error {
 
-	fmt.Println("usecase: verifica se o cliente existe: " + customer.GetCPF().Value)
-	c, err := cr.repository.Find(ctx, customer.GetCPF().Value)
+	fmt.Println("usecase: verifica se o cliente existe: " + customer.CPF)
+	c, err := cr.repository.Find(ctx, customer.CPF)
 	if err != nil {
 		fmt.Println("usecase: err: " + err.Error())
 		return err
@@ -32,9 +31,10 @@ func (cr *CustomerUpdateUseCase) UpdateCustomer(ctx context.Context, customer en
 		return fmt.Errorf("customer not found")
 	}
 
-	fmt.Println("usecase: atualizando cliente: " + customer.GetCPF().Value)
+	fmt.Println("usecase: atualizando cliente: " + customer.CPF)
+
 	// Cria o cliente
-	err = cr.repository.Update(ctx, &customer)
+	err = cr.repository.Update(ctx, customer.ToEntity())
 	if err != nil {
 		return err
 	}

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
 	ports "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository"
 	"github.com/jinzhu/copier"
 )
@@ -20,7 +19,7 @@ func NewKitchenFindAll(repository ports.KitchenRepository) *KitchenFindAllUseCas
 }
 
 // FindAllOrder busca todas as ordens
-func (cr *KitchenFindAllUseCase) FindAllKitchen(ctx context.Context) ([]*entity.Kitchen, error) {
+func (cr *KitchenFindAllUseCase) FindAllKitchen(ctx context.Context) ([]*KitchenFindAllAOutputDTO, error) {
 
 	models, err := cr.repository.FindAll(ctx)
 	if err != nil {
@@ -31,9 +30,9 @@ func (cr *KitchenFindAllUseCase) FindAllKitchen(ctx context.Context) ([]*entity.
 		return nil, errors.New("kitchens not found")
 	}
 
-	var entities []*entity.Kitchen
+	var outputs []*KitchenFindAllAOutputDTO
 
-	copier.Copy(&entities, &models)
+	copier.Copy(&outputs, &models)
 
-	return entities, nil
+	return outputs, nil
 }

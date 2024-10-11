@@ -1,4 +1,4 @@
-# Projeto para finalização do curso de DDD, das disciplinas de DDD, Docker e Arquitetura Hexagonal
+# Projeto para finalização do curso de Clean Arch e K8S
 
 ## Descrição
 

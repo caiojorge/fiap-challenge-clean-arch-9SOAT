@@ -6,7 +6,6 @@ import (
 
 	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/kitchen"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/copier"
 )
 
 type FindKitchenAllController struct {
@@ -44,9 +43,5 @@ func (r *FindKitchenAllController) GetAllOrdersInKitchen(c *gin.Context) {
 		return
 	}
 
-	var dtos []portsusecase.KitchenDTO
-
-	copier.Copy(&dtos, &entities)
-
-	c.JSON(http.StatusOK, dtos)
+	c.JSON(http.StatusOK, entities)
 }
