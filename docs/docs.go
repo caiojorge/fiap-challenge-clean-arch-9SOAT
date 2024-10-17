@@ -44,7 +44,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateCheckoutDTO"
+                            "$ref": "#/definitions/usecase.CheckoutInputDTO"
                         }
                     }
                 ],
@@ -52,7 +52,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CheckoutDTO"
+                            "$ref": "#/definitions/usecase.CheckoutOutputDTO"
                         }
                     },
                     "400": {
@@ -89,7 +89,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dto.CustomerDTO"
+                                "$ref": "#/definitions/usecase.CustomerFindAllOutputDTO"
                             }
                         }
                     },
@@ -123,7 +123,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CustomerDTO"
+                            "$ref": "#/definitions/usecase.CustomerRegisterInputDTO"
                         }
                     }
                 ],
@@ -131,7 +131,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CustomerDTO"
+                            "$ref": "#/definitions/usecase.CustomerRegisterOutputDTO"
                         }
                     },
                     "400": {
@@ -190,7 +190,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CustomerDTO"
+                            "$ref": "#/definitions/usecase.CustomerFindByCpfOutputDTO"
                         }
                     },
                     "404": {
@@ -226,11 +226,11 @@ const docTemplate = `{
                     },
                     {
                         "description": "Customer data",
-                        "name": "customer",
+                        "name": "Customer",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.UpdateCustomerDTO"
+                            "$ref": "#/definitions/usecase.CustomerUpdateInputDTO"
                         }
                     }
                 ],
@@ -238,7 +238,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.CustomerDTO"
+                            "$ref": "#/definitions/usecase.CustomerUpdateOutputDTO"
                         }
                     },
                     "400": {
@@ -281,7 +281,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dto.KitchenDTO"
+                                "$ref": "#/definitions/usecase.KitchenFindAllAOutputDTO"
                             }
                         }
                     },
@@ -319,7 +319,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dto.OrderDTO"
+                                "$ref": "#/definitions/usecase.OrderFindAllOutputDTO"
                             }
                         }
                     },
@@ -356,7 +356,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateOrderDTO"
+                            "$ref": "#/definitions/usecase.OrderCreateOutputDTO"
                         }
                     }
                 ],
@@ -364,7 +364,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.OrderDTO"
+                            "$ref": "#/definitions/usecase.OrderCreateOutputDTO"
                         }
                     },
                     "400": {
@@ -407,7 +407,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dto.OrderDTO"
+                                "$ref": "#/definitions/usecase.OrderFindByParamOutputDTO"
                             }
                         }
                     },
@@ -452,7 +452,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.OrderDTO"
+                            "$ref": "#/definitions/usecase.OrderFindByIdOutputDTO"
                         }
                     },
                     "400": {
@@ -489,7 +489,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/dto.ProductDTO"
+                                "$ref": "#/definitions/usecase.FindAllProductOutputDTO"
                             }
                         }
                     },
@@ -514,7 +514,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Create Product in DB",
+                "description": "Creates a new product in the database",
                 "consumes": [
                     "application/json"
                 ],
@@ -524,41 +524,41 @@ const docTemplate = `{
                 "tags": [
                     "Products"
                 ],
-                "summary": "Create Product",
+                "summary": "Create a new product",
                 "parameters": [
                     {
-                        "description": "cria novo produto",
+                        "description": "New Product Data",
                         "name": "request",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateProductDTO"
+                            "$ref": "#/definitions/usecase.RegisterProductInputDTO"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Successfully created",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProductDTO"
+                            "$ref": "#/definitions/usecase.RegisterProductOutputDTO"
                         }
                     },
                     "400": {
-                        "description": "invalid data",
+                        "description": "Invalid data format or missing fields",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/shared.ErrorResponse"
                         }
                     },
                     "409": {
-                        "description": "product already exists",
+                        "description": "Product already exists",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/shared.ErrorResponse"
                         }
                     },
                     "500": {
-                        "description": "internal server error",
+                        "description": "Internal server error",
                         "schema": {
-                            "type": "string"
+                            "$ref": "#/definitions/shared.ErrorResponse"
                         }
                     }
                 }
@@ -590,7 +590,10 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProductDTO"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/usecase.FindProductByCategoryOutputDTO"
+                            }
                         }
                     },
                     "404": {
@@ -634,7 +637,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProductDTO"
+                            "$ref": "#/definitions/usecase.FindProductByIDOutputDTO"
                         }
                     },
                     "404": {
@@ -671,15 +674,15 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.CreateProductDTO"
+                            "$ref": "#/definitions/usecase.UpdateProductInputDTO"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Product updated",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProductDTO"
+                            "$ref": "#/definitions/usecase.UpdateProductOutputDTO"
                         }
                     },
                     "400": {
@@ -719,9 +722,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Product deleted",
                         "schema": {
-                            "$ref": "#/definitions/dto.ProductDTO"
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -735,7 +738,18 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dto.CheckoutDTO": {
+        "shared.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecase.CheckoutInputDTO": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -764,66 +778,18 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.CreateCheckoutDTO": {
+        "usecase.CheckoutOutputDTO": {
             "type": "object",
             "properties": {
-                "customer_cpf": {
+                "gateway_transaction_id": {
                     "type": "string"
                 },
-                "gateway": {
-                    "type": "string"
-                },
-                "gateway_id": {
-                    "type": "string"
-                },
-                "order_id": {
+                "id": {
                     "type": "string"
                 }
             }
         },
-        "dto.CreateOrderDTO": {
-            "type": "object",
-            "properties": {
-                "cpf": {
-                    "type": "string"
-                },
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/dto.CreateOrderItemDTO"
-                    }
-                }
-            }
-        },
-        "dto.CreateOrderItemDTO": {
-            "type": "object",
-            "properties": {
-                "productid": {
-                    "type": "string"
-                },
-                "quantity": {
-                    "type": "integer"
-                }
-            }
-        },
-        "dto.CreateProductDTO": {
-            "type": "object",
-            "properties": {
-                "category": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "number"
-                }
-            }
-        },
-        "dto.CustomerDTO": {
+        "usecase.CustomerFindAllOutputDTO": {
             "type": "object",
             "properties": {
                 "cpf": {
@@ -837,7 +803,137 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.KitchenDTO": {
+        "usecase.CustomerFindByCpfOutputDTO": {
+            "type": "object",
+            "properties": {
+                "cpf": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecase.CustomerRegisterInputDTO": {
+            "type": "object",
+            "properties": {
+                "cpf": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecase.CustomerRegisterOutputDTO": {
+            "type": "object",
+            "properties": {
+                "cpf": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecase.CustomerUpdateInputDTO": {
+            "type": "object",
+            "properties": {
+                "cpf": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecase.CustomerUpdateOutputDTO": {
+            "type": "object",
+            "properties": {
+                "cpf": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecase.FindAllProductOutputDTO": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                }
+            }
+        },
+        "usecase.FindProductByCategoryOutputDTO": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                }
+            }
+        },
+        "usecase.FindProductByIDOutputDTO": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                }
+            }
+        },
+        "usecase.KitchenFindAllAOutputDTO": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -860,7 +956,10 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.OrderDTO": {
+        "usecase.OrderCreateOutputDTO": {
+            "type": "object"
+        },
+        "usecase.OrderFindAllOutputDTO": {
             "type": "object",
             "properties": {
                 "created_at": {
@@ -875,7 +974,7 @@ const docTemplate = `{
                 "items": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/dto.OrderItemDTO"
+                        "$ref": "#/definitions/usecase.OrderItemDTO"
                     }
                 },
                 "status": {
@@ -886,7 +985,59 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.OrderItemDTO": {
+        "usecase.OrderFindByIdOutputDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "customercpf": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/usecase.OrderItemDTO"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "number"
+                }
+            }
+        },
+        "usecase.OrderFindByParamOutputDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "customercpf": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/usecase.OrderItemDTO"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "number"
+                }
+            }
+        },
+        "usecase.OrderItemDTO": {
             "type": "object",
             "properties": {
                 "id": {
@@ -906,7 +1057,24 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.ProductDTO": {
+        "usecase.RegisterProductInputDTO": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                }
+            }
+        },
+        "usecase.RegisterProductOutputDTO": {
             "type": "object",
             "properties": {
                 "category": {
@@ -926,14 +1094,43 @@ const docTemplate = `{
                 }
             }
         },
-        "dto.UpdateCustomerDTO": {
+        "usecase.UpdateProductInputDTO": {
             "type": "object",
             "properties": {
-                "email": {
+                "category": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
                     "type": "string"
                 },
                 "name": {
                     "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                }
+            }
+        },
+        "usecase.UpdateProductOutputDTO": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
                 }
             }
         }

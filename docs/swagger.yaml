@@ -1,6 +1,13 @@
 basePath: /kitchencontrol/api/v1
 definitions:
-  dto.CheckoutDTO:
+  shared.ErrorResponse:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  usecase.CheckoutInputDTO:
     properties:
       created_at:
         type: string
@@ -19,45 +26,14 @@ definitions:
       total:
         type: number
     type: object
-  dto.CreateCheckoutDTO:
+  usecase.CheckoutOutputDTO:
     properties:
-      customer_cpf:
+      gateway_transaction_id:
         type: string
-      gateway:
-        type: string
-      gateway_id:
-        type: string
-      order_id:
+      id:
         type: string
     type: object
-  dto.CreateOrderDTO:
-    properties:
-      cpf:
-        type: string
-      items:
-        items:
-          $ref: '#/definitions/dto.CreateOrderItemDTO'
-        type: array
-    type: object
-  dto.CreateOrderItemDTO:
-    properties:
-      productid:
-        type: string
-      quantity:
-        type: integer
-    type: object
-  dto.CreateProductDTO:
-    properties:
-      category:
-        type: string
-      description:
-        type: string
-      name:
-        type: string
-      price:
-        type: number
-    type: object
-  dto.CustomerDTO:
+  usecase.CustomerFindAllOutputDTO:
     properties:
       cpf:
         type: string
@@ -66,7 +42,91 @@ definitions:
       name:
         type: string
     type: object
-  dto.KitchenDTO:
+  usecase.CustomerFindByCpfOutputDTO:
+    properties:
+      cpf:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+    type: object
+  usecase.CustomerRegisterInputDTO:
+    properties:
+      cpf:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+    type: object
+  usecase.CustomerRegisterOutputDTO:
+    properties:
+      cpf:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+    type: object
+  usecase.CustomerUpdateInputDTO:
+    properties:
+      cpf:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+    type: object
+  usecase.CustomerUpdateOutputDTO:
+    properties:
+      cpf:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+    type: object
+  usecase.FindAllProductOutputDTO:
+    properties:
+      category:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  usecase.FindProductByCategoryOutputDTO:
+    properties:
+      category:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  usecase.FindProductByIDOutputDTO:
+    properties:
+      category:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  usecase.KitchenFindAllAOutputDTO:
     properties:
       created_at:
         type: string
@@ -81,7 +141,9 @@ definitions:
       responsible:
         type: string
     type: object
-  dto.OrderDTO:
+  usecase.OrderCreateOutputDTO:
+    type: object
+  usecase.OrderFindAllOutputDTO:
     properties:
       created_at:
         type: string
@@ -91,14 +153,48 @@ definitions:
         type: string
       items:
         items:
-          $ref: '#/definitions/dto.OrderItemDTO'
+          $ref: '#/definitions/usecase.OrderItemDTO'
         type: array
       status:
         type: string
       total:
         type: number
     type: object
-  dto.OrderItemDTO:
+  usecase.OrderFindByIdOutputDTO:
+    properties:
+      created_at:
+        type: string
+      customercpf:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/usecase.OrderItemDTO'
+        type: array
+      status:
+        type: string
+      total:
+        type: number
+    type: object
+  usecase.OrderFindByParamOutputDTO:
+    properties:
+      created_at:
+        type: string
+      customercpf:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/usecase.OrderItemDTO'
+        type: array
+      status:
+        type: string
+      total:
+        type: number
+    type: object
+  usecase.OrderItemDTO:
     properties:
       id:
         type: string
@@ -111,7 +207,18 @@ definitions:
       status:
         type: string
     type: object
-  dto.ProductDTO:
+  usecase.RegisterProductInputDTO:
+    properties:
+      category:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+    type: object
+  usecase.RegisterProductOutputDTO:
     properties:
       category:
         type: string
@@ -124,12 +231,31 @@ definitions:
       price:
         type: number
     type: object
-  dto.UpdateCustomerDTO:
+  usecase.UpdateProductInputDTO:
     properties:
-      email:
+      category:
+        type: string
+      description:
+        type: string
+      id:
         type: string
       name:
         type: string
+      price:
+        type: number
+    type: object
+  usecase.UpdateProductOutputDTO:
+    properties:
+      category:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
     type: object
 host: localhost:8080
 info:
@@ -158,14 +284,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateCheckoutDTO'
+          $ref: '#/definitions/usecase.CheckoutInputDTO'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.CheckoutDTO'
+            $ref: '#/definitions/usecase.CheckoutOutputDTO'
         "400":
           description: invalid data
           schema:
@@ -189,7 +315,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/dto.CustomerDTO'
+              $ref: '#/definitions/usecase.CustomerFindAllOutputDTO'
             type: array
         "500":
           description: Internal Server Error
@@ -210,14 +336,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.CustomerDTO'
+          $ref: '#/definitions/usecase.CustomerRegisterInputDTO'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.CustomerDTO'
+            $ref: '#/definitions/usecase.CustomerRegisterOutputDTO'
         "400":
           description: invalid data
           schema:
@@ -256,7 +382,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.CustomerDTO'
+            $ref: '#/definitions/usecase.CustomerFindByCpfOutputDTO'
         "404":
           description: Customer not found
           schema:
@@ -278,17 +404,17 @@ paths:
         type: string
       - description: Customer data
         in: body
-        name: customer
+        name: Customer
         required: true
         schema:
-          $ref: '#/definitions/dto.UpdateCustomerDTO'
+          $ref: '#/definitions/usecase.CustomerUpdateInputDTO'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.CustomerDTO'
+            $ref: '#/definitions/usecase.CustomerUpdateOutputDTO'
         "400":
           description: Invalid data
           schema:
@@ -317,7 +443,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/dto.KitchenDTO'
+              $ref: '#/definitions/usecase.KitchenFindAllAOutputDTO'
             type: array
         "400":
           description: Bad Request
@@ -343,7 +469,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/dto.OrderDTO'
+              $ref: '#/definitions/usecase.OrderFindAllOutputDTO'
             type: array
         "400":
           description: Bad Request
@@ -368,14 +494,14 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateOrderDTO'
+          $ref: '#/definitions/usecase.OrderCreateOutputDTO'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.OrderDTO'
+            $ref: '#/definitions/usecase.OrderCreateOutputDTO'
         "400":
           description: invalid data
           schema:
@@ -408,7 +534,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.OrderDTO'
+            $ref: '#/definitions/usecase.OrderFindByIdOutputDTO'
         "400":
           description: Bad Request
           schema:
@@ -433,7 +559,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/dto.OrderDTO'
+              $ref: '#/definitions/usecase.OrderFindByParamOutputDTO'
             type: array
         "400":
           description: Bad Request
@@ -458,7 +584,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/dto.ProductDTO'
+              $ref: '#/definitions/usecase.FindAllProductOutputDTO'
             type: array
         "400":
           description: Invalida data
@@ -478,34 +604,34 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create Product in DB
+      description: Creates a new product in the database
       parameters:
-      - description: cria novo produto
+      - description: New Product Data
         in: body
         name: request
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateProductDTO'
+          $ref: '#/definitions/usecase.RegisterProductInputDTO'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Successfully created
           schema:
-            $ref: '#/definitions/dto.ProductDTO'
+            $ref: '#/definitions/usecase.RegisterProductOutputDTO'
         "400":
-          description: invalid data
+          description: Invalid data format or missing fields
           schema:
-            type: string
+            $ref: '#/definitions/shared.ErrorResponse'
         "409":
-          description: product already exists
+          description: Product already exists
           schema:
-            type: string
+            $ref: '#/definitions/shared.ErrorResponse'
         "500":
-          description: internal server error
+          description: Internal server error
           schema:
-            type: string
-      summary: Create Product
+            $ref: '#/definitions/shared.ErrorResponse'
+      summary: Create a new product
       tags:
       - Products
   /products/{id}:
@@ -523,9 +649,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Product deleted
           schema:
-            $ref: '#/definitions/dto.ProductDTO'
+            type: string
         "400":
           description: Invalid data
           schema:
@@ -549,7 +675,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ProductDTO'
+            $ref: '#/definitions/usecase.FindProductByIDOutputDTO'
         "404":
           description: Product not found
           schema:
@@ -572,14 +698,14 @@ paths:
         name: Product
         required: true
         schema:
-          $ref: '#/definitions/dto.CreateProductDTO'
+          $ref: '#/definitions/usecase.UpdateProductInputDTO'
       produces:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Product updated
           schema:
-            $ref: '#/definitions/dto.ProductDTO'
+            $ref: '#/definitions/usecase.UpdateProductOutputDTO'
         "400":
           description: Invalid data
           schema:
@@ -608,7 +734,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.ProductDTO'
+            items:
+              $ref: '#/definitions/usecase.FindProductByCategoryOutputDTO'
+            type: array
         "404":
           description: Product not found
           schema:

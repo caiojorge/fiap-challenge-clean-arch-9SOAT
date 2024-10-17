@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
 	ports "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository"
 )
 
@@ -17,12 +16,14 @@ func NewOrderFindByID(repository ports.OrderRepository) *OrderFindByIDUseCase {
 	}
 }
 
-func (cr *OrderFindByIDUseCase) FindOrderByID(ctx context.Context, id string) (*entity.Order, error) {
+func (cr *OrderFindByIDUseCase) FindOrderByID(ctx context.Context, id string) (*OrderFindByIdOutputDTO, error) {
 
-	product, err := cr.repository.Find(ctx, id)
+	order, err := cr.repository.Find(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	return product, nil
+	output := FromEntity(*order)
+
+	return &output, nil
 }

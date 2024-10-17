@@ -61,11 +61,17 @@ func (d *DB) setupMysql() *gorm.DB {
 
 	//dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", d.User, d.Password, d.Host, d.Port, d.DBName)
 
-	dbHost := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbUser := os.Getenv("DB_USER")
-	dbPass := os.Getenv("DB_PASS")
-	dbName := os.Getenv("DB_NAME")
+	// dbHost := os.Getenv("DB_HOST")
+	// dbPort := os.Getenv("DB_PORT")
+	// dbUser := os.Getenv("DB_USER")
+	// dbPass := os.Getenv("DB_PASS")
+	// dbName := os.Getenv("DB_NAME")
+
+	dbHost := getEnv("DB_HOST", d.Host)
+	dbPort := getEnv("DB_PORT", d.Port)
+	dbUser := getEnv("DB_USER", d.User)
+	dbPass := getEnv("DB_PASS", d.Password)
+	dbName := getEnv("DB_NAME", d.DBName)
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		dbUser, dbPass, dbHost, dbPort, dbName)
@@ -89,4 +95,12 @@ func (d *DB) setupMysql() *gorm.DB {
 	fmt.Println("Successfully connected to the database")
 
 	return db
+}
+
+// getEnv retorna o valor da variável de ambiente ou um valor default se não estiver definido
+func getEnv(key, fallback string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return fallback
 }

@@ -3,7 +3,6 @@ package usecase
 import (
 	"context"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
 	ports "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository"
 )
 
@@ -18,12 +17,14 @@ func NewOrderFindByParams(repository ports.OrderRepository) *OrderFindByParamsUs
 }
 
 // FindAllOrder busca todas as ordens
-func (cr *OrderFindByParamsUseCase) FindOrdersByParams(ctx context.Context, params map[string]interface{}) ([]*entity.Order, error) {
+func (cr *OrderFindByParamsUseCase) FindOrdersByParams(ctx context.Context, params map[string]interface{}) ([]*OrderFindByParamOutputDTO, error) {
 
 	orders, err := cr.repository.FindByParams(ctx, params)
 	if err != nil {
 		return nil, err
 	}
 
-	return orders, nil
+	outputs := FromEntity(orders)
+
+	return outputs, nil
 }

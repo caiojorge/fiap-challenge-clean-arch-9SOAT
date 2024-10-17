@@ -5,13 +5,16 @@ import (
 	"log"
 	"time"
 
-	usecasecheckout "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/checkout"
+	usecasecheckout "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/checkout/create"
 	usecasecustomerfindall "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/customer/findall"
 	usecasecustomerfindbycpf "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/customer/findbycpf"
 	usecasecustomerregister "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/customer/register"
 	usecasecustomerupdate "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/customer/update"
-	usecasekitchen "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/kitchen"
-	usecaseorder "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order"
+	usecasekitchen "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/kitchen/findall"
+	usecaseordercreate "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order/create"
+	usecaseorderfindall "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order/findall"
+	usecaseorderfindbyid "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order/findbyid"
+	usecaseorderfindbyparam "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order/findbyparam"
 	usecaseproductdelete "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/product/delete"
 	usecaseproductfindall "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/product/findall"
 	usecaseproductfindbycategory "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/product/findbycategory"
@@ -101,16 +104,16 @@ func (s *GinServer) Initialization() *GinServer {
 	o := s.router.Group("/kitchencontrol/api/v1/orders")
 	{
 
-		orderController := controllerorder.NewCreateOrderController(ctx, usecaseorder.NewOrderCreate(orderRepo, customerRepo, productRepo))
+		orderController := controllerorder.NewCreateOrderController(ctx, usecaseordercreate.NewOrderCreate(orderRepo, customerRepo, productRepo))
 		o.POST("/", orderController.PostCreateOrder)
 
-		findAllOrdersController := controllerorder.NewFindAllController(ctx, usecaseorder.NewOrderFindAll(orderRepo))
+		findAllOrdersController := controllerorder.NewFindAllController(ctx, usecaseorderfindall.NewOrderFindAll(orderRepo))
 		o.GET("/", findAllOrdersController.GetAllOrders)
 
-		findByIDController := controllerorder.NewFindOrderByIDController(ctx, usecaseorder.NewOrderFindByID(orderRepo))
+		findByIDController := controllerorder.NewFindOrderByIDController(ctx, usecaseorderfindbyid.NewOrderFindByID(orderRepo))
 		o.GET("/:id", findByIDController.GetOrderByID)
 
-		findByParamsOrdersController := controllerorder.NewFindByParamsController(ctx, usecaseorder.NewOrderFindByParams(orderRepo))
+		findByParamsOrdersController := controllerorder.NewFindByParamsController(ctx, usecaseorderfindbyparam.NewOrderFindByParams(orderRepo))
 		o.GET("/paid", findByParamsOrdersController.GetByParamsOrders)
 
 	}

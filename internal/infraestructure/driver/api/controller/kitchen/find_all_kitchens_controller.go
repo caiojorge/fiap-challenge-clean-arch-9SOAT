@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/kitchen"
+	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/kitchen/findall"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,7 +26,7 @@ func NewFindKitchenAllController(ctx context.Context, usecase portsusecase.FindA
 // @Tags Kitchens
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} dto.KitchenDTO
+// @Success 200 {array} usecase.KitchenFindAllAOutputDTO
 // @Failure 400 {object} string "Bad Request"
 // @Failure 404 {object} string "Not Found"
 // @Router /kitchens/orders [get]

@@ -28,7 +28,7 @@ func NewUpdateCustomerController(ctx context.Context, usecase usecase.UpdateCust
 // @Accept  json
 // @Produce  json
 // @Param cpf path string true "Customer cpf"
-// @Param Customer body usecase.CustomerUpdateOutputDTO true "Customer data"
+// @Param Customer body usecase.CustomerUpdateInputDTO true "Customer data"
 // @Success 200 {object} usecase.CustomerUpdateOutputDTO
 // @Failure 400 {object} map[string]string "Invalid data"
 // @Failure 404 {object} map[string]string "Customer not found"

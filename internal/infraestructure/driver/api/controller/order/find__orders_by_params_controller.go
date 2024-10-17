@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order"
+	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order/findbyparam"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,7 +26,7 @@ func NewFindByParamsController(ctx context.Context, usecase portsusecase.FindOrd
 // @Tags Orders
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} dto.OrderDTO
+// @Success 200 {array} usecase.OrderFindByParamOutputDTO
 // @Failure 400 {object} string "Bad Request"
 // @Failure 404 {object} string "Not Found"
 // @Router /orders/paid [get]
@@ -43,18 +43,5 @@ func (r *FindByParamsController) GetByParamsOrders(c *gin.Context) {
 		return
 	}
 
-	var dtos []portsusecase.OrderDTO
-	for _, order := range orders {
-		dto := portsusecase.OrderDTO{}
-		dto.FromEntity(*order)
-		dtos = append(dtos, dto)
-	}
-
-	// err = copier.Copy(&dtos, &orders)
-	// if err != nil {
-	// 	c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
-	// 	return
-	// }
-
-	c.JSON(http.StatusOK, dtos)
+	c.JSON(http.StatusOK, orders)
 }

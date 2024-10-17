@@ -3,13 +3,10 @@ package controller
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
-	usecaseorder "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order"
+	usecaseorder "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order/create"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/copier"
 )
 
 var ErrAlreadyExists = errors.New("order already exists")
@@ -33,32 +30,21 @@ func NewCreateOrderController(ctx context.Context, usecase usecaseorder.CreateOr
 // @Tags Orders
 // @Accept json
 // @Produce json
-// @Param        request   body     dto.CreateOrderDTO  true  "cria nova Order"
-// @Success 200 {object} dto.OrderDTO
+// @Param        request   body     usecase.OrderCreateOutputDTO  true  "cria nova Order"
+// @Success 200 {object} usecase.OrderCreateOutputDTO
 // @Failure 400 {object} string "invalid data"
 // @Failure 409 {object} string "Order already exists"
 // @Failure 500 {object} string "internal server error"
 // @Router /orders [post]
 func (r *CreateOrderController) PostCreateOrder(c *gin.Context) {
-	var dto usecaseorder.CreateOrderDTO
+	var input usecaseorder.OrderCreateInputDTO
 
-	if err := c.BindJSON(&dto); err != nil {
+	if err := c.BindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
 		return
 	}
 
-	var entity entity.Order
-	err := copier.Copy(&entity, &dto)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	// Nesse cenário, o ID informado será ignorado e um novo ID será gerado
-	fmt.Println("controller: Criando Order: " + entity.CustomerCPF)
-	fmt.Println("controller: Criando Order: " + dto.CustomerCPF)
-
-	err = r.usecase.CreateOrder(r.ctx, &entity)
+	output, err := r.usecase.CreateOrder(r.ctx, &input)
 	if err != nil {
 		if err == ErrAlreadyExists {
 			c.JSON(http.StatusConflict, gin.H{"error": "Order already exists"})
@@ -68,5 +54,5 @@ func (r *CreateOrderController) PostCreateOrder(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, entity)
+	c.JSON(http.StatusOK, output)
 }

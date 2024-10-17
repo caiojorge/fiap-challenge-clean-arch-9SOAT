@@ -5,11 +5,9 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/checkout"
+	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/checkout/create"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/formatter"
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/copier"
 )
 
 var ErrAlreadyExists = errors.New("order already exists")
@@ -34,13 +32,13 @@ func NewCreateCheckoutController(ctx context.Context,
 // @Tags Checkouts
 // @Accept json
 // @Produce json
-// @Param        request   body     dto.CreateCheckoutDTO  true  "cria novo Checkout"
-// @Success 200 {object} dto.CheckoutDTO
+// @Param        request   body     usecase.CheckoutInputDTO  true  "cria novo Checkout"
+// @Success 200 {object} usecase.CheckoutOutputDTO
 // @Failure 400 {object} string "invalid data"
 // @Failure 500 {object} string "internal server error"
 // @Router /checkouts [post]
 func (r *CreateCheckoutController) PostCreateCheckout(c *gin.Context) {
-	var dto portsusecase.CreateCheckoutDTO
+	var dto portsusecase.CheckoutInputDTO
 
 	if err := c.BindJSON(&dto); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
@@ -49,23 +47,16 @@ func (r *CreateCheckoutController) PostCreateCheckout(c *gin.Context) {
 
 	dto.CustomerCPF = formatter.RemoveMaksFromCPF(dto.CustomerCPF)
 
-	var entity entity.Checkout
-	err := copier.Copy(&entity, &dto)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	transactionID, err := r.usecase.CreateCheckout(r.ctx, &entity)
+	output, err := r.usecase.CreateCheckout(r.ctx, &dto)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	if transactionID == nil {
+	if output == nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create transaction on gateway"})
 		return
 	}
 
-	c.JSON(http.StatusOK, entity)
+	c.JSON(http.StatusOK, output.GatewayTransactionID)
 }

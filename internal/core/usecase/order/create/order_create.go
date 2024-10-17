@@ -7,21 +7,23 @@ import (
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
 	domainRepository "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository"
-	portsrepository "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository"
+
+	//portsrepository "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/valueobject"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/formatter"
+	"github.com/jinzhu/copier"
 )
 
 // OrderCreateUseCase é a implementação de OrderCreateUseCase.
 // Um caso de uso é uma estrutura que contém todas as regras de negócio para uma determinada funcionalidade.
 // Nesse cenário, vamos precisar acessar 3 agregados e seus repositorios.
 type OrderCreateUseCase struct {
-	orderRepository    portsrepository.OrderRepository
+	orderRepository    domainRepository.OrderRepository
 	customerRepository domainRepository.CustomerRepository
 	productRepository  domainRepository.ProductRepository
 }
 
-func NewOrderCreate(orderRepository portsrepository.OrderRepository,
+func NewOrderCreate(orderRepository domainRepository.OrderRepository,
 	customerRepository domainRepository.CustomerRepository,
 	productRepository domainRepository.ProductRepository) *OrderCreateUseCase {
 	return &OrderCreateUseCase{
@@ -32,7 +34,13 @@ func NewOrderCreate(orderRepository portsrepository.OrderRepository,
 }
 
 // CreateOrder registra um novo pedido.
-func (cr *OrderCreateUseCase) CreateOrder(ctx context.Context, order *entity.Order) error {
+func (cr *OrderCreateUseCase) CreateOrder(ctx context.Context, input *OrderCreateInputDTO) (*OrderCreateOutputDTO, error) {
+
+	var order entity.Order
+	err := copier.Copy(&order, &input)
+	if err != nil {
+		return nil, err
+	}
 
 	fmt.Println("usecase: Criando Order: " + order.CustomerCPF)
 
@@ -41,7 +49,7 @@ func (cr *OrderCreateUseCase) CreateOrder(ctx context.Context, order *entity.Ord
 		// busca o cliente pelo cpf
 		customer, err := cr.customerRepository.Find(ctx, order.CustomerCPF)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		// se o cliente for informado, temos q validar o cpf, e cadastra-lo caso não exista
@@ -53,19 +61,19 @@ func (cr *OrderCreateUseCase) CreateOrder(ctx context.Context, order *entity.Ord
 			// apenas nesse caso, se o cliente não existir, ele será persistido. (apenas o cpf)
 			cpf, err := valueobject.NewCPF(order.CustomerCPF)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			// identifica o cliente pelo cpf
 			newCustomer, err := entity.NewCustomerWithCPFOnly(cpf)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			// cria o cliente sem o nome e email
 			err = cr.customerRepository.Create(ctx, newCustomer)
 			if err != nil {
-				return err
+				return nil, err
 			}
 		}
 
@@ -79,11 +87,11 @@ func (cr *OrderCreateUseCase) CreateOrder(ctx context.Context, order *entity.Ord
 	for _, item := range order.Items {
 		product, err := cr.productRepository.Find(ctx, item.ProductID)
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if product == nil {
-			return errors.New("product not found")
+			return nil, errors.New("product not found")
 		}
 
 		// atualiza o preço do produto
@@ -95,11 +103,17 @@ func (cr *OrderCreateUseCase) CreateOrder(ctx context.Context, order *entity.Ord
 	order.ConfirmOrder()
 
 	// cria a ordem e usa o cliente (novo ou existente) e o produto existente.
-	err := cr.orderRepository.Create(ctx, order)
+	err = cr.orderRepository.Create(ctx, &order)
 	if err != nil {
 		fmt.Println("usecase: repo create: " + err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	var output OrderCreateOutputDTO
+	err = copier.Copy(&output, &order)
+	if err != nil {
+		return nil, err
+	}
+
+	return &output, nil
 }

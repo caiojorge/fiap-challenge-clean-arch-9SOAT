@@ -26,7 +26,7 @@ func NewFindAllCustomersController(ctx context.Context, usecase portsusecase.Fin
 // @Tags Customers
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} dto.CustomerDTO
+// @Success 200 {array} usecase.CustomerFindAllOutputDTO
 // @Failure 500 {object} map[string]string "Internal Server Error"
 // @Router /customers [get]
 func (cr *FindAllCustomersController) GetAllCustomers(c *gin.Context) {

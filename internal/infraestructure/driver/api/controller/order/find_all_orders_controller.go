@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order"
+	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order/findall"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,7 +26,7 @@ func NewFindAllController(ctx context.Context, usecase portsusecase.FindAllOrder
 // @Tags Orders
 // @Accept  json
 // @Produce  json
-// @Success 200 {array} dto.OrderDTO
+// @Success 200 {array} usecase.OrderFindAllOutputDTO
 // @Failure 400 {object} string "Bad Request"
 // @Failure 404 {object} string "Not Found"
 // @Router /orders [get]
@@ -43,12 +43,12 @@ func (r *FindAllController) GetAllOrders(c *gin.Context) {
 		return
 	}
 
-	var dtos []portsusecase.OrderDTO
-	for _, order := range orders {
-		dto := portsusecase.OrderDTO{}
-		dto.FromEntity(*order)
-		dtos = append(dtos, dto)
-	}
+	// var dtos []portsusecase.OrderFindAllOutputDTO
+	// for _, order := range orders {
+	// 	dto := portsusecase.OrderFindAllOutputDTO{}
+	// 	dto.FromEntity(*order)
+	// 	dtos = append(dtos, dto)
+	// }
 
 	// err = copier.Copy(&dtos, &orders)
 	// if err != nil {
@@ -56,5 +56,5 @@ func (r *FindAllController) GetAllOrders(c *gin.Context) {
 	// 	return
 	// }
 
-	c.JSON(http.StatusOK, dtos)
+	c.JSON(http.StatusOK, orders)
 }

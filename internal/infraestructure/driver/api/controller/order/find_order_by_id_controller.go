@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order"
+	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order/findbyid"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,7 +26,7 @@ func NewFindOrderByIDController(ctx context.Context, usecase portsusecase.FindOr
 // @Accept  json
 // @Produce  json
 // @Param id path string true "Order id"
-// @Success 200 {object} dto.OrderDTO
+// @Success 200 {object} usecase.OrderFindByIdOutputDTO
 // @Failure 404 {object} string "Order not found"
 // @Failure 400 {object} string "Bad Request"
 // @Router /orders/{id} [get]
@@ -49,7 +49,5 @@ func (cr *FindOrderByIDController) GetOrderByID(c *gin.Context) {
 		return
 	}
 
-	dto := portsusecase.OrderDTO{}
-	dto.FromEntity(*order)
-	c.JSON(http.StatusOK, dto)
+	c.JSON(http.StatusOK, order)
 }

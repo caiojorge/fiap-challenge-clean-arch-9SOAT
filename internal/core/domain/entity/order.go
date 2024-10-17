@@ -123,9 +123,10 @@ func (o *Order) RemoveItem(item *OrderItem) {
 }
 
 func (o *Order) CalculateTotal() {
+
 	for _, item := range o.Items {
 		if item.Status == valueobject.OrderItemStatusConfirmed {
-			o.Total += item.Price
+			o.Total += (item.Price * float64(item.Quantity))
 		}
 	}
 }

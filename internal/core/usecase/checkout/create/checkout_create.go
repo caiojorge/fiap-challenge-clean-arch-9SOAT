@@ -34,7 +34,7 @@ func NewCheckoutCreate(orderRepository repository.OrderRepository,
 }
 
 // CreateCheckout registra o checkout de um pedido.
-func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkout *entity.Checkout) (*string, error) {
+func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkout *CheckoutInputDTO) (*CheckoutOutputDTO, error) {
 
 	// Checkout - o cliente não pode fazer checkout duas vezes
 	ch, _ := cr.checkoutRepository.FindbyOrderID(ctx, checkout.ID)
@@ -56,8 +56,10 @@ func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkout *e
 		return nil, errors.New("order already paid")
 	}
 
+	checkoutEntity := checkout.ToEntity()
+
 	// Gateway
-	transactionID, err := cr.gatewayService.CreateTransaction(ctx, checkout)
+	transactionID, err := cr.gatewayService.CreateTransaction(ctx, checkoutEntity)
 	if err != nil {
 		return nil, err
 	}
@@ -76,17 +78,16 @@ func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkout *e
 	}
 
 	cupon := 0.0 // apenas um exemplo de como poderiamos aplicar um cupom de desconto no pagamento
-	err = checkout.ConfirmTransaction(*transactionID, order.Total-cupon)
+	err = checkoutEntity.ConfirmTransaction(*transactionID, order.Total-cupon)
 	if err != nil {
 		cr.gatewayService.CancelTransaction(ctx, *transactionID)
 		//rollbackOrder(ctx, order, cr)
 		return nil, err
 	}
 
-	err = cr.checkoutRepository.Create(ctx, checkout)
+	err = cr.checkoutRepository.Create(ctx, checkoutEntity)
 	if err != nil {
 		cr.gatewayService.CancelTransaction(ctx, *transactionID)
-		//rollbackOrder(ctx, order, cr)
 		return nil, err
 	}
 
@@ -101,10 +102,10 @@ func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkout *e
 		}
 	}
 
-	return transactionID, nil
-}
+	output := &CheckoutOutputDTO{
+		ID:                   checkoutEntity.ID,
+		GatewayTransactionID: *transactionID,
+	}
 
-// func rollbackOrder(ctx context.Context, order *entity.Order, cr *CheckoutCreateUseCase) {
-// 	order.Status = valueobject.OrderStatusConfirmed
-// 	cr.orderRepository.Update(ctx, order)
-// }
+	return output, nil
+}

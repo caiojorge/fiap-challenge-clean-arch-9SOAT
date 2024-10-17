@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/product/register"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/shared"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,23 +27,28 @@ func NewRegisterProductController(ctx context.Context, usecase portsusecase.Regi
 }
 
 // PostRegisterProduct godoc
-// @Summary Create Product
-// @Schemes
-// @Description Create Product in DB
+// @Summary Create a new product
+// @Schemes http
+// @Description Creates a new product in the database
 // @Tags Products
 // @Accept json
 // @Produce json
-// @Param        request   body     portsusecase.RegisterProductInputDTO  true  "cria novo produto"
-// @Success 200 {object} usecase.RegisterProductOutputDTO
-// @Failure 400 {object} string "invalid data"
-// @Failure 409 {object} string "product already exists"
-// @Failure 500 {object} string "internal server error"
+// @Param        request   body     usecase.RegisterProductInputDTO  true  "New Product Data"
+// @Success 200 {object} usecase.RegisterProductOutputDTO "Successfully created"
+// @Failure 400 {object} shared.ErrorResponse "Invalid data format or missing fields"
+// @Failure 409 {object} shared.ErrorResponse "Product already exists"
+// @Failure 500 {object} shared.ErrorResponse "Internal server error"
 // @Router /products [post]
 func (r *RegisterProductController) PostRegisterProduct(c *gin.Context) {
 	var input portsusecase.RegisterProductInputDTO
 
 	if err := c.BindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
+		errorResponse := shared.ErrorResponse{
+			Message: "Invalid data",
+			Code:    http.StatusBadRequest,
+		}
+
+		c.JSON(http.StatusBadRequest, errorResponse)
 		return
 	}
 
@@ -51,9 +57,17 @@ func (r *RegisterProductController) PostRegisterProduct(c *gin.Context) {
 	output, err := r.usecase.RegisterProduct(r.ctx, &input)
 	if err != nil {
 		if err == ErrAlreadyExists {
-			c.JSON(http.StatusConflict, gin.H{"error": "product already exists"})
+			errorResponse := shared.ErrorResponse{
+				Message: "product already exists",
+				Code:    http.StatusConflict,
+			}
+			c.JSON(http.StatusConflict, errorResponse)
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			errorResponse := shared.ErrorResponse{
+				Message: "error: " + err.Error(),
+				Code:    http.StatusInternalServerError,
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse)
 		}
 		return
 	}
