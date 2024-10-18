@@ -30,7 +30,7 @@ func NewCreateOrderController(ctx context.Context, usecase usecaseorder.CreateOr
 // @Tags Orders
 // @Accept json
 // @Produce json
-// @Param        request   body     usecase.OrderCreateOutputDTO  true  "cria nova Order"
+// @Param        request   body     usecase.OrderCreateInputDTO  true  "cria nova Order"
 // @Success 200 {object} usecase.OrderCreateOutputDTO
 // @Failure 400 {object} string "invalid data"
 // @Failure 409 {object} string "Order already exists"

@@ -356,7 +356,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/usecase.OrderCreateOutputDTO"
+                            "$ref": "#/definitions/usecase.OrderCreateInputDTO"
                         }
                     }
                 ],
@@ -956,8 +956,45 @@ const docTemplate = `{
                 }
             }
         },
+        "usecase.OrderCreateInputDTO": {
+            "type": "object",
+            "properties": {
+                "cpf": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/usecase.OrderItemCreateInputDTO"
+                    }
+                }
+            }
+        },
         "usecase.OrderCreateOutputDTO": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "customercpf": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/usecase.OrderItemDTO"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "total": {
+                    "type": "number"
+                }
+            }
         },
         "usecase.OrderFindAllOutputDTO": {
             "type": "object",
@@ -1034,6 +1071,17 @@ const docTemplate = `{
                 },
                 "total": {
                     "type": "number"
+                }
+            }
+        },
+        "usecase.OrderItemCreateInputDTO": {
+            "type": "object",
+            "properties": {
+                "productid": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "type": "integer"
                 }
             }
         },
@@ -1143,8 +1191,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8080",
 	BasePath:         "/kitchencontrol/api/v1",
 	Schemes:          []string{},
-	Title:            "Fiap Challenge DDD API",
-	Description:      "This is fiap ddd challenge project.",
+	Title:            "Fiap Fase 2 Challenge Clean Arch API - 9SOAT",
+	Description:      "This is fiap fase 2 challenge project.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

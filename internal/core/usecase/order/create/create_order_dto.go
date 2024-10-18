@@ -3,7 +3,7 @@ package usecase
 import (
 	"time"
 
-	shared "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order/shared"
+	usecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order/shared"
 )
 
 type OrderCreateInputDTO struct {
@@ -17,10 +17,10 @@ type OrderItemCreateInputDTO struct {
 }
 
 type OrderCreateOutputDTO struct {
-	ID          string                 `json:"id"`
-	Items       []*shared.OrderItemDTO `json:"items"`
-	Total       float64                `json:"total"`
-	Status      string                 `json:"status"`
-	CustomerCPF string                 `json:"customercpf"`
-	CreatedAt   time.Time              `json:"created_at"`
+	ID          string                  `json:"id"`
+	Items       []*usecase.OrderItemDTO `json:"items"`
+	Total       float64                 `json:"total"`
+	Status      string                  `json:"status"`
+	CustomerCPF string                  `json:"customercpf"`
+	CreatedAt   time.Time               `json:"created_at"`
 }

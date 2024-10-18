@@ -59,8 +59,6 @@ func (d *DB) setupSQLite() *gorm.DB {
 
 func (d *DB) setupMysql() *gorm.DB {
 
-	//dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", d.User, d.Password, d.Host, d.Port, d.DBName)
-
 	// dbHost := os.Getenv("DB_HOST")
 	// dbPort := os.Getenv("DB_PORT")
 	// dbUser := os.Getenv("DB_USER")

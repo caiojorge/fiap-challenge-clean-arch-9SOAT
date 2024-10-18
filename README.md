@@ -97,4 +97,26 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
         - Para deletar os Identifier 
         ```bash
             find . -name "*.Identifier" -type f -delete 
+            wsl --install -d Debian 
+            wsl -l -v
+        ```
+    ### Docker
+         ```bash
+ 
+            docker
+            docker version
+            docker container run hello-world
+            docker run -it ubuntu bash
+            docker container ls
+            docker container ls -la
+            docker container run node:18-slim
+            docker image ls
+            docker container run -it node:18-slim
+            docker container kill id-container
+            docker --help
+            docker container rm id-container
+            docker container rm -f id-container
+            docker container start id-container
+            docker container top id-container
+
         ```

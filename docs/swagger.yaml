@@ -141,7 +141,31 @@ definitions:
       responsible:
         type: string
     type: object
+  usecase.OrderCreateInputDTO:
+    properties:
+      cpf:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/usecase.OrderItemCreateInputDTO'
+        type: array
+    type: object
   usecase.OrderCreateOutputDTO:
+    properties:
+      created_at:
+        type: string
+      customercpf:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/usecase.OrderItemDTO'
+        type: array
+      status:
+        type: string
+      total:
+        type: number
     type: object
   usecase.OrderFindAllOutputDTO:
     properties:
@@ -193,6 +217,13 @@ definitions:
         type: string
       total:
         type: number
+    type: object
+  usecase.OrderItemCreateInputDTO:
+    properties:
+      productid:
+        type: string
+      quantity:
+        type: integer
     type: object
   usecase.OrderItemDTO:
     properties:
@@ -263,12 +294,12 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: This is fiap ddd challenge project.
+  description: This is fiap fase 2 challenge project.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   termsOfService: http://swagger.io/terms/
-  title: Fiap Challenge DDD API
+  title: Fiap Fase 2 Challenge Clean Arch API - 9SOAT
   version: "1.0"
 paths:
   /checkouts:
@@ -494,7 +525,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/usecase.OrderCreateOutputDTO'
+          $ref: '#/definitions/usecase.OrderCreateInputDTO'
       produces:
       - application/json
       responses:
