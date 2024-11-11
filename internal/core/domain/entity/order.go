@@ -7,6 +7,7 @@ import (
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/valueobject"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/formatter"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/validator"
 )
 
@@ -19,6 +20,7 @@ type Order struct {
 	CreatedAt   time.Time
 }
 
+// OrderInit cria um novo pedido. TODO usada apenas no order_test.
 func OrderInit(customerCPF string) *Order {
 
 	location, err := time.LoadLocation("America/Sao_Paulo")
@@ -36,6 +38,7 @@ func OrderInit(customerCPF string) *Order {
 	return &order
 }
 
+// NewOrder cria um novo pedido. TODO Não esta sendo usada.
 func NewOrder(cpf string, items []*OrderItem) (*Order, error) {
 	location, err := time.LoadLocation("America/Sao_Paulo")
 	if err != nil {
@@ -58,10 +61,10 @@ func NewOrder(cpf string, items []*OrderItem) (*Order, error) {
 	return &order, nil
 }
 
-// ConfirmOrder confirma o pedido. Tem muita lógica de negócio aqui.
+// Confirm confirma o pedido. Tem muita lógica de negócio aqui.
 // Toda preparação necessária, validação de cpf, cálculo do total e validação dos itens.
 // As regras aplicadas impactam apenas os dados da ordem / item.
-func (o *Order) ConfirmOrder() error {
+func (o *Order) Confirm() error {
 
 	location, err := time.LoadLocation("America/Sao_Paulo")
 	if err != nil {
@@ -73,7 +76,7 @@ func (o *Order) ConfirmOrder() error {
 	o.CreatedAt = time.Now().In(location)
 
 	for _, item := range o.Items {
-		item.ConfirmItem()
+		item.Confirm()
 	}
 
 	// Calcula o total do pedido se o item for confirmado
@@ -86,6 +89,16 @@ func (o *Order) ConfirmOrder() error {
 	}
 
 	return nil
+}
+
+func (o *Order) IsCustomerInformed() bool {
+	return o.CustomerCPF != ""
+}
+
+func (o *Order) RemoveMaksFromCPF() {
+	if o.CustomerCPF != "" {
+		o.CustomerCPF = formatter.RemoveMaskFromCPF(o.CustomerCPF)
+	}
 }
 
 func (o *Order) GetID() string {

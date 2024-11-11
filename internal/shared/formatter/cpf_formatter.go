@@ -5,7 +5,7 @@ import (
 	"regexp"
 )
 
-func RemoveMaksFromCPF(cpf string) string {
+func RemoveMaskFromCPF(cpf string) string {
 	re := regexp.MustCompile(`[^\d]`)
 	return re.ReplaceAllString(cpf, "")
 }
@@ -13,7 +13,7 @@ func RemoveMaksFromCPF(cpf string) string {
 // PutMaskOnCPF formats a CPF string
 func PutMaskOnCPF(cpf string) (string, error) {
 	// Remove any non-digit characters
-	cleanedCPF := RemoveMaksFromCPF(cpf)
+	cleanedCPF := RemoveMaskFromCPF(cpf)
 
 	// Check if the cleaned CPF has exactly 11 digits
 	if len(cleanedCPF) != 11 {

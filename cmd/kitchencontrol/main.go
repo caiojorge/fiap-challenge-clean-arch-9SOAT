@@ -39,7 +39,7 @@ func main() {
 	defer logger.Sync() // flushes buffer, if any
 
 	db := setupDB()
-	server := server.NewServer(db)
+	server := server.NewServer(db, logger)
 	server.Initialization()
 
 	logger.Info("Server Initialized")

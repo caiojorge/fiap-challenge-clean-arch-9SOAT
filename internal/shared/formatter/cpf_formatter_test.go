@@ -22,7 +22,7 @@ func TestRemoveFormatCPF(t *testing.T) {
 	cpf := "123.456.789-00"
 	expected := "12345678900"
 
-	result := RemoveMaksFromCPF(cpf)
+	result := RemoveMaskFromCPF(cpf)
 	assert.NotNil(t, result)
 
 	if result != expected {

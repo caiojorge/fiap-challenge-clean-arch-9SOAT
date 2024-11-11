@@ -39,7 +39,7 @@ func (cr *FindCustomerByCPFController) GetCustomerByCPF(c *gin.Context) {
 		return
 	}
 
-	customer, err := cr.usecase.FindCustomerByCPF(cr.ctx, formatter.RemoveMaksFromCPF(cpf))
+	customer, err := cr.usecase.FindCustomerByCPF(cr.ctx, formatter.RemoveMaskFromCPF(cpf))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

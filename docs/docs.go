@@ -752,9 +752,6 @@ const docTemplate = `{
         "usecase.CheckoutInputDTO": {
             "type": "object",
             "properties": {
-                "created_at": {
-                    "type": "string"
-                },
                 "customer_cpf": {
                     "type": "string"
                 },
@@ -764,17 +761,8 @@ const docTemplate = `{
                 "gateway_id": {
                     "type": "string"
                 },
-                "gateway_transaction_id": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
                 "order_id": {
                     "type": "string"
-                },
-                "total": {
-                    "type": "number"
                 }
             }
         },

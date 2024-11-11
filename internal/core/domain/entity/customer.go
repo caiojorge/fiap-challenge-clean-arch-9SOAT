@@ -14,6 +14,18 @@ type Customer struct {
 	Email string
 }
 
+func NewCustomerWithCPFInformed(cpf string) (*Customer, error) {
+	cpfVO, err := valueobject.NewCPF(cpf)
+	if err != nil {
+		return nil, err
+	}
+	customer := &Customer{
+		CPF: *cpfVO,
+	}
+
+	return customer, nil
+}
+
 // NewCustomerWithCPFOnly identifica um cliente pelo CPF; na verdade, cria pelo CPF
 func NewCustomerWithCPFOnly(cpf *valueobject.CPF) (*Customer, error) {
 	if cpf == nil {
@@ -35,8 +47,7 @@ func NewCustomer(cpf valueobject.CPF, name, email string) (*Customer, error) {
 	}
 
 	// Validate customer
-	err := customer.Validate()
-	if err != nil {
+	if err := customer.Validate(); err != nil {
 		return nil, err
 	}
 
@@ -49,8 +60,7 @@ func (c *Customer) RegisterCustomer(name, email string) error {
 	c.Email = email
 
 	// Validate customer
-	err := c.Validate()
-	if err != nil {
+	if err := c.Validate(); err != nil {
 		return err
 	}
 

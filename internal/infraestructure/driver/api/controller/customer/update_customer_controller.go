@@ -46,7 +46,7 @@ func (r *UpdateCustomerController) PutUpdateCustomer(c *gin.Context) {
 		return
 	}
 
-	dto.CPF = formatter.RemoveMaksFromCPF(cpf)
+	dto.CPF = formatter.RemoveMaskFromCPF(cpf)
 
 	err := r.usecase.UpdateCustomer(r.ctx, dto)
 	if err != nil {

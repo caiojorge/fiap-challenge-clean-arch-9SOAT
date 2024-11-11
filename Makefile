@@ -1,6 +1,6 @@
 # Container
 fiap-run:
-	# docker rmi fiap-challenge-ddd-app
+	#docker rmi fiap-challenge-ddd-app
 	docker-compose up -d
 
 fiap-stop:

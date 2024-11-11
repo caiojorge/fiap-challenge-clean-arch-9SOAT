@@ -32,7 +32,7 @@ func setupTestServer() *GinServer {
 		panic("failed to migrate database")
 	}
 	gin.SetMode(gin.TestMode)
-	server := NewServer(db)
+	server := NewServer(db, nil)
 	server.router.GET("/customer", mockControllerGetCustomerByCPF)
 	return server
 }

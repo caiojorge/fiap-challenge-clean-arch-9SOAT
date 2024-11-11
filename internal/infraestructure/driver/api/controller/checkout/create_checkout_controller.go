@@ -45,7 +45,7 @@ func (r *CreateCheckoutController) PostCreateCheckout(c *gin.Context) {
 		return
 	}
 
-	dto.CustomerCPF = formatter.RemoveMaksFromCPF(dto.CustomerCPF)
+	dto.CustomerCPF = formatter.RemoveMaskFromCPF(dto.CustomerCPF)
 
 	output, err := r.usecase.CreateCheckout(r.ctx, &dto)
 	if err != nil {

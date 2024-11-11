@@ -119,4 +119,17 @@ Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICE
             docker container start id-container
             docker container top id-container
 
+            docker build -t nome-imagem .
+            docker build -t nome-imagem -f Dockerfile-dev .
+            docker build .
+
+            docker login 
+            docker push userdockerhub/imagem:tagname
+
+            docker network ls
+            docker network create --driver brigde name-network
+            docker network inspect id-network
+
+            docker network connect id-network id-container
+
         ```

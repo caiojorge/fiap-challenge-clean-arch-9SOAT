@@ -31,7 +31,7 @@ func (r *CustomerRepositoryGorm) Create(ctx context.Context, entity *entity.Cust
 func (r *CustomerRepositoryGorm) Update(ctx context.Context, entity *entity.Customer) error {
 
 	model := model.Customer{
-		CPF:   formatter.RemoveMaksFromCPF(entity.GetCPF().Value),
+		CPF:   formatter.RemoveMaskFromCPF(entity.GetCPF().Value),
 		Name:  entity.GetName(),
 		Email: entity.GetEmail(),
 	}
@@ -52,7 +52,7 @@ func (r *CustomerRepositoryGorm) Update(ctx context.Context, entity *entity.Cust
 func (r *CustomerRepositoryGorm) Find(ctx context.Context, id string) (*entity.Customer, error) {
 	var customerModel model.Customer
 	// sempre removo a mascara do cpf para buscar no banco
-	result := r.DB.Model(&model.Customer{}).Where("cpf = ?", formatter.RemoveMaksFromCPF(id)).First(&customerModel)
+	result := r.DB.Model(&model.Customer{}).Where("cpf = ?", formatter.RemoveMaskFromCPF(id)).First(&customerModel)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nil, nil

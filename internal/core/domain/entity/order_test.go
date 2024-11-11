@@ -221,7 +221,7 @@ func TestConfirmedOrder(t *testing.T) {
 		CustomerCPF: cpf,
 	}
 
-	err := order.ConfirmOrder()
+	err := order.Confirm()
 	assert.Nil(t, err)
 
 }

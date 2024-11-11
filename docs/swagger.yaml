@@ -9,22 +9,14 @@ definitions:
     type: object
   usecase.CheckoutInputDTO:
     properties:
-      created_at:
-        type: string
       customer_cpf:
         type: string
       gateway:
         type: string
       gateway_id:
         type: string
-      gateway_transaction_id:
-        type: string
-      id:
-        type: string
       order_id:
         type: string
-      total:
-        type: number
     type: object
   usecase.CheckoutOutputDTO:
     properties:

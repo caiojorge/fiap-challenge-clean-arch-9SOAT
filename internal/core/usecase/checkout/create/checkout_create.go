@@ -37,7 +37,7 @@ func NewCheckoutCreate(orderRepository repository.OrderRepository,
 func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkout *CheckoutInputDTO) (*CheckoutOutputDTO, error) {
 
 	// Checkout - o cliente não pode fazer checkout duas vezes
-	ch, _ := cr.checkoutRepository.FindbyOrderID(ctx, checkout.ID)
+	ch, _ := cr.checkoutRepository.FindbyOrderID(ctx, checkout.OrderID)
 	if ch != nil {
 		return nil, errors.New("you can not checkout twice")
 	}

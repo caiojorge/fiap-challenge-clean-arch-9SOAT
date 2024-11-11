@@ -33,13 +33,13 @@ func NewOrderItem(productID string, quantity int, price float64) (*OrderItem, er
 	return &item, nil
 }
 
-func (i *OrderItem) ConfirmItem() {
+func (i *OrderItem) Confirm() {
 	i.ID = shared.NewIDGenerator()
 	i.Status = valueobject.OrderItemStatusConfirmed
 
 }
 
-func (i *OrderItem) UpdatePrice(price float64) {
+func (i *OrderItem) ConfirmPrice(price float64) {
 	i.Price = price
 }
 

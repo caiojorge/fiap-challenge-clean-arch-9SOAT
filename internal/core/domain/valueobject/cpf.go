@@ -49,5 +49,5 @@ func (c *CPF) Format() (string, error) {
 func (c *CPF) RemoveFormat() string {
 	cpf := c.Value
 
-	return formatter.RemoveMaksFromCPF(cpf)
+	return formatter.RemoveMaskFromCPF(cpf)
 }

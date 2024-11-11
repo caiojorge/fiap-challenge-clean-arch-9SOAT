@@ -30,17 +30,22 @@ import (
 	controllerorder "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/order"
 	controllerproduct "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/product"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
 type GinServer struct {
 	router *gin.Engine
 	db     *gorm.DB
+	logger *zap.Logger
 }
 
-func NewServer(db *gorm.DB) *GinServer {
+func NewServer(db *gorm.DB, logger *zap.Logger) *GinServer {
 	r := gin.Default()
-	return &GinServer{router: r, db: db}
+	return &GinServer{
+		router: r, db: db,
+		logger: logger,
+	}
 }
 
 func (s *GinServer) GetDB() *gorm.DB {

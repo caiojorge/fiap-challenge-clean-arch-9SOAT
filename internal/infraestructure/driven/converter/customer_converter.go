@@ -11,7 +11,7 @@ import (
 
 func FromEntity(entity *entity.Customer) *model.Customer {
 
-	cpfWithoutNonDigits := formatter.RemoveMaksFromCPF(entity.GetCPF().Value)
+	cpfWithoutNonDigits := formatter.RemoveMaskFromCPF(entity.GetCPF().Value)
 
 	return &model.Customer{
 		CPF:   cpfWithoutNonDigits,

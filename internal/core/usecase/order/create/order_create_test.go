@@ -65,7 +65,7 @@ func TestCreateOrder(t *testing.T) {
 	}
 
 	mockCustomer.EXPECT().
-		Find(gomock.Any(), "123.456.789-09").
+		Find(gomock.Any(), "12345678909").
 		Return(testCustomer, nil).Times(1)
 
 	// Expectativa: Chamar FindProduct para buscar os produtos da ordem
