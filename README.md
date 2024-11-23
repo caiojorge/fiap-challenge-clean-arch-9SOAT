@@ -65,13 +65,19 @@ A Kitchen Control API é uma aplicação para gerenciar clientes, produtos, pedi
 
 8. Swagger:
     ```bash
-    http://localhost:8080/kitchencontrol/api/v1/docs/index.html
+    http://localhost:30080/kitchencontrol/api/v1/docs/index.html
     ```
 ### Client para DB - Adminer
 9. Adminer
     ```bash
-    http://localhost:8282/
+    http://localhost:30000/
     ```
+
+    - usuario: root
+    - senha: root
+    - servidor: mysql
+    - db: dbcontrol
+
 ### Gerador de CPF para os testes
 10. CPFs
     ```bash
