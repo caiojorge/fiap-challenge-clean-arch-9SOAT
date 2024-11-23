@@ -1,5 +1,5 @@
-# FASE 2
-# DESENVOLVIMENTO
+# fase 2
+# teste do projeto
 test-coverage:
 	go test -coverprofile=coverage.out ./...
 coverage: test-coverage
@@ -9,9 +9,14 @@ coverage-html: test-coverage
 test:
 	go test -v -cover ./...
 
+# cria o swagger
 docs:
 	#rm -rf docs
 	swag init -g ./cmd/kitchencontrol/main.go -o ./docs
+
+# limpa os arquivos de identificação
+delete-identifiers:
+	find . -name "*.Identifier" -type f -delete
 
 # cria os mocks para testes
 mocks:
@@ -19,9 +24,8 @@ mocks:
 	mockgen -source=internal/core/domain/repository/customer_repository.go -destination=internal/core/domain/repository/mocks/mock_customer_repository.go -package=mocksrepository
 	mockgen -source=internal/core/domain/repository/order_repository.go -destination=internal/core/domain/repository/mocks/mock_order_repository.go -package=mocksrepository
 
-# CONFIGURAÇÃO do K8S e seus recursos
 # cria as imagens que usaremos no kind
-create-image:
+create-images:
 	docker build -t caiojorge/fiap-rocks .
 
 # faz o login no docker hub para subir as imagens
@@ -29,7 +33,7 @@ login:
 	docker login
 
 # sobe as imagens no docker hub
-push-image:
+push-images:
 	docker push caiojorge/fiap-rocks
 
 # Usei o kind para testar o projeto no k8s, sendo assim, é necessário criar o cluster
@@ -41,29 +45,3 @@ setup-cluster:
 setup-configmap:
 	kubectl create configmap db-init-scripts --from-file=./db-init
 	kubectl get configmaps
-
-setup-k8s:
-	kubectl apply -f k8s/mysql-secret.yaml
-	kubectl apply -f k8s/mysql-pvc.yaml
-	kubectl apply -f k8s/mysql-deployment.yaml
-	kubectl apply -f k8s/mysql-service.yaml
-	kubectl apply -f k8s/adminer-deployment.yaml
-	kubectl apply -f k8s/adminer-service.yaml
-	kubectl apply -f k8s/server-deployment.yaml
-	kubectl apply -f k8s/server-service.yaml
-
-	kubectl get pods
-	kubectl get svc
-
-setup-all: setup-cluster setup-configmap setup-k8s
-	@echo "Setup concluído!"
-
-log-k8s:
-	kubectl logs -f $(shell kubectl get pods -l app=fiap-rocks-server -o jsonpath='{.items[0].metadata.name}')
-
-get-k8s:
-	kubectl get pods
-	kubectl get svc
-
-shutdown:
-	kind delete cluster

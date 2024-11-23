@@ -26,7 +26,7 @@ import (
 // @license.name Apache 2.0
 // @license.url http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host localhost:8080
+// @host localhost:30080
 // @BasePath /kitchencontrol/api/v1
 
 func main() {
@@ -62,7 +62,7 @@ func main() {
 
 	logger.Info("Swagger ok")
 
-	server.Run(":8080")
+	server.Run(":8083")
 
 }
 

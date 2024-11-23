@@ -29,6 +29,7 @@ import (
 	controllerkitchen "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/kitchen"
 	controllerorder "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/order"
 	controllerproduct "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/product"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -42,9 +43,31 @@ type GinServer struct {
 
 func NewServer(db *gorm.DB, logger *zap.Logger) *GinServer {
 	r := gin.Default()
+
+	// Configurar CORS
+	r.Use(corsMiddleware())
+
 	return &GinServer{
 		router: r, db: db,
 		logger: logger,
+	}
+}
+
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, Authorization")
+		c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Length")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+
+		// Responder diretamente às requisições OPTIONS (pré-voo)
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
 	}
 }
 
