@@ -58,7 +58,7 @@ A Kitchen Control API é uma aplicação para gerenciar clientes, produtos, pedi
     ```bash
     make shutdown
     ```
-
+    - esse comando irá deletar o cluster e os dados no DB serão perdidos 
 ## Como usar o Kitchen Control
 
 ### Endpoints (acesso via swagger)
