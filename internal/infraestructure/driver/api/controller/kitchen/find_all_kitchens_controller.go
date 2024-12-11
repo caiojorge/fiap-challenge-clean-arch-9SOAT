@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/kitchen/findall"
+	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/kitchen/findall"
 	"github.com/gin-gonic/gin"
 )
 

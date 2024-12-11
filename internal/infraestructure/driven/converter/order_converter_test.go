@@ -3,7 +3,7 @@ package converter
 import (
 	"testing"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model"
 	"github.com/stretchr/testify/assert"
 )

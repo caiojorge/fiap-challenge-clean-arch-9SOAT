@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/product/findbycategory"
+	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/product/findbycategory"
 	"github.com/gin-gonic/gin"
 )
 

@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared"
 )
 

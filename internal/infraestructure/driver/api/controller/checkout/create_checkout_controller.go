@@ -5,8 +5,8 @@ import (
 	"errors"
 	"net/http"
 
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/checkout/create"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/formatter"
+	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/checkout/create"
 	"github.com/gin-gonic/gin"
 )
 

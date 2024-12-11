@@ -3,8 +3,8 @@ package converter_test
 import (
 	"testing"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/valueobject"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/converter"
 	"github.com/stretchr/testify/assert"
 )

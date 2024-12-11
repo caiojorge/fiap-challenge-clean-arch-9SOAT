@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	usecaseorder "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/order/create"
+	usecaseorder "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/order/create"
 	"github.com/gin-gonic/gin"
 )
 

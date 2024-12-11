@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	updateusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/product/update"
+	updateusecase "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/product/update"
 	"github.com/gin-gonic/gin"
 )
 

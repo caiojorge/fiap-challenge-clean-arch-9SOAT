@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	usecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/customer/update"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/formatter"
+	usecase "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/customer/update"
 	"github.com/gin-gonic/gin"
 )
 

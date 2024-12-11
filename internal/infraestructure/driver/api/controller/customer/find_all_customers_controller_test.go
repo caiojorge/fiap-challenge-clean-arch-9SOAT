@@ -9,10 +9,10 @@ import (
 
 	//"github.com/caiojorge/fiap-challenge-ddd/internal/adapter/driver/api/dto"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
-	mocksrepository "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository/mocks"
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/valueobject"
-	usecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/customer/findall"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
+	mocksrepository "github.com/caiojorge/fiap-challenge-ddd/internal/domain/repository/mocks"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
+	usecase "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/customer/findall"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"

@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/customer/findbycpf"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/formatter"
+	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/customer/findbycpf"
 	"github.com/gin-gonic/gin"
 )
 

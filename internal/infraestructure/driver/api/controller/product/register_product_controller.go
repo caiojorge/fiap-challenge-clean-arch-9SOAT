@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/product/register"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/shared"
+	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/product/register"
 	"github.com/gin-gonic/gin"
 )
 

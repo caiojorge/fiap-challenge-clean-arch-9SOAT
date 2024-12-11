@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	portsusecaseregister "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/customer/register"
+	portsusecaseregister "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/customer/register"
 	"github.com/gin-gonic/gin"
 )
 

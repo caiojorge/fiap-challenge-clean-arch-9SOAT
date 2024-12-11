@@ -9,15 +9,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	usecasefindall "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/product/findall"
-	usecasefindbyid "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/product/findbyid"
-	usecaseregister "github.com/caiojorge/fiap-challenge-ddd/internal/core/usecase/product/register"
+	usecasefindall "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/product/findall"
+	usecasefindbyid "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/product/findbyid"
+	usecaseregister "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/product/register"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
-	mocksrepository "github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/repository/mocks"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
+	mocksrepository "github.com/caiojorge/fiap-challenge-ddd/internal/domain/repository/mocks"
 )
 
 func TestRegisterProductController(t *testing.T) {

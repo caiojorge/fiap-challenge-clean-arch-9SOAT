@@ -1,7 +1,7 @@
 package converter
 
 import (
-	"github.com/caiojorge/fiap-challenge-ddd/internal/core/domain/entity"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model"
 )
 

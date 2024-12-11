@@ -89,3 +89,6 @@ A Kitchen Control API é uma aplicação para gerenciar clientes, produtos, pedi
 ## Licença
 Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
+
+
+

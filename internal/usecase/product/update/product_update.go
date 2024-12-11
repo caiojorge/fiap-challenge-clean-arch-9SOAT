@@ -1,0 +1,41 @@
+package usecase
+
+import (
+	"context"
+	"errors"
+
+	portsrepository "github.com/caiojorge/fiap-challenge-ddd/internal/domain/repository"
+)
+
+type ProductUpdateUseCase struct {
+	repository portsrepository.ProductRepository
+}
+
+func NewProductUpdate(repository portsrepository.ProductRepository) *ProductUpdateUseCase {
+	return &ProductUpdateUseCase{
+		repository: repository,
+	}
+}
+
+// UpdateProduct atualiza um novo produto.
+func (cr *ProductUpdateUseCase) UpdateProduct(ctx context.Context, product UpdateProductInputDTO) (*UpdateProductOutputDTO, error) {
+
+	prd, err := cr.repository.Find(ctx, product.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if prd == nil {
+		return nil, errors.New("product not found")
+	}
+
+	err = cr.repository.Update(ctx, product.ToEntity())
+	if err != nil {
+		return nil, err
+	}
+
+	output := &UpdateProductOutputDTO{}
+	output.FromEntity(*product.ToEntity())
+
+	return output, nil
+}
