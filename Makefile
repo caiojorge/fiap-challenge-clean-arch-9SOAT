@@ -15,9 +15,11 @@ docs:
 
 # cria os mocks para testes
 mocks:
-	mockgen -source=internal/core/domain/repository/product_repository.go -destination=internal/core/domain/repository/mocks/mock_product_repository.go -package=mocksrepository
-	mockgen -source=internal/core/domain/repository/customer_repository.go -destination=internal/core/domain/repository/mocks/mock_customer_repository.go -package=mocksrepository
-	mockgen -source=internal/core/domain/repository/order_repository.go -destination=internal/core/domain/repository/mocks/mock_order_repository.go -package=mocksrepository
+	mockgen -source=internal/domain/repository/product_repository.go -destination=internal/domain/repository/mocks/mock_product_repository.go -package=mocksrepository
+	mockgen -source=internal/domain/repository/customer_repository.go -destination=internal/domain/repository/mocks/mock_customer_repository.go -package=mocksrepository
+	mockgen -source=internal/domain/repository/order_repository.go -destination=internal/domain/repository/mocks/mock_order_repository.go -package=mocksrepository
+	mockgen -source=internal/domain/repository/checkout_repository.go -destination=internal/domain/repository/mocks/mock_checkout_repository.go -package=mocksrepository
+	mockgen -source=internal/domain/repository/kitchen_repository.go -destination=internal/domain/repository/mocks/mock_kitchen_repository.go -package=mocksrepository
 
 # CONFIGURAÇÃO do K8S e seus recursos
 # cria as imagens que usaremos no kind

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/formatter"
 	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/checkout/create"
 	"github.com/gin-gonic/gin"
 )
@@ -44,8 +43,6 @@ func (r *CreateCheckoutController) PostCreateCheckout(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
 		return
 	}
-
-	dto.CustomerCPF = formatter.RemoveMaskFromCPF(dto.CustomerCPF)
 
 	output, err := r.usecase.CreateCheckout(r.ctx, &dto)
 	if err != nil {

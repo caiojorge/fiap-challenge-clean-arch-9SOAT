@@ -60,6 +60,27 @@ func NewOrder(cpf string, items []*OrderItem) (*Order, error) {
 
 	return &order, nil
 }
+func (o *Order) ApplyDiscountCoupon() *OrderItem {
+
+	for _, item := range o.Items {
+		if item.ID == o.ID {
+			return item
+		}
+	}
+
+	return nil
+}
+
+func (o *Order) GetOrderItem() *OrderItem {
+
+	for _, item := range o.Items {
+		if item.ID == o.ID {
+			return item
+		}
+	}
+
+	return nil
+}
 
 // Confirm confirma o pedido. Tem muita lógica de negócio aqui.
 // Toda preparação necessária, validação de cpf, cálculo do total e validação dos itens.

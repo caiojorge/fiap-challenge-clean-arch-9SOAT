@@ -2,52 +2,31 @@ package usecase
 
 import (
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
 )
 
-// type CreateCheckoutDTO struct {
-// 	OrderID     string `json:"order_id"`
-// 	Gateway     string `json:"gateway"`
-// 	GatewayID   string `json:"gateway_id"`
-// 	CustomerCPF string `json:"customer_cpf"`
-// }
-
-// type CheckoutDTO struct {
-// 	ID                   string    `json:"id"`
-// 	OrderID              string    `json:"order_id"`
-// 	Gateway              string    `json:"gateway"`
-// 	GatewayID            string    `json:"gateway_id"`
-// 	GatewayTransactionID string    `json:"gateway_transaction_id"`
-// 	CustomerCPF          string    `json:"customer_cpf"`
-// 	Total                float64   `json:"total"`
-// 	CreatedAt            time.Time `json:"created_at"`
-// }
-
 type CheckoutInputDTO struct {
-	OrderID     string `json:"order_id"`
-	Gateway     string `json:"gateway"`
-	GatewayID   string `json:"gateway_id"`
-	CustomerCPF string `json:"customer_cpf"`
+	OrderID      string `json:"order_id"`      // o ID do pedido que será pago
+	GatewayName  string `json:"gateway_name"`  // nome do gateway (nesse caso, mercado livre fake)
+	GatewayToken string `json:"gateway_token"` // id ou token para uso no gateway
 }
 
 func (dto *CheckoutInputDTO) ToEntity() *entity.Checkout {
 	return &entity.Checkout{
 		//ID:                   dto.ID,
-		OrderID:   dto.OrderID,
-		Gateway:   dto.Gateway,
-		GatewayID: dto.GatewayID,
-		//GatewayTransactionID: dto.GatewayTransactionID,
-		CustomerCPF: dto.CustomerCPF,
-		//Total:                dto.Total,
-		//CreatedAt:            dto.CreatedAt,
+		OrderID: dto.OrderID,
+		Gateway: valueobject.NewGateway(dto.GatewayName, dto.GatewayToken),
 	}
 }
 
 type CheckoutOutputDTO struct {
-	ID                   string `json:"id"`
-	GatewayTransactionID string `json:"gateway_transaction_id"`
+	ID                   string `json:"id"`                     // ID do checkout
+	GatewayTransactionID string `json:"gateway_transaction_id"` // ID de transação gerado pelo gateway
+	OrderID              string `json:"order_id"`               // ID do pedido
 }
 
-func (dto *CheckoutOutputDTO) FromEntity(product entity.Checkout) {
-	dto.ID = product.ID
-	dto.GatewayTransactionID = product.GatewayTransactionID
+func (dto *CheckoutOutputDTO) FromEntity(entity entity.Checkout) {
+	dto.ID = entity.ID
+	dto.GatewayTransactionID = entity.Gateway.GatewayTransactionID
+	dto.OrderID = entity.OrderID
 }
