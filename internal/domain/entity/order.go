@@ -71,10 +71,10 @@ func (o *Order) ApplyDiscountCoupon() *OrderItem {
 	return nil
 }
 
-func (o *Order) GetOrderItem() *OrderItem {
+func (o *Order) GetOrderItemByProductID(productID string) *OrderItem {
 
 	for _, item := range o.Items {
-		if item.ID == o.ID {
+		if item.ProductID == productID {
 			return item
 		}
 	}

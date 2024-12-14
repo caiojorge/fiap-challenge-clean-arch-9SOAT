@@ -27,47 +27,6 @@ func TestCreateCheckout(t *testing.T) {
 	mockKitchenRepository := mocks.NewMockKitchenRepository(ctrl)
 	assert.NotNil(t, mockKitchenRepository)
 
-	// Criar product
-	product := &entity.Product{
-		ID:          "1",
-		Name:        "Product 1",
-		Description: "Product 1 description",
-		Price:       10.0,
-		Category:    "Category 1",
-	}
-
-	// Criar customer
-	customer := &entity.Customer{
-		CPF: valueobject.CPF{
-			Value: "123.456.789-09",
-		},
-		Name:  "John Doe",
-		Email: "john@email.com",
-	}
-
-	// Criar order
-	order := &entity.Order{
-		ID:          "1",
-		CustomerCPF: customer.GetCPF().Value,
-		Status:      "confirmed",
-		Items: []*entity.OrderItem{
-			{
-				ProductID: product.ID,
-				Quantity:  1,
-				Price:     product.Price,
-				Status:    "confirmed",
-			},
-		},
-	}
-
-	order.CalculateTotal()
-	assert.Equal(t, 10.0, order.Total)
-
-	// Criar checkout
-	checkout, err := entity.NewCheckout(order.ID, "mercado livre", "123456789", order.Total)
-	assert.Nil(t, err)
-	assert.NotNil(t, checkout)
-
 	useCase := NewCheckoutCreate(
 		mockOrderRepository,
 		mockCheckoutRepository,
@@ -80,7 +39,64 @@ func TestCreateCheckout(t *testing.T) {
 	ctx := context.Background()
 	assert.NotNil(t, ctx)
 
-	checkoutInput := &
+	// Define input DTO
+	checkoutInput := &CheckoutInputDTO{
+		OrderID: "order123",
+	}
+
+	// Define entities for the mocks to return
+	order := &entity.Order{
+		ID:     "order123",
+		Status: valueobject.OrderItemStatusConfirmed,
+		Items: []*entity.OrderItem{
+			{ProductID: "prod123", Quantity: 1, Status: valueobject.OrderItemStatusConfirmed, Price: 100.0},
+		},
+	}
+
+	order.CalculateTotal()
+
+	product := &entity.Product{
+		ID:    "prod123",
+		Name:  "Test Product",
+		Price: 100.0,
+	}
+
+	payment := &entity.Payment{
+		ID: "payment123",
+	}
+
+	// Set up mock expectations for a successful checkout
+	mockCheckoutRepository.EXPECT().
+		FindbyOrderID(ctx, "order123").
+		Return(nil, nil) // No duplicate checkout found
+
+	mockOrderRepository.EXPECT().
+		Find(ctx, "order123").
+		Return(order, nil) // Order found and not paid
+
+	mockProductRepository.EXPECT().
+		Find(ctx, "prod123").
+		Return(product, nil) // Product found
+
+	// mockGatewayService.EXPECT().
+	// 	CreateTransaction(ctx, gomock.Any(), order, gomock.Any(), "http://localhost:8080/checkout", 1).
+	// 	Return(payment, nil) // Payment successful
+
+	mockCheckoutRepository.EXPECT().
+		Create(ctx, gomock.Any()).
+		Return(nil) // Checkout creation successful
+
+	mockKitchenRepository.EXPECT().
+		Create(ctx, gomock.Any()).
+		Return(nil) // Kitchen entry creation successful
+
+	// Execute the test
+	result, err := useCase.CreateCheckout(ctx, checkoutInput)
+
+	// Assertions
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, payment.ID, result.GatewayTransactionID)
 
 }
 

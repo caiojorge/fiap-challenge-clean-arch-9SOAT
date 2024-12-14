@@ -35,10 +35,10 @@ type Payment struct {
 func NewPayment(checkout Checkout, order Order, productList []*Product, notificationURL string, sponsorID int) (*Payment, error) {
 
 	var items []Item
-	orderItem := order.GetOrderItem()
 	UnitMeasure := "un"
 
 	for _, product := range productList {
+		orderItem := order.GetOrderItemByProductID(product.ID)
 		items = append(items, Item{
 			SKU:         product.ID,
 			Category:    product.Category,
