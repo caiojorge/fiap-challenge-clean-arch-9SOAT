@@ -22,9 +22,11 @@ A Kitchen Control API é uma aplicação para gerenciar clientes, produtos, pedi
 - Docker
 - Git
 - make
-- Kind (ou minikube / docker desktop)
+- Kind v0.25.0 (ou minikube / docker desktop)
 
 ### Como instalar o Kitchen Control
+
+- obs: A imagem do projeto esta no dockerhub; não é necessário gerar nova imagem.
 
 1. Com o projeto baixado / clonado, instale as dependências:
     ```bash
@@ -34,7 +36,7 @@ A Kitchen Control API é uma aplicação para gerenciar clientes, produtos, pedi
     ```bash
     make test (ou go test -v -cover ./...)
     ```
-3. Se estiver usando kind como eu, crie o custer
+3. Se estiver usando kind (v0.25.0) como eu, crie o custer
 
     ```bash
     make setup-cluster
@@ -83,8 +85,42 @@ A Kitchen Control API é uma aplicação para gerenciar clientes, produtos, pedi
     ```bash
     https://www.geradordecpf.org/
 
+## Requisitos da Fase 2
+
+### #1 Atualizar a aplicação desenvolvida na FASE 1 refatorando o código para seguir os padrões Clean Code e Clean Architecture
+
+#### Todo código foi migrado para novos padrões de pastas que atendem melhor a ideia da clean arch (vejo que a arquitetura do projeto grita / deixa claro o que esta acontecendo)
+
+```plaintext
+internal/
+├── domain/
+│   └── (Entidades, objetos de valor, interafaces para repositório e gateway)
+│
+├── infraestructure/
+│   └── (Implementações específicas de tecnologias, como repositórios, gateways e controllers)
+│
+├── shared/
+│   └── (Pacotes compartilhados, helpers e utilitários usados em várias partes do projeto)
+│
+└── usecase/
+    └── (Casos de uso que orquestram a lógica de negócios e seus objetos de dados (dto's) de input e output)
+
+```
+##### Domain
+- DDD: Escolhi manter o DDD no centro do projeto. A clean arch não proíbe o uso da DDD, e define apenas a camada de entidade e que ali temos as regras de negócios do sistema. Entendi que a ideia é evoluir o projeto que construimos na FASE 1, sendo assim, decidi manter a camada de dominio.
+
+- Gateway e Repositórios: Mesma coisa no contexto desse sistema. Decidi usar Gateway para o acesso à API de pagamentos de manter Repository para os acessos ao DB. Estou mantendo o conceito do DDD, então me agrada usar os repositórios com os agregadores. Nessa camada estou mantendo apenas as interfaces.
+
+- Entities, agregates e value objects: Escolhi os agregadores depois de testar e repensar o funcionamento do sistema. As entidades / regras criadas representam as regras do sistema, bem como seu vocabulário comum (linguagem ubíqua) 
+
+##### Usecases
+- Usecases: É a camada de regras da aplicação; é o orquestrador e suporta a necessidade especifica do usuário, por isso, o nome é caso de uso. Escolhi usar um arquivo por caso de uso (acho mais fácil manter o caso de uso com apenas 1 responsabilidade) e também escolhi manter inputs e outputs espeficios por caso de uso. Não reuso os DTO's de entrada e saída. Eles são focados na regra de aplicação que irão suportar.
+
+##### infraestructure
+- 
 ## Acesso ao projeto no github
 - Será enviado aos professores via plataforma da fiap
+- https://github.com/caiojorge/fiap-challenge-clean-arch-9SOAT
 
 ## Licença
 Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.

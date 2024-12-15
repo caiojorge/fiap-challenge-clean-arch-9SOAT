@@ -1,18 +1,23 @@
-package usecase
+package controller
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
 	mocks "github.com/caiojorge/fiap-challenge-ddd/internal/domain/repository/mocks"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
+	usecase "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/checkout/create"
+	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateCheckout(t *testing.T) {
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -22,12 +27,12 @@ func TestCreateCheckout(t *testing.T) {
 	assert.NotNil(t, mockOrderRepository)
 	mockProductRepository := mocks.NewMockProductRepository(ctrl)
 	assert.NotNil(t, mockProductRepository)
-	mockGatewayService := NewMLFakePaymentService()
+	mockGatewayService := usecase.NewMLFakePaymentService()
 	assert.NotNil(t, mockGatewayService)
 	mockKitchenRepository := mocks.NewMockKitchenRepository(ctrl)
 	assert.NotNil(t, mockKitchenRepository)
 
-	useCase := NewCheckoutCreate(
+	useCase := usecase.NewCheckoutCreate(
 		mockOrderRepository,
 		mockCheckoutRepository,
 		mockGatewayService,
@@ -40,7 +45,7 @@ func TestCreateCheckout(t *testing.T) {
 	assert.NotNil(t, ctx)
 
 	// Define input DTO
-	checkoutInput := &CheckoutInputDTO{
+	checkoutInput := &usecase.CheckoutInputDTO{
 		OrderID:         "order123",
 		GatewayName:     "mercadopago", //TODO: colocar uma validaçao para o nome do gateway
 		GatewayToken:    "01234567890",
@@ -73,11 +78,11 @@ func TestCreateCheckout(t *testing.T) {
 	// Set up mock expectations for a successful checkout
 	mockCheckoutRepository.EXPECT().
 		FindbyOrderID(ctx, "order123").
-		Return(nil, nil) // No duplicate checkout found
+		Return(nil, nil)
 
 	mockOrderRepository.EXPECT().
 		Find(ctx, "order123").
-		Return(order, nil) // Order found and not paid
+		Return(order, nil)
 
 	// Add expectation for the Update method
 	mockOrderRepository.EXPECT().
@@ -90,20 +95,46 @@ func TestCreateCheckout(t *testing.T) {
 
 	mockCheckoutRepository.EXPECT().
 		Create(ctx, gomock.Any()).
-		Return(nil) // Checkout creation successful
+		Return(nil)
 
 	mockKitchenRepository.EXPECT().
 		Create(ctx, gomock.Any()).
 		Return(nil) // Kitchen entry creation successful
 
 	// Execute the test
-	result, err := useCase.CreateCheckout(ctx, checkoutInput)
+	// result, err := useCase.CreateCheckout(ctx, checkoutInput)
+	// assert.NotNil(t, result)
+	// assert.NoError(t, err)
 
-	// Assertions
+	controller := NewCreateCheckoutController(context.Background(), useCase)
+
+	// Set up the Gin router
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+
+	// Register the handler
+	r.POST("/checkout", controller.PostCreateCheckout)
+
+	jsonData, err := json.MarshalIndent(checkoutInput, "", "  ")
 	assert.NoError(t, err)
-	assert.NotNil(t, result)
-	assert.NotNil(t, result.ID)
-	assert.NotNil(t, result.GatewayTransactionID)
-	assert.NotNil(t, result.OrderID)
+
+	// Create a JSON body
+	requestBody := bytes.NewBuffer(jsonData)
+
+	// Create the HTTP request with JSON body
+	req, err := http.NewRequest("POST", "/checkout", requestBody)
+	if err != nil {
+		t.Fatalf("Couldn't create request: %v\n", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	// Create a response recorder
+	w := httptest.NewRecorder()
+
+	// Perform the request
+	r.ServeHTTP(w, req)
+
+	// Check the response
+	assert.Equal(t, http.StatusOK, w.Code, "Expected response code to be 200")
 
 }

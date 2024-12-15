@@ -169,7 +169,11 @@ func (o *Order) IsPaid() bool {
 	return o.Status == valueobject.OrderStatusPaid
 }
 
-func (o *Order) Pay() {
+func (o *Order) ConfirmPayment() {
+	o.Status = valueobject.OrderStatusPaid
+}
+
+func (o *Order) NotConfirmPayment() {
 	o.Status = valueobject.OrderStatusPaid
 }
 

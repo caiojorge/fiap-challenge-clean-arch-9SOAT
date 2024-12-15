@@ -37,15 +37,15 @@ func NewCheckoutCreate(orderRepository repository.OrderRepository,
 // Requisito: Checkout Pedido que deverá receber os produtos solicitados e retornar à identificação do pedido.
 // o checkout recebe alguns parametros, sendo um deles, o id da ordem. Esse id, é usado para retornar a ordem com seus items, que por sua vez, tem os produtos.
 // É dessa forma que penso em atender o requisito indicado acima
-func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkout *CheckoutInputDTO) (*CheckoutOutputDTO, error) {
+func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkoutDTO *CheckoutInputDTO) (*CheckoutOutputDTO, error) {
 
-	err := cr.validateDuplicatedCheckout(ctx, checkout)
+	err := cr.validateDuplicatedCheckout(ctx, checkoutDTO)
 	if err != nil {
 		return nil, err
 	}
 
 	// Order- o pedido deve existir e não pode estar pago
-	order, err := cr.validateAndReturnOrder(ctx, checkout)
+	order, err := cr.validateAndReturnOrder(ctx, checkoutDTO)
 	if err != nil {
 		return nil, err
 	}
@@ -57,19 +57,16 @@ func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkout *C
 	}
 
 	// converte dto para entidade
-	checkoutEntity := checkout.ToEntity()
-
-	// apenas um exemplo de como poderiamos aplicar um cupom de desconto no pagamento
-	discountCoupon := 0.0
+	checkout := checkoutDTO.ToEntity()
 
 	// integração com o gateway de pagamento e confirmação do pagamento na ordem
-	payment, err := cr.handlePayment(ctx, checkoutEntity, order, productList, "http://localhost:8080/checkout", 1, discountCoupon)
+	payment, err := cr.handlePayment(ctx, checkout, order, productList, checkoutDTO.NotificationURL, checkoutDTO.SponsorID, checkoutDTO.DiscontCoupon)
 	if err != nil {
 		return nil, err
 	}
 
 	// confirma a transação e grava o checkout
-	err = cr.handleCheckout(ctx, checkoutEntity, order.Total, payment.ID)
+	err = cr.handleCheckout(ctx, checkout, order.Total, payment.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -81,8 +78,9 @@ func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkout *C
 	}
 
 	output := &CheckoutOutputDTO{
-		ID:                   checkoutEntity.ID,
+		ID:                   checkout.ID,
 		GatewayTransactionID: payment.ID,
+		OrderID:              order.ID,
 	}
 
 	return output, nil
@@ -135,21 +133,24 @@ func (cr *CheckoutCreateUseCase) getProductList(ctx context.Context, order *enti
 // handlePayment integração com o gateway de pagamento e confirmação do pagamento na ordem
 func (cr *CheckoutCreateUseCase) handlePayment(ctx context.Context, checkout *entity.Checkout, order *entity.Order, productList []*entity.Product, notificationURL string, sponsorID int, cupon float64) (*entity.Payment, error) {
 
-	payment, err := cr.gatewayService.CreateTransaction(ctx, checkout, order, productList, notificationURL, sponsorID)
+	payment, err := cr.gatewayService.ConfirmPayment(ctx, checkout, order, productList, notificationURL, sponsorID)
 	if err != nil {
+		order.NotConfirmPayment()
+		_ = cr.orderRepository.Update(ctx, order)
 		return nil, err
 	}
 
 	if payment == nil {
+		order.NotConfirmPayment()
+		_ = cr.orderRepository.Update(ctx, order)
 		return nil, errors.New("failed to create transaction on gateway")
 	}
 
 	// efetiva o pagamento
-	order.Pay()
+	order.ConfirmPayment()
 	err = cr.orderRepository.Update(ctx, order)
 	if err != nil {
-		cr.gatewayService.CancelTransaction(ctx, payment.ID) // não tem rollback no gateway
-		//rollbackOrder(ctx, order, cr)
+		cr.gatewayService.CancelPayment(ctx, payment.ID) // não tem rollback no gateway
 		return nil, err
 	}
 
@@ -163,14 +164,14 @@ func (cr *CheckoutCreateUseCase) handleCheckout(ctx context.Context, checkout *e
 	// se houver algum cupom de desconto, ele será aplicado na ordem no handlePayment
 	err := checkout.ConfirmTransaction(paymentID, orderTotal)
 	if err != nil {
-		cr.gatewayService.CancelTransaction(ctx, paymentID)
+		cr.gatewayService.CancelPayment(ctx, paymentID)
 		return err
 	}
 
 	// grava o checkout
 	err = cr.checkoutRepository.Create(ctx, checkout)
 	if err != nil {
-		cr.gatewayService.CancelTransaction(ctx, paymentID)
+		cr.gatewayService.CancelPayment(ctx, paymentID)
 		return err
 	}
 
@@ -181,11 +182,9 @@ func (cr *CheckoutCreateUseCase) handleKitchen(ctx context.Context, order *entit
 
 	// Kitchen - cria um item na cozinha para cada produto do pedido
 	for _, item := range productList {
-		//product, _ := cr.productRepository.Find(ctx, item.ProductID)
 		kt := entity.NewKitchen(order.ID, item.ID, item.Name, item.Category)
 		err := cr.kitchenRepository.Create(ctx, kt)
 		if err != nil {
-			cr.gatewayService.CancelTransaction(ctx, payment.ID)
 			return err
 		}
 	}
