@@ -106,6 +106,9 @@ internal/
     └── (Casos de uso que orquestram a lógica de negócios e seus objetos de dados (dto's) de input e output)
 
 ```
+ 
+ Também adaptei o código para o estilo clean arch; seguem alguns detalhes:
+
 ##### Domain
 - DDD: Escolhi manter o DDD no centro do projeto. A clean arch não proíbe o uso da DDD, e define apenas a camada de entidade e que ali temos as regras de negócios do sistema. Entendi que a ideia é evoluir o projeto que construimos na FASE 1, sendo assim, decidi manter a camada de dominio.
 
@@ -117,7 +120,14 @@ internal/
 - Usecases: É a camada de regras da aplicação; é o orquestrador e suporta a necessidade especifica do usuário, por isso, o nome é caso de uso. Escolhi usar um arquivo por caso de uso (acho mais fácil manter o caso de uso com apenas 1 responsabilidade) e também escolhi manter inputs e outputs espeficios por caso de uso. Não reuso os DTO's de entrada e saída. Eles são focados na regra de aplicação que irão suportar.
 
 ##### infraestructure
-- 
+
+- Driven:
+- Driver: 
+
+
+
+
+
 ## Acesso ao projeto no github
 - Será enviado aos professores via plataforma da fiap
 - https://github.com/caiojorge/fiap-challenge-clean-arch-9SOAT
