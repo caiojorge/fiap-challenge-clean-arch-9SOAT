@@ -103,7 +103,7 @@ internal/
 │   └── (Pacotes compartilhados, helpers e utilitários usados em várias partes do projeto)
 │
 └── usecase/
-    └── (Casos de uso que orquestram a lógica de negócios e seus objetos de dados (dto's) de input e output)
+    └── (Casos de uso que orquestram a lógica de negócios da aplicação e seus objetos de dados (dto's) de input e output)
 
 ```
  
