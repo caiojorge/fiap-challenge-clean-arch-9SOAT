@@ -8,6 +8,7 @@ import (
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/converter"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model"
+	sharedDate "github.com/caiojorge/fiap-challenge-ddd/internal/shared"
 	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 )
@@ -36,6 +37,8 @@ func (r *OrderRepositoryGorm) Create(ctx context.Context, entity *entity.Order) 
 	if *model.CustomerCPF == "" {
 		model.CustomerCPF = nil
 	}
+
+	model.CreatedAt = sharedDate.GetBRTimeNow()
 
 	err = r.DB.Create(model).Error
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/converter"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model"
+	sharedDate "github.com/caiojorge/fiap-challenge-ddd/internal/shared"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/formatter"
 	"gorm.io/gorm"
 )
@@ -31,9 +32,10 @@ func (r *CustomerRepositoryGorm) Create(ctx context.Context, entity *entity.Cust
 func (r *CustomerRepositoryGorm) Update(ctx context.Context, entity *entity.Customer) error {
 
 	model := model.Customer{
-		CPF:   formatter.RemoveMaskFromCPF(entity.GetCPF().Value),
-		Name:  entity.GetName(),
-		Email: entity.GetEmail(),
+		CPF:       formatter.RemoveMaskFromCPF(entity.GetCPF().Value),
+		Name:      entity.GetName(),
+		Email:     entity.GetEmail(),
+		CreatedAt: sharedDate.GetBRTimeNow(),
 	}
 
 	if model.CPF == "" {

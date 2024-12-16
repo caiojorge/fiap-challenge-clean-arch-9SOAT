@@ -96,7 +96,9 @@ func TestCreateCheckout(t *testing.T) {
 		Create(ctx, gomock.Any()).
 		Return(nil) // Kitchen entry creation successful
 
-	// Execute the test
+	// o checkout recede a ordem, que tem os itens e os produtos.
+	// o payment é criado no padrão do gateway de pagamento, com a lista de produtos e a ordem.
+	// o teste prova que o output do usecase recebe e retorna os dados solicitados.
 	result, err := useCase.CreateCheckout(ctx, checkoutInput)
 
 	// Assertions
@@ -105,5 +107,6 @@ func TestCreateCheckout(t *testing.T) {
 	assert.NotNil(t, result.ID)
 	assert.NotNil(t, result.GatewayTransactionID)
 	assert.NotNil(t, result.OrderID)
+	assert.Equal(t, order.ID, result.OrderID) // #3 Checkout Pedido que deverá receber os produtos solicitados e retornar à identificação do pedido.
 
 }

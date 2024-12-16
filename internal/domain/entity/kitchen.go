@@ -16,7 +16,6 @@ type Kitchen struct {
 }
 
 func NewKitchen(orderID, itemOrderID, productName, category string) *Kitchen {
-	location, _ := time.LoadLocation("America/Sao_Paulo")
 	var responsible string
 
 	if category == "bebida" || category == "refrigerante" {
@@ -31,6 +30,5 @@ func NewKitchen(orderID, itemOrderID, productName, category string) *Kitchen {
 		ItemID:      itemOrderID,
 		ProductName: productName,
 		Responsible: responsible,
-		CreatedAt:   time.Now().In(location),
 	}
 }

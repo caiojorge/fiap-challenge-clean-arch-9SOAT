@@ -6,6 +6,7 @@ import (
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model"
+	sharedDate "github.com/caiojorge/fiap-challenge-ddd/internal/shared"
 	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 )
@@ -22,10 +23,15 @@ func NewCheckoutRepositoryGorm(db *gorm.DB) *CheckoutRepositoryGorm {
 
 // Create creates a new checkcout. It returns an error if something goes wrong.
 func (r *CheckoutRepositoryGorm) Create(ctx context.Context, entity *entity.Checkout) error {
-	var model model.Checkout
-	err := copier.Copy(&model, entity)
-	if err != nil {
-		return err
+
+	model := model.Checkout{
+		ID:                   entity.ID,
+		OrderID:              entity.OrderID,
+		GatewayName:          entity.Gateway.GatewayName,
+		GatewayToken:         entity.Gateway.GatewayToken,
+		GatewayTransactionID: entity.Gateway.GatewayTransactionID,
+		Total:                entity.Total,
+		CreatedAt:            sharedDate.GetBRTimeNow(),
 	}
 
 	if err := r.DB.Create(&model).Error; err != nil {

@@ -2,15 +2,17 @@ package model
 
 import (
 	"fmt"
+	"time"
 )
 
 // Product representa um producto no banco de dados.
 type Product struct {
-	ID          string  `gorm:"type:char(36);primaryKey"`
-	Name        string  `gorm:"not null;unique;index:idx_name_product;type:varchar(255)"`
-	Description string  `gorm:"not null;type:varchar(255)"`
-	Category    string  `gorm:"not null;index:idx_category;type:varchar(255)"`
-	Price       float64 `gorm:"not null"`
+	ID          string    `gorm:"type:char(36);primaryKey"`
+	Name        string    `gorm:"not null;unique;index:idx_name_product;type:varchar(255)"`
+	Description string    `gorm:"not null;type:varchar(255)"`
+	Category    string    `gorm:"not null;index:idx_category;type:varchar(255)"`
+	Price       float64   `gorm:"not null"`
+	CreatedAt   time.Time `gorm:"not null"`
 }
 
 // Validate verifica se os campos obrigatórios de um producto estão preenchidos.

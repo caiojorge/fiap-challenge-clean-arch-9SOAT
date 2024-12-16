@@ -7,6 +7,7 @@ import (
 )
 
 // FakePaymentService provides methods for payment operations.
+// Vai se conectar com o gateway de pagamento, nesse caso, FAKE.
 type FakePaymentService struct {
 }
 

@@ -2,7 +2,6 @@ package entity
 
 import (
 	"errors"
-	"log"
 	"time"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
@@ -23,16 +22,10 @@ type Order struct {
 // OrderInit cria um novo pedido. TODO usada apenas no order_test.
 func OrderInit(customerCPF string) *Order {
 
-	location, err := time.LoadLocation("America/Sao_Paulo")
-	if err != nil {
-		log.Default().Println("failed to load location")
-	}
-
 	order := Order{
 		ID:          shared.NewIDGenerator(),
 		CustomerCPF: customerCPF,
 		Status:      valueobject.OrderStatusConfirmed,
-		CreatedAt:   time.Now().In(location),
 	}
 
 	return &order
@@ -40,35 +33,24 @@ func OrderInit(customerCPF string) *Order {
 
 // NewOrder cria um novo pedido. TODO Não esta sendo usada.
 func NewOrder(cpf string, items []*OrderItem) (*Order, error) {
-	location, err := time.LoadLocation("America/Sao_Paulo")
-	if err != nil {
-		return nil, err
-	}
 
 	order := Order{
 		ID:          shared.NewIDGenerator(),
 		CustomerCPF: cpf,
 		Items:       items,
 		Status:      valueobject.OrderStatusConfirmed,
-		CreatedAt:   time.Now().In(location),
 	}
 
-	err = order.Validate()
+	if len(order.Items) > 0 {
+		order.CalculateTotal()
+	}
+
+	err := order.Validate()
 	if err != nil {
 		return nil, err
 	}
 
 	return &order, nil
-}
-func (o *Order) ApplyDiscountCoupon() *OrderItem {
-
-	for _, item := range o.Items {
-		if item.ID == o.ID {
-			return item
-		}
-	}
-
-	return nil
 }
 
 func (o *Order) GetOrderItemByProductID(productID string) *OrderItem {
@@ -87,14 +69,8 @@ func (o *Order) GetOrderItemByProductID(productID string) *OrderItem {
 // As regras aplicadas impactam apenas os dados da ordem / item.
 func (o *Order) Confirm() error {
 
-	location, err := time.LoadLocation("America/Sao_Paulo")
-	if err != nil {
-		return errors.New("failed to load location")
-	}
-
 	o.ID = shared.NewIDGenerator()
 	o.Status = valueobject.OrderStatusConfirmed
-	o.CreatedAt = time.Now().In(location)
 
 	for _, item := range o.Items {
 		item.Confirm()
@@ -104,7 +80,7 @@ func (o *Order) Confirm() error {
 	o.CalculateTotal()
 
 	// Valida o pedido
-	err = o.Validate()
+	err := o.Validate()
 	if err != nil {
 		return errors.New("failed to validate order")
 	}
@@ -170,11 +146,11 @@ func (o *Order) IsPaid() bool {
 }
 
 func (o *Order) ConfirmPayment() {
-	o.Status = valueobject.OrderStatusPaid
+	o.Status = valueobject.OrderItemStatusConfirmed
 }
 
 func (o *Order) NotConfirmPayment() {
-	o.Status = valueobject.OrderStatusPaid
+	o.Status = valueobject.OrderStatusNotConfirmed
 }
 
 func (o *Order) Prepare() {

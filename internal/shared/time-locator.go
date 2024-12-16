@@ -10,3 +10,8 @@ func GetBRLocationDefault() (*time.Location, error) {
 
 	return location, nil
 }
+
+func GetBRTimeNow() time.Time {
+	location, _ := GetBRLocationDefault()
+	return time.Now().In(location)
+}

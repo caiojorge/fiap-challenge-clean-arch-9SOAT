@@ -2,15 +2,17 @@ package model
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/validator"
 )
 
 // Customer representa um cliente no banco de dados.
 type Customer struct {
-	CPF   string `gorm:"primaryKey;type:char(11);not null;not empty;unique"`
-	Name  string `gorm:"type:varchar(255);not null"`
-	Email string `gorm:"type:varchar(255);not null"`
+	CPF       string    `gorm:"primaryKey;type:char(11);not null;not empty;unique"`
+	Name      string    `gorm:"type:varchar(255);not null"`
+	Email     string    `gorm:"type:varchar(255);not null"`
+	CreatedAt time.Time `gorm:"not null"`
 }
 
 // Validate verifica se os campos obrigatórios de um cliente estão preenchidos.

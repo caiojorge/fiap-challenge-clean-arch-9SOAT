@@ -6,6 +6,7 @@ import (
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model"
+	sharedDate "github.com/caiojorge/fiap-challenge-ddd/internal/shared"
 	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 )
@@ -27,6 +28,8 @@ func (r *KitchenRepositoryGorm) Create(ctx context.Context, entity *entity.Kitch
 	if err != nil {
 		return err
 	}
+
+	model.CreatedAt = sharedDate.GetBRTimeNow()
 
 	if err := r.DB.Create(&model).Error; err != nil {
 		return err
