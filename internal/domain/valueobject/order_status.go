@@ -4,12 +4,12 @@ package valueobject
 const (
 	OrderStatusConfirmed    = "confirmed"
 	OrderStatusNotConfirmed = "notconfirmed"
+	OrderStatusApproved     = "approved"
+	OrderStatusNotApproved  = "notapproved"
 	OrderStatusPaid         = "paid"
 	OrderStatusPreparing    = "preparing"
 	OrderStatusDelivered    = "delivered"
 	OrderStatusCanceled     = "canceled"
-	OrderStatusApproved     = "approved"
-	OrderStatusNotApproved  = "notapproved"
 )
 
 // Order Item status

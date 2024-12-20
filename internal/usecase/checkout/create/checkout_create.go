@@ -72,10 +72,10 @@ func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkoutDTO
 	}
 
 	// Kitchen - cria um item na cozinha para cada produto do pedido
-	err = cr.handleKitchen(ctx, order, productList, *payment)
-	if err != nil {
-		return nil, err
-	}
+	// err = cr.handleKitchen(ctx, order, productList, *payment)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	output := &CheckoutOutputDTO{
 		ID:                   checkout.ID,
@@ -107,7 +107,7 @@ func (cr *CheckoutCreateUseCase) validateAndReturnOrder(ctx context.Context, che
 	if order == nil {
 		return nil, errors.New("order not found")
 	}
-	if order.IsPaid() {
+	if order.IsPaymentApproved() {
 		return nil, errors.New("order already paid")
 	}
 
@@ -115,6 +115,7 @@ func (cr *CheckoutCreateUseCase) validateAndReturnOrder(ctx context.Context, che
 }
 
 // getProductList retorna a lista de produtos do pedido
+// TODO: esse método pode ser movido para um repositório de produtos
 func (cr *CheckoutCreateUseCase) getProductList(ctx context.Context, order *entity.Order) ([]*entity.Product, error) {
 	var products []*entity.Product
 
@@ -135,24 +136,23 @@ func (cr *CheckoutCreateUseCase) handlePayment(ctx context.Context, checkout *en
 
 	payment, err := cr.gatewayService.ConfirmPayment(ctx, checkout, order, productList, notificationURL, sponsorID)
 	if err != nil {
-		order.NotConfirmPayment()
+		order.InformPaymentNotApproval()
 		_ = cr.orderRepository.Update(ctx, order)
 		return nil, err
 	}
 
 	if payment == nil {
-		order.NotConfirmPayment()
+		order.InformPaymentNotApproval()
 		_ = cr.orderRepository.Update(ctx, order)
 		return nil, errors.New("failed to create transaction on gateway")
 	}
 
-	// efetiva o pagamento
-	order.ConfirmPayment()
-	err = cr.orderRepository.Update(ctx, order)
-	if err != nil {
-		cr.gatewayService.CancelPayment(ctx, payment.ID) // não tem rollback no gateway
-		return nil, err
-	}
+	// //order.ApprovePayment()
+	// err = cr.orderRepository.Update(ctx, order)
+	// if err != nil {
+	// 	cr.gatewayService.CancelPayment(ctx, payment.ID) // não tem rollback no gateway
+	// 	return nil, err
+	// }
 
 	return payment, nil
 }

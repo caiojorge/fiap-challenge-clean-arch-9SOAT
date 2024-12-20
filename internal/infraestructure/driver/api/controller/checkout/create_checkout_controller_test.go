@@ -71,10 +71,6 @@ func TestCreateCheckout(t *testing.T) {
 		Price: 100.0,
 	}
 
-	// payment := &entity.Payment{
-	// 	ID: "payment123",
-	// }
-
 	// Set up mock expectations for a successful checkout
 	mockCheckoutRepository.EXPECT().
 		FindbyOrderID(ctx, "order123").
@@ -85,9 +81,9 @@ func TestCreateCheckout(t *testing.T) {
 		Return(order, nil)
 
 	// Add expectation for the Update method
-	mockOrderRepository.EXPECT().
-		Update(ctx, order).
-		Return(nil) // Order update successful
+	// mockOrderRepository.EXPECT().
+	// 	Update(ctx, order).
+	// 	Return(nil) // Order update successful
 
 	mockProductRepository.EXPECT().
 		Find(ctx, "prod123").
@@ -97,9 +93,9 @@ func TestCreateCheckout(t *testing.T) {
 		Create(ctx, gomock.Any()).
 		Return(nil)
 
-	mockKitchenRepository.EXPECT().
-		Create(ctx, gomock.Any()).
-		Return(nil) // Kitchen entry creation successful
+	// mockKitchenRepository.EXPECT().
+	// 	Create(ctx, gomock.Any()).
+	// 	Return(nil) // Kitchen entry creation successful
 
 	// Execute the test
 	// result, err := useCase.CreateCheckout(ctx, checkoutInput)

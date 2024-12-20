@@ -7,12 +7,12 @@ import (
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
 	mocks "github.com/caiojorge/fiap-challenge-ddd/internal/domain/repository/mocks"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
+	checkoutUseCase "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/checkout/create"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCreateCheckout(t *testing.T) {
-
+func TestPayment(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -22,12 +22,12 @@ func TestCreateCheckout(t *testing.T) {
 	assert.NotNil(t, mockOrderRepository)
 	mockProductRepository := mocks.NewMockProductRepository(ctrl)
 	assert.NotNil(t, mockProductRepository)
-	mockGatewayService := NewMLFakePaymentService()
+	mockGatewayService := checkoutUseCase.NewMLFakePaymentService()
 	assert.NotNil(t, mockGatewayService)
 	mockKitchenRepository := mocks.NewMockKitchenRepository(ctrl)
 	assert.NotNil(t, mockKitchenRepository)
 
-	useCase := NewCheckoutCreate(
+	useCase := checkoutUseCase.NewCheckoutCreate(
 		mockOrderRepository,
 		mockCheckoutRepository,
 		mockGatewayService,
@@ -40,7 +40,7 @@ func TestCreateCheckout(t *testing.T) {
 	assert.NotNil(t, ctx)
 
 	// Define input DTO
-	checkoutInput := &CheckoutInputDTO{
+	checkoutInput := &checkoutUseCase.CheckoutInputDTO{
 		OrderID:         "order123",
 		GatewayName:     "mercadopago", //TODO: colocar uma validaçao para o nome do gateway
 		GatewayToken:    "01234567890",
@@ -58,6 +58,7 @@ func TestCreateCheckout(t *testing.T) {
 		},
 	}
 
+	// como criei a ordem na mão, preciso calcular o total dela.
 	order.CalculateTotal()
 
 	product := &entity.Product{
@@ -67,17 +68,27 @@ func TestCreateCheckout(t *testing.T) {
 	}
 
 	// Set up mock expectations for a successful checkout
-	mockCheckoutRepository.EXPECT().
-		FindbyOrderID(ctx, "order123").
-		Return(nil, nil) // No duplicate checkout found
 
 	mockOrderRepository.EXPECT().
-		Find(ctx, "order123").
-		Return(order, nil) // Order found and not paid
+		Find(ctx, gomock.Any()).
+		Return(order, nil).AnyTimes() // Order found and not paid
 
 	mockProductRepository.EXPECT().
-		Find(ctx, "prod123").
+		Find(ctx, gomock.Any()).
 		Return(product, nil) // Product found
+
+	checkoutEntity, err := entity.NewCheckout(order.ID, checkoutInput.GatewayName, checkoutInput.GatewayToken, order.Total)
+	assert.NoError(t, err)
+	assert.NotNil(t, checkoutEntity)
+
+	firstcall := mockCheckoutRepository.EXPECT().
+		FindbyOrderID(ctx, gomock.Any()).
+		Return(nil, nil) // No duplicate checkout found
+	secondcall := mockCheckoutRepository.EXPECT().
+		FindbyOrderID(ctx, gomock.Any()).
+		Return(checkoutEntity, nil) // No duplicate checkout found
+
+	gomock.InOrder(firstcall, secondcall)
 
 	mockCheckoutRepository.EXPECT().
 		Create(ctx, gomock.Any()).
@@ -98,6 +109,20 @@ func TestCreateCheckout(t *testing.T) {
 	assert.NotNil(t, result.ID)
 	assert.NotNil(t, result.GatewayTransactionID)
 	assert.NotNil(t, result.OrderID)
-	assert.Equal(t, order.ID, result.OrderID) // #3 Checkout Pedido que deverá receber os produtos solicitados e retornar à identificação do pedido.
+	assert.Equal(t, order.ID, result.OrderID)
+
+	checkPayment := NewCheckPaymentUseCase(
+		mockCheckoutRepository,
+		mockOrderRepository,
+	)
+
+	checkedPayment, err := checkPayment.CheckPayment(ctx, result.OrderID)
+	assert.NoError(t, err)
+	assert.NotNil(t, checkedPayment)
+	assert.NotNil(t, checkedPayment.Status)
+	assert.NotNil(t, checkedPayment.GatewayTransactionID)
+	assert.NotNil(t, checkedPayment.OrderID)
+	assert.Equal(t, order.ID, checkedPayment.OrderID)
+	assert.Equal(t, checkedPayment.PaymentApproved, false)
 
 }

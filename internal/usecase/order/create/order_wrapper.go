@@ -5,6 +5,8 @@ import (
 	"github.com/jinzhu/copier"
 )
 
+// CreateOrderWrapper wraps the OrderCreateInputDTO to Order entity
+// A ordem é um objeto complexo, então achei mais fácil criar um wrapper para fazer a conversão.
 type CreateOrderWrapper struct {
 	dto *OrderCreateInputDTO
 }

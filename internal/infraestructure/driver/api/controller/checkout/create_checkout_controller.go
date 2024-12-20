@@ -13,11 +13,11 @@ var ErrAlreadyExists = errors.New("order already exists")
 
 type CreateCheckoutController struct {
 	ctx     context.Context
-	usecase portsusecase.CreateCheckoutUseCase
+	usecase portsusecase.ICreateCheckoutUseCase
 }
 
 func NewCreateCheckoutController(ctx context.Context,
-	usecase portsusecase.CreateCheckoutUseCase) *CreateCheckoutController {
+	usecase portsusecase.ICreateCheckoutUseCase) *CreateCheckoutController {
 	return &CreateCheckoutController{
 		usecase: usecase,
 		ctx:     ctx,

@@ -10,6 +10,13 @@ import (
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/validator"
 )
 
+/*
+Simplicidade: O pedido (Order) representa o agregado principal no domínio. Saber se o pedido foi pago ou não é fundamental para determinar se ele pode avançar para outras etapas (ex: envio, entrega).
+Estados do Pedido: O status de pagamento faz parte do ciclo de vida do pedido. Estados como "pendente" e "pago" são naturais em um pedido.
+Agregação: A entidade Order é o ponto central para acompanhar o progresso do pedido, enquanto Checkout é apenas um processo auxiliar para concretizar o pagamento.
+*/
+
+// Order representa um pedido.
 type Order struct {
 	ID          string
 	Items       []*OrderItem
@@ -19,17 +26,17 @@ type Order struct {
 	CreatedAt   time.Time
 }
 
-// OrderInit cria um novo pedido. TODO usada apenas no order_test.
-func OrderInit(customerCPF string) *Order {
+// // OrderInit cria um novo pedido. TODO usada apenas no order_test.
+// func OrderInit(customerCPF string) *Order {
 
-	order := Order{
-		ID:          shared.NewIDGenerator(),
-		CustomerCPF: customerCPF,
-		Status:      valueobject.OrderStatusConfirmed,
-	}
+// 	order := Order{
+// 		ID:          shared.NewIDGenerator(),
+// 		CustomerCPF: customerCPF,
+// 		Status:      valueobject.OrderStatusConfirmed,
+// 	}
 
-	return &order
-}
+// 	return &order
+// }
 
 // NewOrder cria um novo pedido. TODO Não esta sendo usada.
 func NewOrder(cpf string, items []*OrderItem) (*Order, error) {
@@ -70,6 +77,8 @@ func (o *Order) GetOrderItemByProductID(productID string) *OrderItem {
 func (o *Order) Confirm() error {
 
 	o.ID = shared.NewIDGenerator()
+
+	// o status da ordem é confirmado
 	o.Status = valueobject.OrderStatusConfirmed
 
 	for _, item := range o.Items {
@@ -86,6 +95,17 @@ func (o *Order) Confirm() error {
 	}
 
 	return nil
+}
+
+func (o *Order) ConfirmItemsPrice(products []*Product) {
+
+	for i, item := range o.Items {
+		for _, product := range products {
+			if item.ProductID == product.ID {
+				o.Items[i].ConfirmPrice(product.Price)
+			}
+		}
+	}
 }
 
 func (o *Order) IsCustomerInformed() bool {
@@ -134,6 +154,8 @@ func (o *Order) RemoveItem(item *OrderItem) {
 
 func (o *Order) CalculateTotal() {
 
+	o.Total = 0
+
 	for _, item := range o.Items {
 		if item.Status == valueobject.OrderItemStatusConfirmed {
 			o.Total += (item.Price * float64(item.Quantity))
@@ -141,16 +163,16 @@ func (o *Order) CalculateTotal() {
 	}
 }
 
-func (o *Order) IsPaid() bool {
-	return o.Status == valueobject.OrderStatusPaid
+func (o *Order) IsPaymentApproved() bool {
+	return o.Status == valueobject.OrderStatusApproved
 }
 
-func (o *Order) ConfirmPayment() {
-	o.Status = valueobject.OrderItemStatusConfirmed
+func (o *Order) InformPaymentApproval() {
+	o.Status = valueobject.OrderStatusApproved
 }
 
-func (o *Order) NotConfirmPayment() {
-	o.Status = valueobject.OrderStatusNotConfirmed
+func (o *Order) InformPaymentNotApproval() {
+	o.Status = valueobject.OrderStatusNotApproved
 }
 
 func (o *Order) Prepare() {

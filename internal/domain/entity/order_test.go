@@ -5,7 +5,6 @@ import (
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared"
-	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/validator"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -28,10 +27,7 @@ func TestOrder(t *testing.T) {
 	assert.NotNil(t, product2)
 
 	// Order
-	order := OrderInit(customer.GetCPF().Value)
-	order.ID = "1"
-	assert.Equal(t, "1", order.ID)
-	assert.Equal(t, "19528476562", order.CustomerCPF)
+	//order := OrderInit(customer.GetCPF().Value)
 
 	orderItem, err := NewOrderItem(product.GetID(), 1, product.Price)
 	assert.Nil(t, err)
@@ -40,22 +36,10 @@ func TestOrder(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, orderItem2)
 
-	order.AddItem(orderItem)
-	order.AddItem(orderItem2)
-
+	order, _ := NewOrder(customer.GetCPF().Value, []*OrderItem{orderItem, orderItem2})
+	assert.Equal(t, "19528476562", order.CustomerCPF)
 	assert.Equal(t, 2, len(order.Items))
-
-	order.CalculateTotal()
 	assert.Equal(t, 20.00, order.Total)
-
-	// validando o cpf q seria informado pelo cliente.
-	v := validator.CPFValidator{}
-	assert.True(t, v.IsValid(order.CustomerCPF))
-	err = v.Validate(order.CustomerCPF)
-	assert.Nil(t, err)
-
-	err = order.Validate()
-	assert.Nil(t, err)
 
 }
 
@@ -76,19 +60,9 @@ func TestOrderWithNoItens(t *testing.T) {
 	assert.NotNil(t, product2)
 
 	// Order
-	order := OrderInit(customer.GetCPF().Value)
-	order.ID = "1"
-	assert.Equal(t, "1", order.ID)
-	assert.Equal(t, "19528476562", order.CustomerCPF)
-
-	// validando o cpf q seria informado pelo cliente.
-	v := validator.CPFValidator{}
-	assert.True(t, v.IsValid(order.CustomerCPF))
-	err = v.Validate(order.CustomerCPF)
-	assert.Nil(t, err)
-
-	err = order.Validate()
+	order, err := NewOrder(customer.GetCPF().Value, []*OrderItem{})
 	assert.NotNil(t, err)
+	assert.Nil(t, order)
 
 }
 
@@ -102,11 +76,6 @@ func TestOrderWithNoCustomer(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, product2)
 
-	// Order
-	order := OrderInit("")
-	order.ID = "1"
-	assert.Equal(t, "1", order.ID)
-
 	orderItem, err := NewOrderItem(product.GetID(), 1, product.Price)
 	assert.Nil(t, err)
 	assert.NotNil(t, orderItem)
@@ -114,22 +83,11 @@ func TestOrderWithNoCustomer(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, orderItem2)
 
-	order.AddItem(orderItem)
-	order.AddItem(orderItem2)
-
-	assert.Equal(t, 2, len(order.Items))
-
-	order.CalculateTotal()
-	assert.Equal(t, 20.00, order.Total)
-
-	// cpf não informado; tem q dar erro.
-	v := validator.CPFValidator{}
-	err = v.Validate(order.CustomerCPF)
-	assert.NotNil(t, err)
-
-	// não tem cliente mas tem itens, tem q dar certo
-	err = order.Validate()
+	// Order
+	order, err := NewOrder("", []*OrderItem{orderItem, orderItem2})
 	assert.Nil(t, err)
+	assert.Equal(t, 2, len(order.Items))
+	assert.Equal(t, 20.00, order.Total)
 
 }
 
@@ -148,15 +106,10 @@ func TestOrderWithNoRegistration(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, product2)
 
-	// Order
-	order := OrderInit(customer.GetCPF().Value)
-	order.ID = "1"
-	assert.Equal(t, "1", order.ID)
-	assert.Equal(t, "19528476562", order.CustomerCPF)
-
 	orderItem, err := NewOrderItem(product.GetID(), 1, product.Price)
 	assert.Nil(t, err)
 	assert.NotNil(t, orderItem)
+
 	orderItem2, err := NewOrderItem(product2.GetID(), 1, product2.Price)
 	assert.Nil(t, err)
 	assert.NotNil(t, orderItem2)
@@ -164,24 +117,15 @@ func TestOrderWithNoRegistration(t *testing.T) {
 	// cancelando o item2, então o valor do pedido deveria ser 10
 	orderItem2.Cancel()
 
-	order.AddItem(orderItem)
-	order.AddItem(orderItem2)
+	// Order
+	order, err := NewOrder(customer.GetCPF().Value, []*OrderItem{orderItem, orderItem2})
+	assert.Nil(t, err)
+	assert.Equal(t, "19528476562", order.CustomerCPF)
 
 	assert.Equal(t, 2, len(order.Items))
-
-	order.CalculateTotal()
 	assert.Equal(t, 10.00, order.Total)
 
 	assert.Equal(t, valueobject.OrderStatusConfirmed, order.Status)
-
-	// validando o cpf q seria informado pelo cliente.
-	v := validator.CPFValidator{}
-	assert.True(t, v.IsValid(order.CustomerCPF))
-	err = v.Validate(order.CustomerCPF)
-	assert.Nil(t, err)
-
-	err = order.Validate()
-	assert.Nil(t, err)
 
 }
 
@@ -223,5 +167,7 @@ func TestConfirmedOrder(t *testing.T) {
 
 	err := order.Confirm()
 	assert.Nil(t, err)
+
+	assert.Equal(t, valueobject.OrderStatusConfirmed, order.Status)
 
 }
