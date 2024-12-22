@@ -121,10 +121,12 @@ internal/
 
 ##### infraestructure
 
-- Driven:
-- Driver: 
+- Driven: É o output, e aqui deixamos a conexão com o DB e ou APIs externas
+- Driver: É o input, e aqui temos os controlers e o server/api
 
-
+### #2 refatorando o código para seguir os padrões Clean Code e Clean Architecture
+### #3 Checkout Pedido que deverá receber os produtos solicitados e retornar à identificação do pedido.
+### #4 Consultar status de pagamento pedido, que informa se o pagamento foi aprovado ou não.
 
 
 

@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
-	"github.com/caiojorge/fiap-challenge-ddd/internal/shared"
+	sharedgenerator "github.com/caiojorge/fiap-challenge-ddd/internal/shared/generator"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -133,7 +133,7 @@ func TestConfirmedOrder(t *testing.T) {
 	cpf := "75419654059"
 
 	lanche := Product{
-		ID:          shared.NewIDGenerator(),
+		ID:          sharedgenerator.NewIDGenerator(),
 		Name:        "Burger Kong",
 		Description: "Pão, carne e queijo",
 		Category:    "lanche",
@@ -141,7 +141,7 @@ func TestConfirmedOrder(t *testing.T) {
 	}
 
 	refri := Product{
-		ID:          shared.NewIDGenerator(),
+		ID:          sharedgenerator.NewIDGenerator(),
 		Name:        "Pepsicola",
 		Description: "Peptococa",
 		Category:    "refrigerante",

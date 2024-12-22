@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
-	"github.com/caiojorge/fiap-challenge-ddd/internal/shared"
+	sharedgenerator "github.com/caiojorge/fiap-challenge-ddd/internal/shared/generator"
 )
 
 type OrderItem struct {
@@ -18,7 +18,7 @@ type OrderItem struct {
 // NewOrderItem creates a new OrderItem
 func NewOrderItem(productID string, quantity int, price float64) (*OrderItem, error) {
 	item := OrderItem{
-		ID:        shared.NewIDGenerator(),
+		ID:        sharedgenerator.NewIDGenerator(),
 		ProductID: productID,
 		Quantity:  quantity,
 		Price:     price,
@@ -34,7 +34,7 @@ func NewOrderItem(productID string, quantity int, price float64) (*OrderItem, er
 }
 
 func (i *OrderItem) Confirm() {
-	i.ID = shared.NewIDGenerator()
+	i.ID = sharedgenerator.NewIDGenerator()
 	i.Status = valueobject.OrderItemStatusConfirmed
 
 }

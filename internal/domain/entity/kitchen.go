@@ -3,7 +3,7 @@ package entity
 import (
 	"time"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/shared"
+	sharedgenerator "github.com/caiojorge/fiap-challenge-ddd/internal/shared/generator"
 )
 
 type Kitchen struct {
@@ -25,7 +25,7 @@ func NewKitchen(orderID, itemOrderID, productName, category string) *Kitchen {
 	}
 
 	return &Kitchen{
-		ID:          shared.NewIDGenerator(),
+		ID:          sharedgenerator.NewIDGenerator(),
 		OrderID:     orderID,
 		ItemID:      itemOrderID,
 		ProductName: productName,

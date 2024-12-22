@@ -1,4 +1,4 @@
-package shared
+package sharedgenerator
 
 import "github.com/google/uuid"
 

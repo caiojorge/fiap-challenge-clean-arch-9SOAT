@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
-	"github.com/caiojorge/fiap-challenge-ddd/internal/shared"
+	sharedgenerator "github.com/caiojorge/fiap-challenge-ddd/internal/shared/generator"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
@@ -24,7 +24,7 @@ func TestProductRegisterAndUpdater(t *testing.T) {
 		Return(nil)
 
 	product := &entity.Product{
-		ID:          shared.NewIDGenerator(),
+		ID:          sharedgenerator.NewIDGenerator(),
 		Name:        "Lanche XPTO 2",
 		Description: "Pão queijo e carne",
 		Category:    "Lanche",

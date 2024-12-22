@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
-	"github.com/caiojorge/fiap-challenge-ddd/internal/shared"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/formatter"
+	sharedgenerator "github.com/caiojorge/fiap-challenge-ddd/internal/shared/generator"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/validator"
 )
 
@@ -42,7 +42,7 @@ type Order struct {
 func NewOrder(cpf string, items []*OrderItem) (*Order, error) {
 
 	order := Order{
-		ID:          shared.NewIDGenerator(),
+		ID:          sharedgenerator.NewIDGenerator(),
 		CustomerCPF: cpf,
 		Items:       items,
 		Status:      valueobject.OrderStatusConfirmed,
@@ -76,7 +76,7 @@ func (o *Order) GetOrderItemByProductID(productID string) *OrderItem {
 // As regras aplicadas impactam apenas os dados da ordem / item.
 func (o *Order) Confirm() error {
 
-	o.ID = shared.NewIDGenerator()
+	o.ID = sharedgenerator.NewIDGenerator()
 
 	// o status da ordem é confirmado
 	o.Status = valueobject.OrderStatusConfirmed

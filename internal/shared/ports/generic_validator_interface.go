@@ -1,4 +1,4 @@
-package shared
+package sharedports
 
 type Validator interface {
 	Validate() error

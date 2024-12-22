@@ -3,7 +3,7 @@ package entity
 import (
 	"errors"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/shared"
+	sharedgenerator "github.com/caiojorge/fiap-challenge-ddd/internal/shared/generator"
 )
 
 type Item struct {
@@ -52,7 +52,7 @@ func NewPayment(checkout Checkout, order Order, productList []*Product, notifica
 	}
 
 	payment := &Payment{
-		ID:                shared.NewIDGenerator(),
+		ID:                sharedgenerator.NewIDGenerator(),
 		CheckoutID:        checkout.ID,
 		ExternalReference: order.ID,
 		Title:             "Pedido de compra",

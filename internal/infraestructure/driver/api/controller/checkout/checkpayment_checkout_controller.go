@@ -1,0 +1,67 @@
+package controller
+
+import (
+	"context"
+	"errors"
+	"net/http"
+
+	customerrors "github.com/caiojorge/fiap-challenge-ddd/internal/shared/error"
+	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/checkout/checkpayment"
+	"github.com/gin-gonic/gin"
+)
+
+//var someError = errors.New("order already exists")
+
+type CheckPaymentCheckoutController struct {
+	ctx     context.Context
+	usecase portsusecase.ICheckPaymentUseCase
+}
+
+func NewCheckPaymentCheckoutController(ctx context.Context,
+	usecase portsusecase.ICheckPaymentUseCase) *CheckPaymentCheckoutController {
+	return &CheckPaymentCheckoutController{
+		usecase: usecase,
+		ctx:     ctx,
+	}
+}
+
+// @Summary Check Payment by Order ID
+// @Description Get details of an Checkout and Status of Payment by Order id
+// @Tags Orders
+// @Accept  json
+// @Produce  json
+// @Param id path string true "Order id"
+// @Success 200 {object} usecase.OrderFindByIdOutputDTO
+// @Failure 404 {object} string "Order | Checkout not found"
+// @Failure 400 {object} string "Order ID is required"
+// @Failure 500 {object} string "Internal Server Error"
+// @Router /checkout/check/{id} [get]
+func (r *CheckPaymentCheckoutController) GetCheckPaymentCheckout(c *gin.Context) {
+	id := c.Param("id")
+
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": customerrors.ErrOrderIDIsRequired.Error()})
+		return
+	}
+
+	output, err := r.usecase.CheckPayment(r.ctx, id)
+	if err != nil {
+		if errors.Is(err, customerrors.ErrOrderNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		if errors.Is(err, customerrors.ErrCheckoutNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	if output == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": customerrors.ErrCheckoutNotFound.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, output.GatewayTransactionID)
+}

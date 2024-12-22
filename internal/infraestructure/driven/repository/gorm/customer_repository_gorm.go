@@ -8,8 +8,8 @@ import (
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/converter"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model"
-	sharedDate "github.com/caiojorge/fiap-challenge-ddd/internal/shared"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/formatter"
+	sharedDate "github.com/caiojorge/fiap-challenge-ddd/internal/shared/time"
 	"gorm.io/gorm"
 )
 

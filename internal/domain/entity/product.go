@@ -3,7 +3,7 @@ package entity
 import (
 	"errors"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/shared"
+	sharedgenerator "github.com/caiojorge/fiap-challenge-ddd/internal/shared/generator"
 )
 
 type Product struct {
@@ -35,7 +35,7 @@ func ConvertProduct(id, name, description, category string, price float64) (*Pro
 func NewProduct(name, description, category string, price float64) (*Product, error) {
 
 	product := &Product{
-		ID:          shared.NewIDGenerator(),
+		ID:          sharedgenerator.NewIDGenerator(),
 		Name:        name,
 		Description: description,
 		Price:       price,
@@ -51,7 +51,7 @@ func NewProduct(name, description, category string, price float64) (*Product, er
 }
 
 func (p *Product) DefineID() {
-	p.ID = shared.NewIDGenerator()
+	p.ID = sharedgenerator.NewIDGenerator()
 }
 
 func (p *Product) Validate() error {

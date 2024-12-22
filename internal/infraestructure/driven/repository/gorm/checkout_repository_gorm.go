@@ -6,7 +6,7 @@ import (
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model"
-	sharedDate "github.com/caiojorge/fiap-challenge-ddd/internal/shared"
+	sharedDate "github.com/caiojorge/fiap-challenge-ddd/internal/shared/time"
 	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 )
