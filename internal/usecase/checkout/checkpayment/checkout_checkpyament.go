@@ -37,10 +37,6 @@ func (cr *CheckPaymentUseCase) CheckPayment(ctx context.Context, orderID string)
 		return nil, customerrors.ErrOrderNotFound
 	}
 
-	if checkout == nil {
-		return nil, customerrors.ErrCheckoutNotFound
-	}
-
 	outputs := &CheckPaymentOutputDTO{
 		OrderID:              checkout.OrderID,
 		GatewayTransactionID: checkout.Gateway.GatewayTransactionID,

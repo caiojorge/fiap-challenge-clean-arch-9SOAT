@@ -2,6 +2,7 @@ package controller
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -77,6 +78,68 @@ func TestCheckPayment(t *testing.T) {
 
 		assert.Equal(t, http.StatusOK, resp.Code)
 		//assert.JSONEq(t, `{"error":"Order ID is required"}`, resp.Body.String())
+	})
+
+	t.Run("should return 404 if order not found", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockUseCase := usecase.NewCheckPaymentUseCase(mockCheckoutRepository, mockOrderRepository)
+
+		mockCheckoutRepository.EXPECT().
+			FindbyOrderID(ctx, gomock.Any()).
+			Return(nil, nil)
+
+		mockOrderRepository.EXPECT().
+			Find(ctx, gomock.Any()).
+			Return(nil, nil)
+
+		router := gin.Default()
+		controller := &CheckPaymentCheckoutController{
+			usecase: mockUseCase,
+			ctx:     ctx,
+		}
+
+		router.GET("/checkout/check/:id", controller.GetCheckPaymentCheckout)
+
+		req, _ := http.NewRequest(http.MethodGet, "/checkout/check/123", nil)
+		resp := httptest.NewRecorder()
+
+		router.ServeHTTP(resp, req)
+
+		assert.Equal(t, http.StatusNotFound, resp.Code)
+		assert.JSONEq(t, `{"error":"order not found"}`, resp.Body.String())
+	})
+
+	t.Run("should return 500 if use case returns unexpected error", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockUseCase := usecase.NewCheckPaymentUseCase(mockCheckoutRepository, mockOrderRepository)
+
+		mockCheckoutRepository.EXPECT().
+			FindbyOrderID(ctx, gomock.Any()).
+			Return(nil, nil)
+
+		mockOrderRepository.EXPECT().
+			Find(ctx, gomock.Any()).
+			Return(nil, errors.New("unexpected error"))
+
+		router := gin.Default()
+		controller := &CheckPaymentCheckoutController{
+			usecase: mockUseCase,
+			ctx:     ctx,
+		}
+
+		router.GET("/checkout/check/:id", controller.GetCheckPaymentCheckout)
+
+		req, _ := http.NewRequest(http.MethodGet, "/checkout/check/123", nil)
+		resp := httptest.NewRecorder()
+
+		router.ServeHTTP(resp, req)
+
+		assert.Equal(t, http.StatusInternalServerError, resp.Code)
+		assert.JSONEq(t, `{"error":"unexpected error"}`, resp.Body.String())
 	})
 
 }
