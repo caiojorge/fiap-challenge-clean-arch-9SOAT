@@ -3,7 +3,7 @@ package entity
 import (
 	"errors"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
+	sharedconsts "github.com/caiojorge/fiap-challenge-ddd/internal/shared/consts"
 	sharedgenerator "github.com/caiojorge/fiap-challenge-ddd/internal/shared/generator"
 )
 
@@ -22,7 +22,7 @@ func NewOrderItem(productID string, quantity int, price float64) (*OrderItem, er
 		ProductID: productID,
 		Quantity:  quantity,
 		Price:     price,
-		Status:    valueobject.OrderItemStatusConfirmed,
+		Status:    sharedconsts.OrderItemStatusConfirmed,
 	}
 
 	err := item.Validate()
@@ -35,7 +35,7 @@ func NewOrderItem(productID string, quantity int, price float64) (*OrderItem, er
 
 func (i *OrderItem) Confirm() {
 	i.ID = sharedgenerator.NewIDGenerator()
-	i.Status = valueobject.OrderItemStatusConfirmed
+	i.Status = sharedconsts.OrderItemStatusConfirmed
 
 }
 
@@ -60,5 +60,5 @@ func (i *OrderItem) Validate() error {
 }
 
 func (i *OrderItem) Cancel() {
-	i.Status = valueobject.OrderItemStatusCanceled
+	i.Status = sharedconsts.OrderItemStatusCanceled
 }

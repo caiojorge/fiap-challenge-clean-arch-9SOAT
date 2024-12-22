@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
+	sharedconsts "github.com/caiojorge/fiap-challenge-ddd/internal/shared/consts"
 	sharedgenerator "github.com/caiojorge/fiap-challenge-ddd/internal/shared/generator"
 	"github.com/stretchr/testify/assert"
 )
@@ -125,7 +126,7 @@ func TestOrderWithNoRegistration(t *testing.T) {
 	assert.Equal(t, 2, len(order.Items))
 	assert.Equal(t, 10.00, order.Total)
 
-	assert.Equal(t, valueobject.OrderStatusConfirmed, order.Status)
+	assert.Equal(t, sharedconsts.OrderStatusConfirmed, order.Status)
 
 }
 
@@ -168,6 +169,6 @@ func TestConfirmedOrder(t *testing.T) {
 	err := order.Confirm()
 	assert.Nil(t, err)
 
-	assert.Equal(t, valueobject.OrderStatusConfirmed, order.Status)
+	assert.Equal(t, sharedconsts.OrderStatusConfirmed, order.Status)
 
 }

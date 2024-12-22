@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	sharedconsts "github.com/caiojorge/fiap-challenge-ddd/internal/shared/consts"
 	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/order/findbyparam"
 	"github.com/gin-gonic/gin"
 )
@@ -29,10 +30,10 @@ func NewFindByParamsController(ctx context.Context, usecase portsusecase.FindOrd
 // @Success 200 {array} usecase.OrderFindByParamOutputDTO
 // @Failure 400 {object} string "Bad Request"
 // @Failure 404 {object} string "Not Found"
-// @Router /orders/paid [get]
+// @Router /orders/notconfirmed [get]
 func (r *FindByParamsController) GetByParamsOrders(c *gin.Context) {
 
-	orders, err := r.usecase.FindOrdersByParams(r.ctx, map[string]interface{}{"status": "paid"})
+	orders, err := r.usecase.FindOrdersByParams(r.ctx, map[string]interface{}{"status": sharedconsts.OrderStatusNotConfirmed})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
 		return

@@ -6,7 +6,7 @@ import (
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
 	mocks "github.com/caiojorge/fiap-challenge-ddd/internal/domain/repository/mocks"
-	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
+	sharedconsts "github.com/caiojorge/fiap-challenge-ddd/internal/shared/consts"
 	checkoutUseCase "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/checkout/create"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -52,9 +52,9 @@ func TestPayment(t *testing.T) {
 	// Define entities for the mocks to return
 	order := &entity.Order{
 		ID:     "order123",
-		Status: valueobject.OrderItemStatusConfirmed,
+		Status: sharedconsts.OrderItemStatusConfirmed,
 		Items: []*entity.OrderItem{
-			{ProductID: "prod123", Quantity: 1, Status: valueobject.OrderItemStatusConfirmed, Price: 100.0},
+			{ProductID: "prod123", Quantity: 1, Status: sharedconsts.OrderItemStatusConfirmed, Price: 100.0},
 		},
 	}
 

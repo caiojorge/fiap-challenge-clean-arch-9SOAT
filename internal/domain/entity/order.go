@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
+	sharedconsts "github.com/caiojorge/fiap-challenge-ddd/internal/shared/consts"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/formatter"
 	sharedgenerator "github.com/caiojorge/fiap-challenge-ddd/internal/shared/generator"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/validator"
@@ -26,18 +26,6 @@ type Order struct {
 	CreatedAt   time.Time
 }
 
-// // OrderInit cria um novo pedido. TODO usada apenas no order_test.
-// func OrderInit(customerCPF string) *Order {
-
-// 	order := Order{
-// 		ID:          shared.NewIDGenerator(),
-// 		CustomerCPF: customerCPF,
-// 		Status:      valueobject.OrderStatusConfirmed,
-// 	}
-
-// 	return &order
-// }
-
 // NewOrder cria um novo pedido. TODO Não esta sendo usada.
 func NewOrder(cpf string, items []*OrderItem) (*Order, error) {
 
@@ -45,7 +33,7 @@ func NewOrder(cpf string, items []*OrderItem) (*Order, error) {
 		ID:          sharedgenerator.NewIDGenerator(),
 		CustomerCPF: cpf,
 		Items:       items,
-		Status:      valueobject.OrderStatusConfirmed,
+		Status:      sharedconsts.OrderStatusConfirmed,
 	}
 
 	if len(order.Items) > 0 {
@@ -79,7 +67,7 @@ func (o *Order) Confirm() error {
 	o.ID = sharedgenerator.NewIDGenerator()
 
 	// o status da ordem é confirmado
-	o.Status = valueobject.OrderStatusConfirmed
+	o.Status = sharedconsts.OrderStatusConfirmed
 
 	for _, item := range o.Items {
 		item.Confirm()
@@ -157,32 +145,32 @@ func (o *Order) CalculateTotal() {
 	o.Total = 0
 
 	for _, item := range o.Items {
-		if item.Status == valueobject.OrderItemStatusConfirmed {
+		if item.Status == sharedconsts.OrderItemStatusConfirmed {
 			o.Total += (item.Price * float64(item.Quantity))
 		}
 	}
 }
 
 func (o *Order) IsPaymentApproved() bool {
-	return o.Status == valueobject.OrderStatusApproved
+	return o.Status == sharedconsts.OrderStatusPaymentApproved
 }
 
 func (o *Order) InformPaymentApproval() {
-	o.Status = valueobject.OrderStatusApproved
+	o.Status = sharedconsts.OrderStatusPaymentApproved
 }
 
 func (o *Order) InformPaymentNotApproval() {
-	o.Status = valueobject.OrderStatusNotApproved
+	o.Status = sharedconsts.OrderStatusNotApproved
 }
 
-func (o *Order) Prepare() {
-	o.Status = valueobject.OrderStatusPreparing
-}
+// func (o *Order) Prepare() {
+// 	o.Status = sharedconsts.OrderStatusPreparing
+// }
 
-func (o *Order) Deliver() {
-	o.Status = valueobject.OrderStatusDelivered
-}
+// func (o *Order) Deliver() {
+// 	o.Status = sharedconsts.OrderStatusDelivered
+// }
 
-func (o *Order) Cancel() {
-	o.Status = valueobject.OrderStatusCanceled
-}
+// func (o *Order) Cancel() {
+// 	o.Status = sharedconsts.OrderStatusCanceled
+// }

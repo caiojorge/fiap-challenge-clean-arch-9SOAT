@@ -31,7 +31,7 @@ func NewCheckPaymentCheckoutController(ctx context.Context,
 // @Accept  json
 // @Produce  json
 // @Param id path string true "Order id"
-// @Success 200 {object} usecase.OrderFindByIdOutputDTO
+// @Success 200 {object} usecase.CheckPaymentOutputDTO
 // @Failure 404 {object} string "Order | Checkout not found"
 // @Failure 400 {object} string "Order ID is required"
 // @Failure 500 {object} string "Internal Server Error"
@@ -64,5 +64,5 @@ func (r *CheckPaymentCheckoutController) GetCheckPaymentCheckout(c *gin.Context)
 		return
 	}
 
-	c.JSON(http.StatusOK, output.GatewayTransactionID)
+	c.JSON(http.StatusOK, output)
 }
