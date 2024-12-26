@@ -40,7 +40,7 @@ func main() {
 
 	db := setupDB()
 	server := server.NewServer(db, logger)
-	server.Initialization()
+	//server.Initialization()
 
 	logger.Info("Server Initialized")
 

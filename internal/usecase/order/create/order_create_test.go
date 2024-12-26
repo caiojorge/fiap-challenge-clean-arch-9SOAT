@@ -90,7 +90,7 @@ func TestCreateOrder(t *testing.T) {
 	assert.Nil(t, err)
 	assert.NotNil(t, output)
 	assert.NotNil(t, output.ID)
-	assert.Equal(t, "confirmed", output.Status)
+	assert.Equal(t, "order-confirmed", output.Status)
 	assert.Equal(t, 2, len(output.Items))
 	assert.Equal(t, 200.0, output.Total)
 

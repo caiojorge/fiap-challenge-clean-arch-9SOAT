@@ -8,6 +8,7 @@ import (
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -32,7 +33,8 @@ func setupTestServer() *GinServer {
 		panic("failed to migrate database")
 	}
 	gin.SetMode(gin.TestMode)
-	server := NewServer(db, nil)
+	logger, _ := zap.NewProduction()
+	server := NewServer(db, logger)
 	server.router.GET("/customer", mockControllerGetCustomerByCPF)
 	return server
 }

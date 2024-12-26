@@ -1,34 +1,10 @@
 package server
 
 import (
-	"context"
 	"log"
-	"time"
 
-	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/converter"
-	service "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/gateway"
-	repositorygorm "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/repository/gorm"
-	controllercheckout "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/checkout"
-	controllercustomer "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/customer"
-	controllerkitchen "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/kitchen"
-	controllerorder "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/order"
-	controllerproduct "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/product"
-	usecasecheckout "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/checkout/create"
-	usecasecustomerfindall "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/customer/findall"
-	usecasecustomerfindbycpf "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/customer/findbycpf"
-	usecasecustomerregister "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/customer/register"
-	usecasecustomerupdate "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/customer/update"
-	usecasekitchen "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/kitchen/findall"
-	usecaseordercreate "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/order/create"
-	usecaseorderfindall "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/order/findall"
-	usecaseorderfindbyid "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/order/findbyid"
-	usecaseorderfindbyparam "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/order/findbyparam"
-	usecaseproductdelete "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/product/delete"
-	usecaseproductfindall "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/product/findall"
-	usecaseproductfindbycategory "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/product/findbycategory"
-	usecaseproductfindbyid "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/product/findbyid"
-	usecaseproductregister "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/product/register"
-	usecaseproductupdater "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/product/update"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/di"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/router"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -36,23 +12,33 @@ import (
 )
 
 type GinServer struct {
-	router *gin.Engine
-	db     *gorm.DB
-	logger *zap.Logger
+	router    *gin.Engine
+	db        *gorm.DB
+	logger    *zap.Logger
+	container *di.Container
 }
 
 func NewServer(db *gorm.DB, logger *zap.Logger) *GinServer {
-	r := gin.Default()
+	container := di.NewContainer(db, logger)
+	err := container.Validate()
+	if err != nil {
+		log.Fatal("Failed to create container: ", err)
+	}
+
+	r := router.SetupRouter(container)
 
 	// Configurar CORS
-	r.Use(corsMiddleware())
+	//r.Use(corsMiddleware())
 
 	return &GinServer{
-		router: r, db: db,
-		logger: logger,
+		router:    r,
+		db:        db,
+		logger:    logger,
+		container: container,
 	}
 }
 
+/*
 func corsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
@@ -70,11 +56,13 @@ func corsMiddleware() gin.HandlerFunc {
 		c.Next()
 	}
 }
+*/
 
 func (s *GinServer) GetDB() *gorm.DB {
 	return s.db
 }
 
+/*
 func (s *GinServer) Initialization() *GinServer {
 
 	//db := setupSQLite()
@@ -83,13 +71,14 @@ func (s *GinServer) Initialization() *GinServer {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 
-	customerRepo := repositorygorm.NewCustomerRepositoryGorm(s.db)
 	productConverter := converter.NewProductConverter()
-	productRepo := repositorygorm.NewProductRepositoryGorm(s.db, productConverter)
 	orderConverter := converter.NewOrderConverter()
+	customerRepo := repositorygorm.NewCustomerRepositoryGorm(s.db)
+	productRepo := repositorygorm.NewProductRepositoryGorm(s.db, productConverter)
 	orderRepo := repositorygorm.NewOrderRepositoryGorm(s.db, orderConverter)
 	checkoutRepo := repositorygorm.NewCheckoutRepositoryGorm(s.db)
 	kitchenRepo := repositorygorm.NewKitchenRepositoryGorm(s.db)
+
 	gatewayService := service.NewFakePaymentService()
 
 	g := s.router.Group("/kitchencontrol/api/v1/customers")
@@ -141,8 +130,12 @@ func (s *GinServer) Initialization() *GinServer {
 		findByIDController := controllerorder.NewFindOrderByIDController(ctx, usecaseorderfindbyid.NewOrderFindByID(orderRepo))
 		o.GET("/:id", findByIDController.GetOrderByID)
 
-		findByParamsOrdersController := controllerorder.NewFindByParamsController(ctx, usecaseorderfindbyparam.NewOrderFindByParams(orderRepo))
-		o.GET("/paid", findByParamsOrdersController.GetByParamsOrders)
+		findConfirmedOrdersController := controllerorder.NewFindByParamsConfirmedController(ctx, usecaseorderfindbyparam.NewOrderFindByParams(orderRepo))
+		o.GET("/confirmed", findConfirmedOrdersController.GetOrdersConfirmed)
+		findNotConfirmedOrdersController := controllerorder.NewFindByParamsController(ctx, usecaseorderfindbyparam.NewOrderFindByParams(orderRepo))
+		o.GET("/pending", findNotConfirmedOrdersController.GetOrdersNotConfirmed)
+		findPaymentApprovedOrdersController := controllerorder.NewFindByParamsPaymentApprovedController(ctx, usecaseorderfindbyparam.NewOrderFindByParams(orderRepo))
+		o.GET("/paid", findPaymentApprovedOrdersController.GetOrdersWithPaymentApproved)
 
 	}
 
@@ -160,6 +153,7 @@ func (s *GinServer) Initialization() *GinServer {
 
 	return s
 }
+*/
 
 func (s *GinServer) Run(port string) {
 	if err := s.router.Run(port); err != nil {
@@ -169,4 +163,8 @@ func (s *GinServer) Run(port string) {
 
 func (s *GinServer) GetRouter() *gin.Engine {
 	return s.router
+}
+
+func (s *GinServer) GetContainer() *di.Container {
+	return s.container
 }

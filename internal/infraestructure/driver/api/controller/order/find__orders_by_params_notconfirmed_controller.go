@@ -9,13 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type FindByParamsController struct {
+type FindByParamsNotConfirmedController struct {
 	usecase portsusecase.FindOrderByParamsUseCase
 	ctx     context.Context
 }
 
-func NewFindByParamsController(ctx context.Context, usecase portsusecase.FindOrderByParamsUseCase) *FindByParamsController {
-	return &FindByParamsController{
+func NewFindByParamsNotConfirmedController(ctx context.Context, usecase portsusecase.FindOrderByParamsUseCase) *FindByParamsNotConfirmedController {
+	return &FindByParamsNotConfirmedController{
 		usecase: usecase,
 		ctx:     ctx,
 	}
@@ -31,7 +31,7 @@ func NewFindByParamsController(ctx context.Context, usecase portsusecase.FindOrd
 // @Failure 400 {object} string "Bad Request"
 // @Failure 404 {object} string "Not Found"
 // @Router /orders/notconfirmed [get]
-func (r *FindByParamsController) GetByParamsOrders(c *gin.Context) {
+func (r *FindByParamsNotConfirmedController) GetOrdersNotConfirmed(c *gin.Context) {
 
 	orders, err := r.usecase.FindOrdersByParams(r.ctx, map[string]interface{}{"status": sharedconsts.OrderStatusNotConfirmed})
 	if err != nil {

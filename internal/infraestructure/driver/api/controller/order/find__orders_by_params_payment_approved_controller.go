@@ -31,7 +31,7 @@ func NewFindByParamsPaymentApprovedController(ctx context.Context, usecase ports
 // @Failure 400 {object} string "Bad Request"
 // @Failure 404 {object} string "Not Found"
 // @Router /orders/paid [get]
-func (r *FindByParamsPaymentApprovedController) GetConfirmedOrders(c *gin.Context) {
+func (r *FindByParamsPaymentApprovedController) GetOrdersWithPaymentApproved(c *gin.Context) {
 
 	orders, err := r.usecase.FindOrdersByParams(r.ctx, map[string]interface{}{"status": sharedconsts.OrderStatusPaymentApproved})
 	if err != nil {
