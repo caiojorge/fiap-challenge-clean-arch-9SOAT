@@ -35,16 +35,16 @@ func SetupRouter(container *di.Container) *gin.Engine {
 		orderGroup.POST("/", container.CreateOrderController.PostCreateOrder)
 		orderGroup.GET("/", container.FindAllOrdersController.GetAllOrders)
 		orderGroup.GET("/:id", container.FindOrderByIDController.GetOrderByID)
-		orderGroup.GET("/confirmed", container.FindByParamsOrdersConfirmedController.GetOrdersConfirmed)
-		orderGroup.GET("/pending", container.FindByParamsOrdersNotConfirmedController.GetOrdersNotConfirmed)
-		orderGroup.GET("/paid", container.FindByParamsOrdersPaymentApprovedController.GetOrdersWithPaymentApproved)
+		orderGroup.GET("/confirmed", container.FindByParamsOrdersConfirmedController.GetOrdersConfirmed)            // listagem: pedido confimado, mas ainda não pago
+		orderGroup.GET("/pending", container.FindByParamsOrdersNotConfirmedController.GetOrdersNotConfirmed)        // listagem: ordens aguardando o pagamento
+		orderGroup.GET("/paid", container.FindByParamsOrdersPaymentApprovedController.GetOrdersWithPaymentApproved) // listagem: ordens pagas
 	}
 
 	// Checkout routes
 	checkoutGroup := r.Group("/kitchencontrol/api/v1/checkouts")
 	{
 		checkoutGroup.POST("/", container.CreateCheckoutController.PostCreateCheckout)
-		checkoutGroup.GET("/check/payment", container.CheckoutCheckController.GetCheckPaymentCheckout)
+		checkoutGroup.GET("/:id/check/payment", container.CheckoutCheckController.GetCheckPaymentCheckout) // verifica se determinada ordem foi paga
 	}
 
 	// Kitchen routes
@@ -56,6 +56,7 @@ func SetupRouter(container *di.Container) *gin.Engine {
 	return r
 }
 
+// corsMiddleware - no K8s, precisamos tratar o cors
 func corsMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")

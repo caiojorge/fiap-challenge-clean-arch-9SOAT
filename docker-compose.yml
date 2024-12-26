@@ -29,21 +29,21 @@ services:
     networks:
       - my-network
   
-  app:
-    build: .
-    container_name: fiap-go-app
-    depends_on:
-      - mysql
-    ports:
-      - "8080:8080"
-    environment:
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASS=root
-      - DB_NAME=dbcontrol
-    networks:
-      - my-network
+  # app:
+  #   build: .
+  #   container_name: fiap-go-app
+  #   depends_on:
+  #     - mysql
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     - DB_HOST=mysql
+  #     - DB_PORT=3306
+  #     - DB_USER=root
+  #     - DB_PASS=root
+  #     - DB_NAME=dbcontrol
+  #   networks:
+  #     - my-network
             
 volumes:
   mysql-data:

@@ -1,5 +1,19 @@
+# FASE 1
+# Local enviroment 
+fiap-run:
+	docker-compose up -d
+
+fiap-stop:
+	docker-compose down
+
+fiap-logs:
+	docker-compose logs -f
+
+go-run:
+	go run cmd/kitchencontrol/main.go
+
 # FASE 2
-# DESENVOLVIMENTO
+# Para apoio ao DESENVOLVIMENTO
 test-coverage:
 	go test -coverprofile=coverage.out ./...
 coverage: test-coverage
@@ -44,6 +58,7 @@ setup-configmap:
 	kubectl create configmap db-init-scripts --from-file=./db-init
 	kubectl get configmaps
 
+# cria os recursos no k8s
 setup-k8s:
 	kubectl apply -f k8s/mysql-secret.yaml
 	kubectl apply -f k8s/mysql-pvc.yaml
@@ -57,15 +72,19 @@ setup-k8s:
 	kubectl get pods
 	kubectl get svc
 
+# faz o setup completo
 setup-all: setup-cluster setup-configmap setup-k8s
 	@echo "Setup concluído!"
 
+# acesso aos logs dos pods no k8s
 log-k8s:
 	kubectl logs -f $(shell kubectl get pods -l app=fiap-rocks-server -o jsonpath='{.items[0].metadata.name}')
 
+# verifica os pods e serviços no k8s
 get-k8s:
 	kubectl get pods
 	kubectl get svc
 
+# deleta todos os recursos no k8s
 shutdown:
 	kind delete cluster
