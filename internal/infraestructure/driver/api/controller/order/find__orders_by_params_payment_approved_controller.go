@@ -21,9 +21,9 @@ func NewFindByParamsPaymentApprovedController(ctx context.Context, usecase ports
 	}
 }
 
-// GetConfirmedOrders returns a list of all paid orders
+// GetOrdersWithPaymentApproved returns a list of all paid orders
 // @Summary Get all confirmed orders
-// @Description Retorna todos os pedidos (orders) registrados no sistema. Se não houver pedidos, retorna um erro (404).
+// @Description Retorna todos os pedidos (orders) registrados no sistema que tenham status de pagamento confirmado. Se não houver pedidos, retorna um erro (404).
 // @Tags Orders
 // @Accept  json
 // @Produce  json

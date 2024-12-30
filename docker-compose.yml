@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: dbcontrol
+      MYSQL_DATABASE: dbcontrolf2
       MYSQL_USER: myuser
       MYSQL_PASSWORD: mypass
     volumes:
@@ -41,7 +41,7 @@ services:
   #     - DB_PORT=3306
   #     - DB_USER=root
   #     - DB_PASS=root
-  #     - DB_NAME=dbcontrol
+  #     - DB_NAME=dbcontrol-f2
   #   networks:
   #     - my-network
             

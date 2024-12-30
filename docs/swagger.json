@@ -18,6 +18,56 @@
     "host": "localhost:30080",
     "basePath": "/kitchencontrol/api/v1",
     "paths": {
+        "/checkout/check/{id}": {
+            "get": {
+                "description": "Get details of an Checkout and Status of Payment by Order id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Check Payment by Order ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/usecase.CheckPaymentOutputDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Order ID is required",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Order | Checkout not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/checkouts": {
             "post": {
                 "description": "Efetiva o pagamento do cliente, via fake checkout nesse momento, e libera o pedido para preparação. A ordem muda de status nesse momento, para em preparação.",
@@ -256,9 +306,9 @@
                 }
             }
         },
-        "/kitchens/orders": {
+        "/kitchens/orders/paid": {
             "get": {
-                "description": "Retorna todos os pedidos (orders) que estão na cozinha para inicio de preparação. Se não houver pedidos, retorna um erro (404).",
+                "description": "Retorna todos os pedidos (orders) que estão na cozinha para inicio de preparação com status pagamento aprovado. Se não houver pedidos, retorna um erro (404).",
                 "consumes": [
                     "application/json"
                 ],
@@ -382,7 +432,7 @@
                 }
             }
         },
-        "/orders/paid": {
+        "/orders/confirmed": {
             "get": {
                 "description": "Retorna todos os pedidos (orders) registrados no sistema. Se não houver pedidos, retorna um erro (404).",
                 "consumes": [
@@ -394,7 +444,83 @@
                 "tags": [
                     "Orders"
                 ],
-                "summary": "Get all paid orders",
+                "summary": "Get all confirmed orders",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/usecase.OrderFindByParamOutputDTO"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/paid": {
+            "get": {
+                "description": "Retorna todos os pedidos (orders) registrados no sistema que tenham status de pagamento confirmado. Se não houver pedidos, retorna um erro (404).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Get all confirmed orders",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/usecase.OrderFindByParamOutputDTO"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/pending": {
+            "get": {
+                "description": "Retorna todos os pedidos (orders) registrados no sistema sem o pagamento confirmado. Se não houver pedidos, retorna um erro (404).",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Orders"
+                ],
+                "summary": "Get all orders not confirmed",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -743,20 +869,49 @@
                 }
             }
         },
+        "usecase.CheckPaymentOutputDTO": {
+            "type": "object",
+            "properties": {
+                "gatewayTransactionID": {
+                    "type": "string"
+                },
+                "orderID": {
+                    "type": "string"
+                },
+                "paymentApproved": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "usecase.CheckoutInputDTO": {
             "type": "object",
             "properties": {
-                "customer_cpf": {
+                "discont_coupon": {
+                    "description": "valor de desconto... só uma ideia nesse momento.",
+                    "type": "number"
+                },
+                "gateway_name": {
+                    "description": "nome do gateway (nesse caso, mercado livre fake)",
                     "type": "string"
                 },
-                "gateway": {
+                "gateway_token": {
+                    "description": "id ou token para uso no gateway",
                     "type": "string"
                 },
-                "gateway_id": {
+                "notification_url": {
+                    "description": "webhook para receber a confirmação do pagamento",
                     "type": "string"
                 },
                 "order_id": {
+                    "description": "o ID do pedido que será pago",
                     "type": "string"
+                },
+                "sponsor_id": {
+                    "description": "ID do patrocinador",
+                    "type": "integer"
                 }
             }
         },
@@ -764,9 +919,15 @@
             "type": "object",
             "properties": {
                 "gateway_transaction_id": {
+                    "description": "ID de transação gerado pelo gateway",
                     "type": "string"
                 },
                 "id": {
+                    "description": "ID do checkout",
+                    "type": "string"
+                },
+                "order_id": {
+                    "description": "Identificação da ordem (pedido)",
                     "type": "string"
                 }
             }

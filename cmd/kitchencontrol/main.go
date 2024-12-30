@@ -38,7 +38,7 @@ func main() {
 	}
 	defer logger.Sync() // flushes buffer, if any
 
-	db := setupDB()
+	db := setupDB(logger)
 	server := server.NewServer(db, logger)
 	//server.Initialization()
 
@@ -66,16 +66,17 @@ func main() {
 
 }
 
-func setupDB() *gorm.DB {
+func setupDB(logger *zap.Logger) *gorm.DB {
 
 	host := "localhost"
 	port := "3306"
 	user := "root"
 	password := "root"
-	dbName := "dbcontrol"
+	dbName := "dbcontrolf2"
 
 	db := infra.NewDB(host, port, user, password, dbName)
-
+	logger.Info("Database connection established")
+	logger.Info(dbName, zap.String("host", host), zap.String("port", port), zap.String("user", user))
 	// get a connection
 	connection := db.GetConnection("mysql")
 	if connection == nil {

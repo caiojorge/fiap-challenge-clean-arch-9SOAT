@@ -21,16 +21,16 @@ func NewFindByParamsNotConfirmedController(ctx context.Context, usecase portsuse
 	}
 }
 
-// GetByParamsOrders returns a list of all paid orders
-// @Summary Get all paid orders
-// @Description Retorna todos os pedidos (orders) registrados no sistema. Se não houver pedidos, retorna um erro (404).
+// GetOrdersNotConfirmed returns a list of all paid orders
+// @Summary Get all orders not confirmed
+// @Description Retorna todos os pedidos (orders) registrados no sistema sem o pagamento confirmado. Se não houver pedidos, retorna um erro (404).
 // @Tags Orders
 // @Accept  json
 // @Produce  json
 // @Success 200 {array} usecase.OrderFindByParamOutputDTO
 // @Failure 400 {object} string "Bad Request"
 // @Failure 404 {object} string "Not Found"
-// @Router /orders/notconfirmed [get]
+// @Router /orders/pending [get]
 func (r *FindByParamsNotConfirmedController) GetOrdersNotConfirmed(c *gin.Context) {
 
 	orders, err := r.usecase.FindOrdersByParams(r.ctx, map[string]interface{}{"status": sharedconsts.OrderStatusNotConfirmed})
