@@ -18,7 +18,7 @@
     "host": "localhost:30080",
     "basePath": "/kitchencontrol/api/v1",
     "paths": {
-        "/checkout/check/{id}": {
+        "/checkout/{id}/check/payment": {
             "get": {
                 "description": "Get details of an Checkout and Status of Payment by Order id",
                 "consumes": [
@@ -28,7 +28,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Orders"
+                    "Checkouts"
                 ],
                 "summary": "Check Payment by Order ID",
                 "parameters": [

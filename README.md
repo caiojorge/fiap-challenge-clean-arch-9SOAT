@@ -128,7 +128,15 @@ internal/
 ### #3 Checkout Pedido que deverá receber os produtos solicitados e retornar à identificação do pedido.
 ### #4 Consultar status de pagamento pedido, que informa se o pagamento foi aprovado ou não.
 
+## Problema para criar o banco de dados (just in case)
 
+- Em caso de problemas com a criação do DB, será necessário remover os volumes existentes
+
+```bash
+docker-compose down -v
+docker volume rm fiap-challenge-clean-arch-9soat_mysql-data
+docker-compose up
+```
 
 ## Acesso ao projeto no github
 - Será enviado aos professores via plataforma da fiap

@@ -24,7 +24,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/checkout/check/{id}": {
+        "/checkout/{id}/check/payment": {
             "get": {
                 "description": "Get details of an Checkout and Status of Payment by Order id",
                 "consumes": [
@@ -34,7 +34,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Orders"
+                    "Checkouts"
                 ],
                 "summary": "Check Payment by Order ID",
                 "parameters": [

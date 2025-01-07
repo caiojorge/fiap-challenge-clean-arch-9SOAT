@@ -27,7 +27,7 @@ func NewCheckPaymentCheckoutController(ctx context.Context,
 
 // @Summary Check Payment by Order ID
 // @Description Get details of an Checkout and Status of Payment by Order id
-// @Tags Orders
+// @Tags Checkouts
 // @Accept  json
 // @Produce  json
 // @Param id path string true "Order id"
@@ -35,7 +35,7 @@ func NewCheckPaymentCheckoutController(ctx context.Context,
 // @Failure 404 {object} string "Order | Checkout not found"
 // @Failure 400 {object} string "Order ID is required"
 // @Failure 500 {object} string "Internal Server Error"
-// @Router /checkout/check/{id} [get]
+// @Router /checkout/{id}/check/payment [get]
 func (r *CheckPaymentCheckoutController) GetCheckPaymentCheckout(c *gin.Context) {
 	// pouco provável que o ID seja vazio, mas é uma validação simples
 	id := c.Param("id")

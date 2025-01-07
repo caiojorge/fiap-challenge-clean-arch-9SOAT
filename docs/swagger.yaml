@@ -320,7 +320,7 @@ info:
   title: Fiap Fase 2 Challenge Clean Arch API - 9SOAT
   version: "1.0"
 paths:
-  /checkout/check/{id}:
+  /checkout/{id}/check/payment:
     get:
       consumes:
       - application/json
@@ -352,7 +352,7 @@ paths:
             type: string
       summary: Check Payment by Order ID
       tags:
-      - Orders
+      - Checkouts
   /checkouts:
     post:
       consumes:
