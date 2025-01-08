@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model"
 	sharedDate "github.com/caiojorge/fiap-challenge-ddd/internal/shared/time"
 	"github.com/jinzhu/copier"
@@ -124,10 +125,12 @@ func (r *CheckoutRepositoryGorm) FindbyOrderID(ctx context.Context, id string) (
 		return nil, errors.New("checkout not found")
 	}
 
-	var entity *entity.Checkout
-	err := copier.Copy(&entity, &orderModel)
-	if err != nil {
-		return nil, err
+	entity := &entity.Checkout{
+		ID:        orderModel.ID,
+		OrderID:   orderModel.OrderID,
+		Gateway:   valueobject.Gateway{GatewayName: orderModel.GatewayName, GatewayToken: orderModel.GatewayToken, GatewayTransactionID: orderModel.GatewayTransactionID},
+		Total:     orderModel.Total,
+		CreatedAt: orderModel.CreatedAt,
 	}
 
 	return entity, nil

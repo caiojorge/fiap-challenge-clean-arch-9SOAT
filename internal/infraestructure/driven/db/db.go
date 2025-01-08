@@ -79,6 +79,7 @@ func (d *DB) setupMysql() *gorm.DB {
 			break
 		}
 		fmt.Printf("Failed to connect to database. Retrying in 5 seconds... (%d/%d)\n", i+1, 10)
+		fmt.Printf("host: %s, port: %s, user: %s, pass: %s, name: %s\n", dbHost, dbPort, dbUser, dbPass, dbName)
 		time.Sleep(5 * time.Second)
 	}
 

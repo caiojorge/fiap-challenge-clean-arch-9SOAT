@@ -24,7 +24,53 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/checkout/{id}/check/payment": {
+        "/checkouts": {
+            "post": {
+                "description": "Efetiva o pagamento do cliente, via fake checkout nesse momento, e libera o pedido para preparação. A ordem muda de status nesse momento, para em preparação.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Checkouts"
+                ],
+                "summary": "Create Checkout",
+                "parameters": [
+                    {
+                        "description": "cria novo Checkout",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/usecase.CheckoutInputDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/usecase.CheckoutOutputDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/checkouts/{id}/check/payment": {
             "get": {
                 "description": "Get details of an Checkout and Status of Payment by Order id",
                 "consumes": [
@@ -67,52 +113,6 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/checkouts": {
-            "post": {
-                "description": "Efetiva o pagamento do cliente, via fake checkout nesse momento, e libera o pedido para preparação. A ordem muda de status nesse momento, para em preparação.",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Checkouts"
-                ],
-                "summary": "Create Checkout",
-                "parameters": [
-                    {
-                        "description": "cria novo Checkout",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/usecase.CheckoutInputDTO"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/usecase.CheckoutOutputDTO"
-                        }
-                    },
-                    "400": {
-                        "description": "invalid data",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "internal server error",
                         "schema": {
                             "type": "string"
                         }

@@ -320,39 +320,6 @@ info:
   title: Fiap Fase 2 Challenge Clean Arch API - 9SOAT
   version: "1.0"
 paths:
-  /checkout/{id}/check/payment:
-    get:
-      consumes:
-      - application/json
-      description: Get details of an Checkout and Status of Payment by Order id
-      parameters:
-      - description: Order id
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/usecase.CheckPaymentOutputDTO'
-        "400":
-          description: Order ID is required
-          schema:
-            type: string
-        "404":
-          description: Order | Checkout not found
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
-      summary: Check Payment by Order ID
-      tags:
-      - Checkouts
   /checkouts:
     post:
       consumes:
@@ -383,6 +350,39 @@ paths:
           schema:
             type: string
       summary: Create Checkout
+      tags:
+      - Checkouts
+  /checkouts/{id}/check/payment:
+    get:
+      consumes:
+      - application/json
+      description: Get details of an Checkout and Status of Payment by Order id
+      parameters:
+      - description: Order id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/usecase.CheckPaymentOutputDTO'
+        "400":
+          description: Order ID is required
+          schema:
+            type: string
+        "404":
+          description: Order | Checkout not found
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Check Payment by Order ID
       tags:
       - Checkouts
   /customers:

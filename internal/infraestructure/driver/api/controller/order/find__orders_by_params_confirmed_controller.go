@@ -33,7 +33,7 @@ func NewFindByParamsConfirmedController(ctx context.Context, usecase portsusecas
 // @Router /orders/confirmed [get]
 func (r *FindByParamsConfirmedController) GetOrdersConfirmed(c *gin.Context) {
 
-	orders, err := r.usecase.FindOrdersByParams(r.ctx, map[string]interface{}{"status": sharedconsts.OrderItemStatusConfirmed})
+	orders, err := r.usecase.FindOrdersByParams(r.ctx, map[string]interface{}{"status": sharedconsts.OrderStatusConfirmed})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid data"})
 		return

@@ -11,7 +11,8 @@ A Kitchen Control API é uma aplicação para gerenciar clientes, produtos, pedi
 - MySQL
 - Gin Web Framework
 - Docker
-- Kind
+- Kind v0.25.0 (ou minikube / docker desktop)
+- kubectl
 
 ## Instalação e acesso ao swagger
 
@@ -23,36 +24,41 @@ A Kitchen Control API é uma aplicação para gerenciar clientes, produtos, pedi
 - Git
 - make
 - Kind v0.25.0 (ou minikube / docker desktop)
+- kubectl
 
 ### Como instalar o Kitchen Control
 
-- obs: A imagem do projeto esta no dockerhub; não é necessário gerar nova imagem.
+- Para rodar no K8S, como a imagem do projeto esta no dockerhub; não é necessário gerar nova imagem.
+- Os steps 1 e 2 são opcionais
 
 1. Com o projeto baixado / clonado, instale as dependências:
     ```bash
     go mod tidy
     ```
+    - se não baixar as dependências, o projeto fica indicando erro, mas, como a imagem esta no hub, vai funcionar normalmente.
+    
 2. Execute os testes:
     ```bash
     make test (ou go test -v -cover ./...)
     ```
-3. Se estiver usando kind (v0.25.0) como eu, crie o custer
+    - apenas se vc quiser conhecer e ou executar os testes unitários
 
+3. Se estiver usando kind (v0.25.0) como eu, crie o custer
     ```bash
     make setup-cluster
     ```
-4. Crie os configmaps
+    - agora sim, estamos inciando a configuração do projeto em uma instalação local do K8S
+    - Usei o KIND durante o desenvolvimento
 
+4. Crie os configmaps
     ```bash
     make setup-configmap
     ```
 5. Crie os deployments, services, pvc e secrets 
-
     ```bash
     make setup-k8s
     ```
 6. Se necessário, acessar os logs
-
     ```bash
     make logs-k8s
     ```
@@ -61,6 +67,7 @@ A Kitchen Control API é uma aplicação para gerenciar clientes, produtos, pedi
     make shutdown
     ```
     - esse comando irá deletar o cluster e os dados no DB serão perdidos 
+
 ## Como usar o Kitchen Control
 
 ### Endpoints (acesso via swagger)
@@ -69,6 +76,7 @@ A Kitchen Control API é uma aplicação para gerenciar clientes, produtos, pedi
     ```bash
     http://localhost:30080/kitchencontrol/api/v1/docs/index.html
     ```
+    
 ### Client para DB - Adminer
 9. Adminer
     ```bash

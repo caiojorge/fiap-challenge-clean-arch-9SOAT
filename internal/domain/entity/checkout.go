@@ -11,7 +11,7 @@ import (
 type Checkout struct {
 	ID        string
 	OrderID   string
-	Gateway   valueobject.Gateway // TODO pensar em um value object para Gateway
+	Gateway   valueobject.Gateway
 	Total     float64
 	CreatedAt time.Time
 }
