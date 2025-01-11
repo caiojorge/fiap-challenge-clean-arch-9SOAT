@@ -26,7 +26,7 @@ func NewCheckPaymentCheckoutController(ctx context.Context,
 }
 
 // @Summary Check Payment by Order ID
-// @Description Get details of an Checkout and Status of Payment by Order id
+// @Description Get details of an Checkout and Status of Payment by Order id. Req #2 - Consultar status de pagamento pedido, que informa se o pagamento foi aprovado ou não.
 // @Tags Checkouts
 // @Accept  json
 // @Produce  json

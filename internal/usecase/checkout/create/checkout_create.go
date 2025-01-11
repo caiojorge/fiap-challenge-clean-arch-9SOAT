@@ -71,6 +71,13 @@ func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkoutDTO
 		return nil, err
 	}
 
+	// muda o status para checkout-confirmado
+	err = cr.handleOrder(ctx, order)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: confirmar a implementação do envio do pedido para a cozinha
 	// Kitchen - cria um item na cozinha para cada produto do pedido
 	// err = cr.handleKitchen(ctx, order, productList, *payment)
 	// if err != nil {
@@ -189,5 +196,14 @@ func (cr *CheckoutCreateUseCase) handleKitchen(ctx context.Context, order *entit
 		}
 	}
 
+	return nil
+}
+
+func (cr *CheckoutCreateUseCase) handleOrder(ctx context.Context, order *entity.Order) error {
+	order.ConfirmCheckout()
+	err := cr.orderRepository.Update(ctx, order)
+	if err != nil {
+		return err
+	}
 	return nil
 }

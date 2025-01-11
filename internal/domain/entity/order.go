@@ -96,6 +96,10 @@ func (o *Order) ConfirmItemsPrice(products []*Product) {
 	}
 }
 
+func (o *Order) ConfirmCheckout() {
+	o.Status = sharedconsts.OrderStatusCheckoutConfirmed
+}
+
 func (o *Order) IsCustomerInformed() bool {
 	return o.CustomerCPF != ""
 }
@@ -162,15 +166,3 @@ func (o *Order) InformPaymentApproval() {
 func (o *Order) InformPaymentNotApproval() {
 	o.Status = sharedconsts.OrderStatusNotApproved
 }
-
-// func (o *Order) Prepare() {
-// 	o.Status = sharedconsts.OrderStatusPreparing
-// }
-
-// func (o *Order) Deliver() {
-// 	o.Status = sharedconsts.OrderStatusDelivered
-// }
-
-// func (o *Order) Cancel() {
-// 	o.Status = sharedconsts.OrderStatusCanceled
-// }

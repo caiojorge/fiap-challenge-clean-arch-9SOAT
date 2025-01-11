@@ -27,7 +27,7 @@ func NewCreateCheckoutController(ctx context.Context,
 // PostCreateCheckout godoc
 // @Summary Create Checkout
 // @Schemes
-// @Description Efetiva o pagamento do cliente, via fake checkout nesse momento, e libera o pedido para preparação. A ordem muda de status nesse momento, para em preparação.
+// @Description Efetiva o pagamento do cliente, via fake checkout nesse momento, e libera o pedido para preparação. A ordem muda de status nesse momento, para em preparação. Req #1 - Checkout Pedido que deverá receber os produtos solicitados e retornar à identificação do pedido.
 // @Tags Checkouts
 // @Accept json
 // @Produce json

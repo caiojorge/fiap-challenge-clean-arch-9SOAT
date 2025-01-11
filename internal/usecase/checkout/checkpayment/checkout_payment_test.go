@@ -73,6 +73,10 @@ func TestPayment(t *testing.T) {
 		Find(ctx, gomock.Any()).
 		Return(order, nil).AnyTimes() // Order found and not paid
 
+	mockOrderRepository.EXPECT().
+		Update(ctx, gomock.Any()).
+		Return(nil) // Order found and not paid
+
 	mockProductRepository.EXPECT().
 		Find(ctx, gomock.Any()).
 		Return(product, nil) // Product found

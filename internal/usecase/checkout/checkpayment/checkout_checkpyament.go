@@ -19,7 +19,7 @@ func NewCheckPaymentUseCase(checkoutRepo ports.CheckoutRepository, orderRepo por
 	}
 }
 
-// CheckPayment busca todas as ordens
+// CheckPayment verifica se a ordem em questão foi paga; é um mix de checkout com ordem
 func (cr *CheckPaymentUseCase) CheckPayment(ctx context.Context, orderID string) (*CheckPaymentOutputDTO, error) {
 
 	checkout, err := cr.checkoutRepo.FindbyOrderID(ctx, orderID)
