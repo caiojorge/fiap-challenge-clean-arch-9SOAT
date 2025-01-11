@@ -9,8 +9,11 @@ fiap-stop:
 fiap-logs:
 	docker-compose logs -f
 
-go-run:
+run-kitchen-api:
 	go run cmd/kitchencontrol/main.go
+
+run-payment-api:
+	go run cmd/fakepaymentservice/main.go	
 
 # FASE 2
 # Para apoio ao DESENVOLVIMENTO
