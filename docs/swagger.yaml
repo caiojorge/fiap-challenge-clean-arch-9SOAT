@@ -18,6 +18,29 @@ definitions:
       status:
         type: string
     type: object
+  usecase.CheckoutConfirmationInputDTO:
+    properties:
+      order_id:
+        type: string
+      status:
+        type: string
+    required:
+    - order_id
+    - status
+    type: object
+  usecase.CheckoutConfirmationOutputDTO:
+    properties:
+      checkout_id:
+        type: string
+      order_id:
+        type: string
+      status:
+        type: string
+    required:
+    - checkout_id
+    - order_id
+    - status
+    type: object
   usecase.CheckoutInputDTO:
     properties:
       discont_coupon:
@@ -324,9 +347,10 @@ paths:
     post:
       consumes:
       - application/json
-      description: Efetiva o pagamento do cliente, via fake checkout nesse momento,
-        e libera o pedido para preparação. A ordem muda de status nesse momento, para
-        em preparação.
+      description: 'Efetiva o pagamento do cliente, via fake checkout nesse momento,
+        e deixa o pedindo em espera da confirmação do pagamento. A ordem muda de status
+        nesse momento para checkout-confirmado. Req #1 - Checkout Pedido que deverá
+        receber os produtos solicitados e retornar à identificação do pedido.'
       parameters:
       - description: cria novo Checkout
         in: body
@@ -356,7 +380,9 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get details of an Checkout and Status of Payment by Order id
+      description: 'Get details of an Checkout and Status of Payment by Order id.
+        Req #2 - Consultar status de pagamento pedido, que informa se o pagamento
+        foi aprovado ou não.'
       parameters:
       - description: Order id
         in: path

@@ -1,5 +1,5 @@
 # FASE 1
-# Local enviroment 
+# Local enviroment with docker compose
 fiap-run:
 	docker-compose up -d
 
@@ -16,7 +16,7 @@ run-payment-api:
 	go run cmd/fakepaymentservice/main.go	
 
 # FASE 2
-# Para apoio ao DESENVOLVIMENTO
+# Local enviroment with kind (kubernetes)
 test-coverage:
 	go test -coverprofile=coverage.out ./...
 coverage: test-coverage

@@ -26,7 +26,7 @@ const docTemplate = `{
     "paths": {
         "/checkouts": {
             "post": {
-                "description": "Efetiva o pagamento do cliente, via fake checkout nesse momento, e libera o pedido para preparação. A ordem muda de status nesse momento, para em preparação.",
+                "description": "Efetiva o pagamento do cliente, via fake checkout nesse momento, e deixa o pedindo em espera da confirmação do pagamento. A ordem muda de status nesse momento para checkout-confirmado. Req #1 - Checkout Pedido que deverá receber os produtos solicitados e retornar à identificação do pedido.",
                 "consumes": [
                     "application/json"
                 ],
@@ -72,7 +72,7 @@ const docTemplate = `{
         },
         "/checkouts/{id}/check/payment": {
             "get": {
-                "description": "Get details of an Checkout and Status of Payment by Order id",
+                "description": "Get details of an Checkout and Status of Payment by Order id. Req #2 - Consultar status de pagamento pedido, que informa se o pagamento foi aprovado ou não.",
                 "consumes": [
                     "application/json"
                 ],
@@ -886,6 +886,40 @@ const docTemplate = `{
                 },
                 "paymentApproved": {
                     "type": "boolean"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecase.CheckoutConfirmationInputDTO": {
+            "type": "object",
+            "required": [
+                "order_id",
+                "status"
+            ],
+            "properties": {
+                "order_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecase.CheckoutConfirmationOutputDTO": {
+            "type": "object",
+            "required": [
+                "checkout_id",
+                "order_id",
+                "status"
+            ],
+            "properties": {
+                "checkout_id": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
                 },
                 "status": {
                     "type": "string"
