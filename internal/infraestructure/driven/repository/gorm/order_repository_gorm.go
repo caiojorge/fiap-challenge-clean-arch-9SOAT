@@ -18,6 +18,14 @@ type OrderRepositoryGorm struct {
 	converter converter.Converter[entity.Order, model.Order]
 }
 
+func (r *OrderRepositoryGorm) getDB(ctx context.Context) *gorm.DB {
+	// Verifica se existe uma transação ativa no contexto
+	if tx, ok := ctx.Value("tx").(*gorm.DB); ok {
+		return tx
+	}
+	return r.DB
+}
+
 func NewOrderRepositoryGorm(db *gorm.DB, converter converter.Converter[entity.Order, model.Order]) *OrderRepositoryGorm {
 	return &OrderRepositoryGorm{
 		DB:        db,
@@ -40,7 +48,9 @@ func (r *OrderRepositoryGorm) Create(ctx context.Context, entity *entity.Order) 
 
 	model.CreatedAt = sharedDate.GetBRTimeNow()
 
-	err = r.DB.Create(model).Error
+	db := r.getDB(ctx)
+
+	err = db.Create(model).Error
 	if err != nil {
 		fmt.Println("gorm: " + err.Error())
 		return err
@@ -51,7 +61,8 @@ func (r *OrderRepositoryGorm) Create(ctx context.Context, entity *entity.Order) 
 
 func (r *OrderRepositoryGorm) Update(ctx context.Context, entity *entity.Order) error {
 
-	result := r.DB.Save(r.converter.FromEntity(entity))
+	db := r.getDB(ctx)
+	result := db.Save(r.converter.FromEntity(entity))
 	if result.Error != nil {
 		return result.Error
 	}
@@ -96,7 +107,9 @@ func (r *OrderRepositoryGorm) FindAll(ctx context.Context) ([]*entity.Order, err
 
 func (r *OrderRepositoryGorm) Delete(ctx context.Context, id string) error {
 	var orderModel model.Order
-	result := r.DB.Model(&model.Order{}).Where("id = ?", id).First(&orderModel)
+
+	db := r.getDB(ctx)
+	result := db.Model(&model.Order{}).Where("id = ?", id).First(&orderModel)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			fmt.Println("repositorygorm: order not found")

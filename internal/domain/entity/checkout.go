@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject"
+	sharedconsts "github.com/caiojorge/fiap-challenge-ddd/internal/shared/consts"
 	sharedgenerator "github.com/caiojorge/fiap-challenge-ddd/internal/shared/generator"
 )
 
@@ -14,6 +15,7 @@ type Checkout struct {
 	Gateway   valueobject.Gateway
 	Total     float64
 	CreatedAt time.Time
+	Status    string
 }
 
 func NewCheckout(orderID string, gatewayName string, gatewayToken string, total float64) (*Checkout, error) {
@@ -31,6 +33,7 @@ func (c *Checkout) ConfirmTransaction(transactionID string, total float64) error
 	c.ID = sharedgenerator.NewIDGenerator()
 	c.Gateway.GatewayTransactionID = transactionID
 	c.Total = total
+	c.Status = sharedconsts.CheckoutPendingPayment
 
 	err := c.Validate()
 	if err != nil {
@@ -46,4 +49,8 @@ func (c *Checkout) Validate() error {
 	}
 
 	return nil
+}
+
+func (c *Checkout) ConfirmPayment() {
+	c.Status = sharedconsts.CheckoutPendingPayment
 }

@@ -22,3 +22,9 @@ const (
 	KitchenReady     = "ready"
 	KitchenDelivered = "delivered"
 )
+
+// Checkout status
+const (
+	CheckoutPendingPayment   = "pending-payment"
+	CheckoutPaymentConfirmed = "payment-confirmed"
+)

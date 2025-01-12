@@ -26,7 +26,7 @@ A Kitchen Control API é uma aplicação para gerenciar clientes, produtos, pedi
 - Kind v0.25.0 (ou minikube / docker desktop)
 - kubectl
 
-### Como instalar o Kitchen Control
+### Como instalar e executar o Kitchen Control
 
 - Para rodar no K8S, como a imagem do projeto esta no dockerhub; não é necessário gerar nova imagem.
 - Os steps 1 e 2 são opcionais
@@ -154,5 +154,19 @@ docker-compose up
 Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 
+## Makefile
+- Para rodar a aplicação em local mode, use o makefile. Sem isso vc vai ter problemas com o .env file.
+- Comente o app e app-payment para não carregar a imagem via docker. Deixe apenas o Mysql e o Adminer ativos no docker-compose file.
+- Feito isso, execute os comandos abaixo:
+```bash
+make fiap-run
+make run-kitchen-api
+make run-payment-api
+```
+- Se quiser rodar "na mão", use:
+```bash
+ go run cmd/<app>/main.go
+```
 
+obs: app pode ser fakepaymentservice e ou kitchencontrol
 

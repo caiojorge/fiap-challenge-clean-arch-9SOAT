@@ -100,6 +100,10 @@ func (o *Order) ConfirmCheckout() {
 	o.Status = sharedconsts.OrderStatusCheckoutConfirmed
 }
 
+func (o *Order) ConfirmPayment() {
+	o.Status = sharedconsts.OrderStatusPaymentApproved
+}
+
 func (o *Order) IsCustomerInformed() bool {
 	return o.CustomerCPF != ""
 }

@@ -44,7 +44,8 @@ func SetupRouter(container *di.Container) *gin.Engine {
 	checkoutGroup := r.Group("/kitchencontrol/api/v1/checkouts")
 	{
 		checkoutGroup.POST("/", container.CreateCheckoutController.PostCreateCheckout)
-		checkoutGroup.GET("/:id/check/payment", container.CheckoutCheckController.GetCheckPaymentCheckout) // verifica se determinada ordem foi paga
+		checkoutGroup.GET("/:id/check/payment", container.CheckoutCheckController.GetCheckPaymentCheckout)   // verifica se determinada ordem foi paga
+		checkoutGroup.PUT("/confirmtion/payment", container.CheckoutCheckController.GetCheckPaymentCheckout) // verifica se determinada ordem foi paga
 	}
 
 	// Kitchen routes

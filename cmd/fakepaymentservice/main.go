@@ -121,12 +121,33 @@ func callWebhook(notificationURL, orderID string) {
 
 	jsonBody, _ := json.Marshal(webhookBody)
 
-	resp, err := http.Post(notificationURL, "application/json", bytes.NewBuffer(jsonBody))
+	// resp, err := http.Post(notificationURL, "application/json", bytes.NewBuffer(jsonBody))
+	// if err != nil {
+	// 	fmt.Println("Erro ao chamar webhook:", err)
+	// 	return
+	// }
+	// defer resp.Body.Close()
+
+	req, err := http.NewRequest(http.MethodPut, notificationURL, bytes.NewBuffer(jsonBody))
+	if err != nil {
+		fmt.Println("Erro ao criar requisição PUT:", err)
+		return
+	}
+
+	// Define o header Content-Type como application/json
+	req.Header.Set("Content-Type", "application/json")
+
+	// Executa a requisição HTTP
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Erro ao chamar webhook:", err)
 		return
 	}
 	defer resp.Body.Close()
 
+	fmt.Println("Resposta do webhook:", resp.Status)
+
 	fmt.Println("Webhook chamado com sucesso!")
+
 }

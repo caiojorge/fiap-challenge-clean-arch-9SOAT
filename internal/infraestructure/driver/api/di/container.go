@@ -14,6 +14,7 @@ import (
 	controllerorder "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/order"
 	controllerproduct "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/product"
 	usecasecheckoutcheck "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/checkout/checkpayment"
+	usecasewebhookcheckout "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/checkout/confirmation"
 	usecasecheckout "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/checkout/create"
 	usecasecustomerfindall "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/customer/findall"
 	usecasecustomerfindbycpf "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/customer/findbycpf"
@@ -101,8 +102,9 @@ type Container struct {
 	FindByParamsOrdersPaymentApprovedController *controllerorder.FindByParamsPaymentApprovedController
 
 	// Checkout
-	CreateCheckoutController *controllercheckout.CreateCheckoutController
-	CheckoutCheckController  *controllercheckout.CheckPaymentCheckoutController
+	CreateCheckoutController  *controllercheckout.CreateCheckoutController
+	CheckoutCheckController   *controllercheckout.CheckPaymentCheckoutController
+	WebhookCheckoutController *controllercheckout.WebhookCheckoutController
 
 	// Kitchen
 	FindKitchenAllController *controllerkitchen.FindKitchenAllController
@@ -120,6 +122,7 @@ func NewContainer(db *gorm.DB, logger *zap.Logger) *Container {
 	checkoutRepo := repositorygorm.NewCheckoutRepositoryGorm(db)
 	kitchenRepo := repositorygorm.NewKitchenRepositoryGorm(db)
 	gatewayService := service.NewFakePaymentService()
+	transactionManager := repositorygorm.NewGormTransactionManager(db)
 
 	// Initialize use cases
 	customerRegisterUseCase := usecasecustomerregister.NewCustomerRegister(customerRepo)
@@ -138,6 +141,7 @@ func NewContainer(db *gorm.DB, logger *zap.Logger) *Container {
 	orderFindByParamsUseCase := usecaseorderfindbyparam.NewOrderFindByParams(orderRepo)
 	checkoutCreateUseCase := usecasecheckout.NewCheckoutCreate(orderRepo, checkoutRepo, gatewayService, kitchenRepo, productRepo)
 	checkoutCheckUseCase := usecasecheckoutcheck.NewCheckPaymentUseCase(checkoutRepo, orderRepo)
+	webhookCheckoutUseCase := usecasewebhookcheckout.NewCheckoutConfirmation(orderRepo, checkoutRepo, transactionManager)
 	kitchenFindAllUseCase := usecasekitchen.NewKitchenFindAll(kitchenRepo)
 
 	// Initialize controllers
@@ -162,6 +166,7 @@ func NewContainer(db *gorm.DB, logger *zap.Logger) *Container {
 	findByParamsOrdersPaymentApprovedController := controllerorder.NewFindByParamsPaymentApprovedController(ctx, orderFindByParamsUseCase)
 	createCheckoutController := controllercheckout.NewCreateCheckoutController(ctx, checkoutCreateUseCase)
 	checkCheckoutController := controllercheckout.NewCheckPaymentCheckoutController(ctx, checkoutCheckUseCase)
+	webhookCheckoutController := controllercheckout.NewWebhookCheckoutController(ctx, webhookCheckoutUseCase)
 	findKitchenAllController := controllerkitchen.NewFindKitchenAllController(ctx, kitchenFindAllUseCase)
 
 	return &Container{
@@ -209,6 +214,7 @@ func NewContainer(db *gorm.DB, logger *zap.Logger) *Container {
 		FindByParamsOrdersPaymentApprovedController: findByParamsOrdersPaymentApprovedController,
 		CreateCheckoutController:                    createCheckoutController,
 		CheckoutCheckController:                     checkCheckoutController,
+		WebhookCheckoutController:                   webhookCheckoutController,
 		FindKitchenAllController:                    findKitchenAllController,
 	}
 }

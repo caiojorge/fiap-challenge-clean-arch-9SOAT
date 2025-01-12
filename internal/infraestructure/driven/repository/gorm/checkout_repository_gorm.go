@@ -16,6 +16,14 @@ type CheckoutRepositoryGorm struct {
 	DB *gorm.DB
 }
 
+func (r *CheckoutRepositoryGorm) getDB(ctx context.Context) *gorm.DB {
+	// Verifica se existe uma transação ativa no contexto
+	if tx, ok := ctx.Value("tx").(*gorm.DB); ok {
+		return tx
+	}
+	return r.DB
+}
+
 func NewCheckoutRepositoryGorm(db *gorm.DB) *CheckoutRepositoryGorm {
 	return &CheckoutRepositoryGorm{
 		DB: db,
@@ -35,7 +43,8 @@ func (r *CheckoutRepositoryGorm) Create(ctx context.Context, entity *entity.Chec
 		CreatedAt:            sharedDate.GetBRTimeNow(),
 	}
 
-	if err := r.DB.Create(&model).Error; err != nil {
+	db := r.getDB(ctx)
+	if err := db.Create(&model).Error; err != nil {
 		return err
 	}
 
@@ -47,8 +56,8 @@ func (r *CheckoutRepositoryGorm) Update(ctx context.Context, entity *entity.Chec
 
 	var model model.Checkout
 	copier.Copy(&model, entity)
-
-	return r.DB.Save(model).Error
+	db := r.getDB(ctx)
+	return db.Save(model).Error
 }
 
 // Find checkout by id

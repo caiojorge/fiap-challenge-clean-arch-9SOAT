@@ -37,6 +37,7 @@ mocks:
 	mockgen -source=internal/domain/repository/order_repository.go -destination=internal/domain/repository/mocks/mock_order_repository.go -package=mocksrepository
 	mockgen -source=internal/domain/repository/checkout_repository.go -destination=internal/domain/repository/mocks/mock_checkout_repository.go -package=mocksrepository
 	mockgen -source=internal/domain/repository/kitchen_repository.go -destination=internal/domain/repository/mocks/mock_kitchen_repository.go -package=mocksrepository
+	mockgen -source=internal/domain/repository/transaction_manager.go -destination=internal/domain/repository/mocks/mock_transaction_manager.go -package=mocksrepository
 
 # CONFIGURAÇÃO do K8S e seus recursos
 # cria as imagens que usaremos no kind
