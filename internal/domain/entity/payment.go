@@ -30,6 +30,8 @@ type Payment struct {
 	Items             []Item  `json:"items"`
 	SponsorID         int     `json:"sponsor_id"`
 	CashOutAmount     float64 `json:"cash_out_amount"`
+	QrData            string  `json:"qr_data"`
+	InStoreOrderID    string  `json:"in_store_order_id"`
 }
 
 func NewPayment(checkout Checkout, order Order, productList []*Product, notificationURL string, sponsorID int) (*Payment, error) {
@@ -99,9 +101,9 @@ func (p *Payment) Validate() error {
 		return errors.New("items is required")
 	}
 
-	if p.SponsorID == 0 {
-		return errors.New("sponsor id is required")
-	}
+	// if p.SponsorID == 0 {
+	// 	return errors.New("sponsor id is required")
+	// }
 
 	if p.CashOutAmount == 0 {
 		return errors.New("cash out amount is required")

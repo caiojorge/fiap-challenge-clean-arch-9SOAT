@@ -25,6 +25,7 @@ const (
 
 // Checkout status
 const (
-	CheckoutPendingPayment   = "pending-payment"
-	CheckoutPaymentConfirmed = "payment-confirmed"
+	CheckoutPendingPayment    = "pending-payment"
+	CheckoutPaymentConfirmed  = "payment-confirmed"
+	CheckoutStatusNotApproved = "payment-not-approved" // em caso de recusa do pagamento pelo gateway
 )

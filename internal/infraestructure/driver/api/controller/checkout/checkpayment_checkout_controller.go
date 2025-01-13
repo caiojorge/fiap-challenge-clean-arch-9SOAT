@@ -37,7 +37,7 @@ func NewCheckPaymentCheckoutController(ctx context.Context,
 // @Failure 500 {object} string "Internal Server Error"
 // @Router /checkouts/{id}/check/payment [get]
 func (r *CheckPaymentCheckoutController) GetCheckPaymentCheckout(c *gin.Context) {
-	// pouco provável que o ID seja vazio, mas é uma validação simples
+	// a.II Consultar status de pagamento pedido, que informa se o pagamento foi aprovado ou não.
 	id := c.Param("id")
 
 	if id == "" {

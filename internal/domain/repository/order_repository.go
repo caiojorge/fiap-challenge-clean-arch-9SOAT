@@ -14,4 +14,5 @@ type OrderRepository interface {
 	FindByParams(ctx context.Context, params map[string]interface{}) ([]*entity.Order, error)
 	FindAll(ctx context.Context) ([]*entity.Order, error)
 	Delete(ctx context.Context, id string) error
+	UpdateStatus(ctx context.Context, id string, status string) error
 }

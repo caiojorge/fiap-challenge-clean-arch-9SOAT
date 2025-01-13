@@ -80,6 +80,10 @@ func TestCreateCheckout(t *testing.T) {
 		Find(ctx, "order123").
 		Return(order, nil)
 
+	// mockOrderRepository.EXPECT().
+	// 	UpdateStatus(ctx, gomock.Any(), gomock.Any()).
+	// 	Return(nil) // Order found and not paid
+
 	mockOrderRepository.EXPECT().
 		Update(ctx, gomock.Any()).
 		Return(nil) // Order found and not paid

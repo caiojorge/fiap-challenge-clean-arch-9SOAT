@@ -45,8 +45,9 @@ type CashOut struct {
 }
 
 type QrResponse struct {
-	QrData         string `json:"qr_data"`
-	InStoreOrderID string `json:"in_store_order_id"`
+	QrData            string `json:"qr_data"`
+	InStoreOrderID    string `json:"in_store_order_id"`
+	ExternalReference string `json:"external_reference"`
 }
 
 type WebhookRequest struct {
@@ -82,20 +83,22 @@ func main() {
 
 		// Gerando um ID único para a ordem de pagamento
 		inStoreOrderID := uuid.New().String()
+		//inStoreOrderID := req.ExternalReference
 
 		// Simulando geração do QR Data
 		qrData := fmt.Sprintf("00020101021243650016COM.MERCADOLIBRE020130%s-%s", req.ExternalReference, inStoreOrderID)
 
 		// Retornando o QR Code e ID da ordem de pagamento
 		c.JSON(http.StatusOK, QrResponse{
-			QrData:         qrData,
-			InStoreOrderID: inStoreOrderID,
+			QrData:            qrData,
+			InStoreOrderID:    inStoreOrderID,
+			ExternalReference: req.ExternalReference,
 		})
 
 		// Simulando pagamento após um tempo
 		go func() {
-			time.Sleep(5 * time.Second)
-			callWebhook(req.NotificationURL, inStoreOrderID)
+			time.Sleep(15 * time.Second)
+			callWebhook(req.NotificationURL, req.ExternalReference)
 		}()
 	})
 
@@ -121,13 +124,6 @@ func callWebhook(notificationURL, orderID string) {
 
 	jsonBody, _ := json.Marshal(webhookBody)
 
-	// resp, err := http.Post(notificationURL, "application/json", bytes.NewBuffer(jsonBody))
-	// if err != nil {
-	// 	fmt.Println("Erro ao chamar webhook:", err)
-	// 	return
-	// }
-	// defer resp.Body.Close()
-
 	req, err := http.NewRequest(http.MethodPut, notificationURL, bytes.NewBuffer(jsonBody))
 	if err != nil {
 		fmt.Println("Erro ao criar requisição PUT:", err)
@@ -147,7 +143,6 @@ func callWebhook(notificationURL, orderID string) {
 	defer resp.Body.Close()
 
 	fmt.Println("Resposta do webhook:", resp.Status)
-
 	fmt.Println("Webhook chamado com sucesso!")
 
 }

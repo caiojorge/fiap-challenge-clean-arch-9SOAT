@@ -28,7 +28,7 @@ func TestPaymentService(t *testing.T) {
 	assert.NotNil(t, order)
 	//order.CalculateTotal()
 
-	gateway := NewFakePaymentService()
+	gateway := NewPaymentGateway(&MockPaymentService{})
 	payment, err := gateway.ConfirmPayment(context.Background(), checkout, order, []*entity.Product{product}, "http://localhost:8080/checkout/notification", 1)
 	// payment, err := entity.NewPayment(
 	// 	*checkout,
@@ -44,5 +44,16 @@ func TestPaymentService(t *testing.T) {
 	assert.Equal(t, payment.CheckoutID, checkout.ID)
 	assert.Equal(t, payment.ExternalReference, order.ID)
 	assert.Equal(t, len(payment.Items), len(order.Items))
+	assert.NotEmpty(t, payment.QrData)
+	assert.NotEmpty(t, payment.InStoreOrderID)
 
+}
+
+type MockPaymentService struct{}
+
+func (m *MockPaymentService) SendPaymentRequest(collectorID, posID string, payment *entity.Payment) error {
+	// Simular um sucesso ou erro
+	payment.QrData = "mocked-qr-data"
+	payment.InStoreOrderID = "mocked-order-id"
+	return nil // ou retornar um erro para testar cenários de falha
 }

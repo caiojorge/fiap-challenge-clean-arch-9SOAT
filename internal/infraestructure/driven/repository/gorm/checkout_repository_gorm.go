@@ -54,10 +54,32 @@ func (r *CheckoutRepositoryGorm) Create(ctx context.Context, entity *entity.Chec
 // Update updates the checkout. It returns an error if something goes wrong.
 func (r *CheckoutRepositoryGorm) Update(ctx context.Context, entity *entity.Checkout) error {
 
-	var model model.Checkout
-	copier.Copy(&model, entity)
+	//var model model.Checkout
+	//copier.Copy(&model, entity)
+	model := model.Checkout{
+		OrderID:              entity.OrderID,
+		GatewayName:          entity.Gateway.GatewayName,
+		GatewayToken:         entity.Gateway.GatewayToken,
+		GatewayTransactionID: entity.Gateway.GatewayTransactionID,
+		Total:                entity.Total,
+		CreatedAt:            entity.CreatedAt,
+		Status:               entity.Status,
+	}
 	db := r.getDB(ctx)
 	return db.Save(model).Error
+}
+
+func (r *CheckoutRepositoryGorm) UpdateStatus(ctx context.Context, id string, status string) error {
+	db := r.getDB(ctx)
+	// Usando RAW SQL para atualizar o status da ordem
+	result := db.Exec("UPDATE checkouts SET status = ? WHERE id = ?", status, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }
 
 // Find checkout by id

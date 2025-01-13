@@ -14,4 +14,5 @@ type CheckoutRepository interface {
 	FindAll(ctx context.Context) ([]*entity.Checkout, error)
 	Delete(ctx context.Context, id string) error
 	FindbyOrderID(ctx context.Context, id string) (*entity.Checkout, error)
+	UpdateStatus(ctx context.Context, id string, status string) error
 }

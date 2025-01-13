@@ -8,9 +8,16 @@ import (
 	mocks "github.com/caiojorge/fiap-challenge-ddd/internal/domain/repository/mocks"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
 )
 
 func TestConfirmPayment_Success(t *testing.T) {
+	logger, err := zap.NewProduction()
+	if err != nil {
+		panic(err)
+	}
+	defer logger.Sync()
+
 	ctrl := gomock.NewController(t) // Cria um controlador do gomock
 	defer ctrl.Finish()             // Libera os mocks após o teste
 
@@ -20,7 +27,7 @@ func TestConfirmPayment_Success(t *testing.T) {
 	transactionManagerMock := mocks.NewMockTransactionManager(ctrl)
 
 	// Use Case
-	checkoutConfirmationUseCase := NewCheckoutConfirmation(orderRepoMock, checkoutRepoMock, transactionManagerMock)
+	checkoutConfirmationUseCase := NewCheckoutConfirmation(orderRepoMock, checkoutRepoMock, transactionManagerMock, logger)
 
 	// Dados de entrada e entidades simuladas
 	ctx := context.Background()
@@ -40,8 +47,8 @@ func TestConfirmPayment_Success(t *testing.T) {
 	// Configuração dos mocks
 	orderRepoMock.EXPECT().Find(ctx, input.OrderID).Return(order, nil)
 	checkoutRepoMock.EXPECT().FindbyOrderID(ctx, input.OrderID).Return(checkout, nil)
-	orderRepoMock.EXPECT().Update(ctx, gomock.Any()).Return(nil)
-	checkoutRepoMock.EXPECT().Update(ctx, gomock.Any()).Return(nil)
+	orderRepoMock.EXPECT().UpdateStatus(ctx, "order123", gomock.Any()).Return(nil)
+	checkoutRepoMock.EXPECT().UpdateStatus(ctx, gomock.Any(), gomock.Any()).Return(nil)
 	transactionManagerMock.EXPECT().
 		RunInTransaction(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(ctx context.Context, fn func(ctx context.Context) error) error {

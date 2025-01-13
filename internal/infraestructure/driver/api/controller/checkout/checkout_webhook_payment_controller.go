@@ -6,17 +6,20 @@ import (
 
 	portsusecase "github.com/caiojorge/fiap-challenge-ddd/internal/usecase/checkout/confirmation"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type WebhookCheckoutController struct {
 	ctx     context.Context
 	usecase portsusecase.ICheckoutConfirmationUseCase
+	logger  *zap.Logger
 }
 
-func NewWebhookCheckoutController(ctx context.Context, usecase portsusecase.ICheckoutConfirmationUseCase) *WebhookCheckoutController {
+func NewWebhookCheckoutController(ctx context.Context, usecase portsusecase.ICheckoutConfirmationUseCase, logger *zap.Logger) *WebhookCheckoutController {
 	return &WebhookCheckoutController{
 		ctx:     ctx,
 		usecase: usecase,
+		logger:  logger,
 	}
 }
 
@@ -33,6 +36,8 @@ func NewWebhookCheckoutController(ctx context.Context, usecase portsusecase.IChe
 // @Failure 500 {object} string "internal server error"
 // @Router /checkouts [post]
 func (cw *WebhookCheckoutController) PutConfirmPayment(c *gin.Context) {
+	cw.logger.Info("PutConfirmPayment")
+	// a.III Webhook para receber confirmação de pagamento aprovado ou recusado. A implementação deve ser clara quanto ao Webhook.
 	var input portsusecase.CheckoutConfirmationInputDTO
 
 	if err := c.BindJSON(&input); err != nil {
@@ -40,6 +45,7 @@ func (cw *WebhookCheckoutController) PutConfirmPayment(c *gin.Context) {
 		return
 	}
 
+	// determina se o pagamento foi aprovado ou não (claro, com base na resposta do gateway de pagamento)
 	output, err := cw.usecase.ConfirmPayment(cw.ctx, &input)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

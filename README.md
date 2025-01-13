@@ -95,7 +95,7 @@ A Kitchen Control API é uma aplicação para gerenciar clientes, produtos, pedi
 
 ## Requisitos da Fase 2
 
-### #1 Atualizar a aplicação desenvolvida na FASE 1 refatorando o código para seguir os padrões Clean Code e Clean Architecture
+### Atualizar a aplicação desenvolvida na FASE 1 refatorando o código para seguir os padrões Clean Code e Clean Architecture
 
 #### Todo código foi migrado para novos padrões de pastas que atendem melhor a ideia da clean arch (vejo que a arquitetura do projeto grita / deixa claro o que esta acontecendo)
 
@@ -131,10 +131,6 @@ internal/
 
 - Driven: É o output, e aqui deixamos a conexão com o DB e ou APIs externas
 - Driver: É o input, e aqui temos os controlers e o server/api
-
-### #2 refatorando o código para seguir os padrões Clean Code e Clean Architecture
-### #3 Checkout Pedido que deverá receber os produtos solicitados e retornar à identificação do pedido.
-### #4 Consultar status de pagamento pedido, que informa se o pagamento foi aprovado ou não.
 
 ## Problema para criar o banco de dados (just in case)
 

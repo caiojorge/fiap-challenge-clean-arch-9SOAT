@@ -66,7 +66,7 @@ func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkoutDTO
 	}
 
 	// confirma a transação e grava o checkout
-	err = cr.handleCheckout(ctx, checkout, order.Total, payment.ID)
+	err = cr.handleCheckout(ctx, checkout, order.Total, payment.InStoreOrderID, payment.QrData)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +86,7 @@ func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkoutDTO
 
 	output := &CheckoutOutputDTO{
 		ID:                   checkout.ID,
-		GatewayTransactionID: payment.ID,
+		GatewayTransactionID: payment.InStoreOrderID,
 		OrderID:              order.ID,
 	}
 
@@ -145,6 +145,8 @@ func (cr *CheckoutCreateUseCase) handlePayment(ctx context.Context, checkout *en
 	if err != nil {
 		order.InformPaymentNotApproval()
 		_ = cr.orderRepository.Update(ctx, order)
+
+		checkout.InformPaymentNotApproval()
 		return nil, err
 	}
 
@@ -165,11 +167,11 @@ func (cr *CheckoutCreateUseCase) handlePayment(ctx context.Context, checkout *en
 }
 
 // handleCheckout confirma a transação e grava o checkout
-func (cr *CheckoutCreateUseCase) handleCheckout(ctx context.Context, checkout *entity.Checkout, orderTotal float64, paymentID string) error {
+func (cr *CheckoutCreateUseCase) handleCheckout(ctx context.Context, checkout *entity.Checkout, orderTotal float64, paymentID string, qrcode string) error {
 
 	// confirma o pagamento de forma fake na própria entidade (muda status na entidade)
 	// se houver algum cupom de desconto, ele será aplicado na ordem no handlePayment
-	err := checkout.ConfirmTransaction(paymentID, orderTotal)
+	err := checkout.ConfirmTransaction(paymentID, orderTotal, qrcode)
 	if err != nil {
 		cr.gatewayService.CancelPayment(ctx, paymentID)
 		return err
@@ -202,6 +204,7 @@ func (cr *CheckoutCreateUseCase) handleKitchen(ctx context.Context, order *entit
 func (cr *CheckoutCreateUseCase) handleOrder(ctx context.Context, order *entity.Order) error {
 	order.ConfirmCheckout()
 	err := cr.orderRepository.Update(ctx, order)
+	//err := cr.orderRepository.UpdateStatus(ctx, order.ID, order.Status)
 	if err != nil {
 		return err
 	}

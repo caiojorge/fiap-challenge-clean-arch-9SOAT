@@ -18,12 +18,13 @@ Agregação: A entidade Order é o ponto central para acompanhar o progresso do 
 
 // Order representa um pedido.
 type Order struct {
-	ID          string
-	Items       []*OrderItem
-	Total       float64
-	Status      string
-	CustomerCPF string
-	CreatedAt   time.Time
+	ID            string
+	Items         []*OrderItem
+	Total         float64
+	Status        string
+	KitchenStatus string
+	CustomerCPF   string
+	CreatedAt     time.Time
 }
 
 // NewOrder cria um novo pedido. TODO Não esta sendo usada.

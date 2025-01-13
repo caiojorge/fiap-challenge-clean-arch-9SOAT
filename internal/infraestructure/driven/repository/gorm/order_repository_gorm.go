@@ -62,11 +62,29 @@ func (r *OrderRepositoryGorm) Create(ctx context.Context, entity *entity.Order) 
 func (r *OrderRepositoryGorm) Update(ctx context.Context, entity *entity.Order) error {
 
 	db := r.getDB(ctx)
-	result := db.Save(r.converter.FromEntity(entity))
+	model := r.converter.FromEntity(entity)
+	if *model.CustomerCPF == "" {
+		model.CustomerCPF = nil
+	}
+
+	result := db.Save(model)
 	if result.Error != nil {
 		return result.Error
 	}
 
+	return nil
+}
+
+func (r *OrderRepositoryGorm) UpdateStatus(ctx context.Context, id string, status string) error {
+	db := r.getDB(ctx)
+	// Usando RAW SQL para atualizar o status da ordem
+	result := db.Exec("UPDATE orders SET status = ? WHERE id = ?", status, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
 	return nil
 }
 

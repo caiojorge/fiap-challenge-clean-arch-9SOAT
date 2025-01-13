@@ -16,6 +16,7 @@ type Checkout struct {
 	Total     float64
 	CreatedAt time.Time
 	Status    string
+	QRCode    string
 }
 
 func NewCheckout(orderID string, gatewayName string, gatewayToken string, total float64) (*Checkout, error) {
@@ -28,12 +29,13 @@ func NewCheckout(orderID string, gatewayName string, gatewayToken string, total 
 	}, nil
 }
 
-func (c *Checkout) ConfirmTransaction(transactionID string, total float64) error {
+func (c *Checkout) ConfirmTransaction(transactionID string, total float64, qrcode string) error {
 
 	c.ID = sharedgenerator.NewIDGenerator()
 	c.Gateway.GatewayTransactionID = transactionID
 	c.Total = total
 	c.Status = sharedconsts.CheckoutPendingPayment
+	c.QRCode = qrcode
 
 	err := c.Validate()
 	if err != nil {
@@ -52,5 +54,9 @@ func (c *Checkout) Validate() error {
 }
 
 func (c *Checkout) ConfirmPayment() {
-	c.Status = sharedconsts.CheckoutPendingPayment
+	c.Status = sharedconsts.CheckoutPaymentConfirmed
+}
+
+func (c *Checkout) InformPaymentNotApproval() {
+	c.Status = sharedconsts.CheckoutStatusNotApproved
 }

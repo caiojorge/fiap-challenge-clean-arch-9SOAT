@@ -121,3 +121,17 @@ func (mr *MockOrderRepositoryMockRecorder) Update(ctx, product interface{}) *gom
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockOrderRepository)(nil).Update), ctx, product)
 }
+
+// UpdateStatus mocks base method.
+func (m *MockOrderRepository) UpdateStatus(ctx context.Context, id, status string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateStatus", ctx, id, status)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateStatus indicates an expected call of UpdateStatus.
+func (mr *MockOrderRepositoryMockRecorder) UpdateStatus(ctx, id, status interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateStatus", reflect.TypeOf((*MockOrderRepository)(nil).UpdateStatus), ctx, id, status)
+}

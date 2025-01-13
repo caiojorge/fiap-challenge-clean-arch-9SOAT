@@ -43,7 +43,8 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 
-	logger, err := zap.NewProduction()
+	//logger, err := zap.NewProduction()
+	logger, err := zap.NewDevelopment()
 	if err != nil {
 		panic(err)
 	}

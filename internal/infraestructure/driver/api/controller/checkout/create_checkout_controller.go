@@ -37,6 +37,7 @@ func NewCreateCheckoutController(ctx context.Context,
 // @Failure 500 {object} string "internal server error"
 // @Router /checkouts [post]
 func (r *CreateCheckoutController) PostCreateCheckout(c *gin.Context) {
+	//// a.I Checkout Pedido que deverá receber os produtos solicitados e retornar à identificação do pedido
 	var dto portsusecase.CheckoutInputDTO
 
 	if err := c.BindJSON(&dto); err != nil {

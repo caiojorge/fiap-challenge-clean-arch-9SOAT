@@ -45,7 +45,7 @@ type Container struct {
 	CustomerRepo     *repositorygorm.CustomerRepositoryGorm
 	CheckoutRepo     *repositorygorm.CheckoutRepositoryGorm
 	KitchenRepo      *repositorygorm.KitchenRepositoryGorm
-	GatewayService   *service.FakePaymentService
+	GatewayService   *service.PaymentGateway
 	ProductConverter *converter.ProductConverter
 	OrderConverter   *converter.OrderConverter
 
@@ -121,7 +121,7 @@ func NewContainer(db *gorm.DB, logger *zap.Logger) *Container {
 	orderRepo := repositorygorm.NewOrderRepositoryGorm(db, orderConverter)
 	checkoutRepo := repositorygorm.NewCheckoutRepositoryGorm(db)
 	kitchenRepo := repositorygorm.NewKitchenRepositoryGorm(db)
-	gatewayService := service.NewFakePaymentService()
+	gatewayService := service.NewPaymentGateway(service.NewPaymentService())
 	transactionManager := repositorygorm.NewGormTransactionManager(db)
 
 	// Initialize use cases
@@ -141,7 +141,7 @@ func NewContainer(db *gorm.DB, logger *zap.Logger) *Container {
 	orderFindByParamsUseCase := usecaseorderfindbyparam.NewOrderFindByParams(orderRepo)
 	checkoutCreateUseCase := usecasecheckout.NewCheckoutCreate(orderRepo, checkoutRepo, gatewayService, kitchenRepo, productRepo)
 	checkoutCheckUseCase := usecasecheckoutcheck.NewCheckPaymentUseCase(checkoutRepo, orderRepo)
-	webhookCheckoutUseCase := usecasewebhookcheckout.NewCheckoutConfirmation(orderRepo, checkoutRepo, transactionManager)
+	webhookCheckoutUseCase := usecasewebhookcheckout.NewCheckoutConfirmation(orderRepo, checkoutRepo, transactionManager, logger)
 	kitchenFindAllUseCase := usecasekitchen.NewKitchenFindAll(kitchenRepo)
 
 	// Initialize controllers
@@ -166,7 +166,7 @@ func NewContainer(db *gorm.DB, logger *zap.Logger) *Container {
 	findByParamsOrdersPaymentApprovedController := controllerorder.NewFindByParamsPaymentApprovedController(ctx, orderFindByParamsUseCase)
 	createCheckoutController := controllercheckout.NewCreateCheckoutController(ctx, checkoutCreateUseCase)
 	checkCheckoutController := controllercheckout.NewCheckPaymentCheckoutController(ctx, checkoutCheckUseCase)
-	webhookCheckoutController := controllercheckout.NewWebhookCheckoutController(ctx, webhookCheckoutUseCase)
+	webhookCheckoutController := controllercheckout.NewWebhookCheckoutController(ctx, webhookCheckoutUseCase, logger)
 	findKitchenAllController := controllerkitchen.NewFindKitchenAllController(ctx, kitchenFindAllUseCase)
 
 	return &Container{

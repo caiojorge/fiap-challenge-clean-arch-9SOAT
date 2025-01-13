@@ -18,6 +18,8 @@ type Checkout struct {
 	GatewayTransactionID string    `gorm:"type:varchar(255)"`
 	Total                float64   `gorm:"not null"`
 	CreatedAt            time.Time `gorm:"not null"`
+	Status               string    `gorm:"not null;type:varchar(36)"`
+	QRCode               string    `gorm:"type:varchar(255)"`
 }
 
 func (c *Checkout) FromEntity(entity *Checkout) {

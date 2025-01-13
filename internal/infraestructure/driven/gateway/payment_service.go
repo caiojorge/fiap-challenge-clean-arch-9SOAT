@@ -1,35 +1,77 @@
 package service
 
 import (
-	"context"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+	"time"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
+	"github.com/joho/godotenv"
 )
 
-// FakePaymentService provides methods for payment operations.
-// Vai se conectar com o gateway de pagamento, nesse caso, FAKE.
-type FakePaymentService struct {
+type IPaymentService interface {
+	SendPaymentRequest(collectorID, posID string, payment *entity.Payment) error
 }
 
-func NewFakePaymentService() *FakePaymentService {
-	return &FakePaymentService{}
+type PaymentService struct{}
+
+func NewPaymentService() *PaymentService {
+	return &PaymentService{}
 }
 
-// CreateCheckout creates a new checkout. This method should be implemented by the payment gateway.
-func (p *FakePaymentService) ConfirmPayment(ctx context.Context, checkout *entity.Checkout, order *entity.Order, productList []*entity.Product, notificationURL string, sponsorID int) (*entity.Payment, error) {
-	payment, err := entity.NewPayment(*checkout, *order, productList, notificationURL, sponsorID)
+func (s *PaymentService) SendPaymentRequest(collectorID, posID string, payment *entity.Payment) error {
+	_ = godotenv.Load() // Carrega o .env se não estiver definido em variáveis de ambiente
+
+	hostname := os.Getenv("HOST2_NAME")
+	hostport := os.Getenv("HOST2_PORT")
+
+	url := fmt.Sprintf("http://%s:%s/instore/orders/qr/seller/collectors/%s/pos/%s/qrs", hostname, hostport, collectorID, posID)
+
+	// Serializar o payload para JSON
+	body, err := json.Marshal(payment)
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("erro ao serializar o payload: %v", err)
 	}
 
-	// TODO: connectar no server de pagamento
-	// enviar dados de pagamento para o gateway
-	// tratar a resposta do gateway
+	// Criar a requisição POST
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))
+	if err != nil {
+		return fmt.Errorf("erro ao criar a requisição: %v", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
 
-	return payment, nil
-}
+	// Cliente HTTP com timeout
+	client := &http.Client{Timeout: 10 * time.Second}
 
-// CancelTransaction cancels a transaction. This method should be implemented by the payment gateway.
-func (p *FakePaymentService) CancelPayment(ctx context.Context, id string) error {
+	// Enviar a requisição
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("erro ao enviar a requisição: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("requisição falhou com status: %s", resp.Status)
+	}
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("erro ao ler o corpo da resposta: %v", err)
+	}
+
+	var qrResponse QrResponse
+	err = json.Unmarshal(respBody, &qrResponse)
+	if err != nil {
+		return fmt.Errorf("erro ao desserializar a resposta: %v", err)
+	}
+
+	// Registra as respostas enviadas pelo gateway
+	payment.QrData = qrResponse.QrData
+	payment.InStoreOrderID = qrResponse.InStoreOrderID
+
 	return nil
 }

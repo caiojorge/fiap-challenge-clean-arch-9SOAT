@@ -92,3 +92,16 @@ get-k8s:
 # deleta todos os recursos no k8s
 shutdown:
 	kind delete cluster
+
+
+# Teste do endpoint de pagamento
+# Variáveis de ambiente
+COLLECTOR_ID := collector123
+POS_ID := pos456
+URL := http://localhost:30090/instore/orders/qr/seller/collectors/$(COLLECTOR_ID)/pos/$(POS_ID)/qrs
+
+send-payment:
+	curl -X POST "$(URL)" \
+	-H "Content-Type: application/json" \
+	-H "Authorization: $(TOKEN)" \
+	-d '{"external_reference": "721ece5d-62c3-49a2-bc12-919a2486cefd", "title": "Compra de Produtos", "description": "Pagamento na loja física", "notification_url": "http://localhost:30080/kitchencontrol/api/v1/checkouts/confirmtion/payment", "total_amount": 200.50, "items": [{"sku_number": "sku-001", "category": "eletronico", "title": "Fone de Ouvido", "description": "Fone de ouvido com cancelamento de ruído", "unit_price": 100.25, "quantity": 2, "unit_measure": "unidade", "total_amount": 200.50}], "sponsor": {"id": 1}, "cash_out": {"enabled": true, "amount": 50.00, "receiver": "receiver-001"}}'
