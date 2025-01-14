@@ -41,6 +41,7 @@ func (r *CheckoutRepositoryGorm) Create(ctx context.Context, entity *entity.Chec
 		GatewayTransactionID: entity.Gateway.GatewayTransactionID,
 		Total:                entity.Total,
 		CreatedAt:            sharedDate.GetBRTimeNow(),
+		QRCode:               entity.QRCode,
 	}
 
 	db := r.getDB(ctx)
@@ -63,7 +64,7 @@ func (r *CheckoutRepositoryGorm) Update(ctx context.Context, entity *entity.Chec
 		GatewayTransactionID: entity.Gateway.GatewayTransactionID,
 		Total:                entity.Total,
 		CreatedAt:            entity.CreatedAt,
-		Status:               entity.Status,
+		QRCode:               entity.QRCode,
 	}
 	db := r.getDB(ctx)
 	return db.Save(model).Error

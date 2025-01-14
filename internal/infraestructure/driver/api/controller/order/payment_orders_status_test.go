@@ -19,17 +19,6 @@ import (
 
 func TestConfirmedOrder(t *testing.T) {
 
-	/*
-		type FindByParamsConfirmedController struct {
-		usecase portsusecase.FindOrderByParamsUseCase
-		ctx     context.Context
-		}
-
-		type OrderFindByParamsUseCase struct {
-		repository ports.OrderRepository
-		}
-	*/
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -43,13 +32,17 @@ func TestConfirmedOrder(t *testing.T) {
 	ctx := context.Background()
 
 	t.Run("should return 200 - Confirmed", func(t *testing.T) {
+		status := &entity.Status{
+			Payment: sharedconsts.OrderStatusConfirmed,
+		}
+
 		testOrders := []*entity.Order{
 			{
 				ID:          "order-123",
 				CustomerCPF: "123.456.789-09",
 				Total:       100.0,
 				CreatedAt:   time.Now(),
-				Status:      sharedconsts.OrderItemStatusConfirmed,
+				Status:      *status,
 				Items: []*entity.OrderItem{
 					{ID: "item-1", ProductID: "prod1", Quantity: 2, Price: 50.00},
 				},
@@ -59,7 +52,7 @@ func TestConfirmedOrder(t *testing.T) {
 				CustomerCPF: "123.456.789-09",
 				Total:       200.0,
 				CreatedAt:   time.Now(),
-				Status:      "pending",
+				Status:      *status,
 				Items: []*entity.OrderItem{
 					{ID: "item-2", ProductID: "prod2", Quantity: 1, Price: 200.00},
 				},
@@ -105,13 +98,16 @@ func TestConfirmedOrder(t *testing.T) {
 	})
 
 	t.Run("should return 200 - Not Confirmed", func(t *testing.T) {
+		status := &entity.Status{
+			Payment: sharedconsts.OrderStatusNotConfirmed,
+		}
 		testOrders := []*entity.Order{
 			{
 				ID:          "order-123",
 				CustomerCPF: "123.456.789-09",
 				Total:       100.0,
 				CreatedAt:   time.Now(),
-				Status:      sharedconsts.OrderStatusNotConfirmed,
+				Status:      *status,
 				Items: []*entity.OrderItem{
 					{ID: "item-1", ProductID: "prod1", Quantity: 2, Price: 50.00},
 				},
@@ -121,7 +117,7 @@ func TestConfirmedOrder(t *testing.T) {
 				CustomerCPF: "123.456.789-09",
 				Total:       200.0,
 				CreatedAt:   time.Now(),
-				Status:      sharedconsts.OrderStatusNotConfirmed,
+				Status:      *status,
 				Items: []*entity.OrderItem{
 					{ID: "item-2", ProductID: "prod2", Quantity: 1, Price: 200.00},
 				},
@@ -166,13 +162,16 @@ func TestConfirmedOrder(t *testing.T) {
 	})
 
 	t.Run("should return 200 - Paid", func(t *testing.T) {
+		status := &entity.Status{
+			Payment: sharedconsts.OrderStatusPaymentApproved,
+		}
 		testOrders := []*entity.Order{
 			{
 				ID:          "order-123",
 				CustomerCPF: "123.456.789-09",
 				Total:       100.0,
 				CreatedAt:   time.Now(),
-				Status:      sharedconsts.OrderStatusPaymentApproved,
+				Status:      *status,
 				Items: []*entity.OrderItem{
 					{ID: "item-1", ProductID: "prod1", Quantity: 2, Price: 50.00},
 				},
@@ -182,7 +181,7 @@ func TestConfirmedOrder(t *testing.T) {
 				CustomerCPF: "123.456.789-09",
 				Total:       200.0,
 				CreatedAt:   time.Now(),
-				Status:      sharedconsts.OrderStatusPaymentApproved,
+				Status:      *status,
 				Items: []*entity.OrderItem{
 					{ID: "item-2", ProductID: "prod2", Quantity: 1, Price: 200.00},
 				},

@@ -49,10 +49,14 @@ func TestCreateCheckout(t *testing.T) {
 		DiscontCoupon:   0.0,                                           // Não é bem um cupom de desconto, mas sim um valor de desconto
 	}
 
+	status := entity.Status{
+		Payment: "confirmed",
+	}
+
 	// Define entities for the mocks to return
 	order := &entity.Order{
 		ID:     "order123",
-		Status: sharedconsts.OrderItemStatusConfirmed,
+		Status: status,
 		Items: []*entity.OrderItem{
 			{ProductID: "prod123", Quantity: 1, Status: sharedconsts.OrderItemStatusConfirmed, Price: 100.0},
 		},
@@ -76,7 +80,7 @@ func TestCreateCheckout(t *testing.T) {
 		Return(order, nil) // Order found and not paid
 
 	mockOrderRepository.EXPECT().
-		Update(ctx, gomock.Any()).
+		UpdateStatus(ctx, gomock.Any(), gomock.Any()).
 		Return(nil) // Order found and not paid
 
 	mockProductRepository.EXPECT().
@@ -87,13 +91,6 @@ func TestCreateCheckout(t *testing.T) {
 		Create(ctx, gomock.Any()).
 		Return(nil) // Checkout creation successful
 
-	// mockKitchenRepository.EXPECT().
-	// 	Create(ctx, gomock.Any()).
-	// 	Return(nil) // Kitchen entry creation successful
-
-	// o checkout recede a ordem, que tem os itens e os produtos.
-	// o payment é criado no padrão do gateway de pagamento, com a lista de produtos e a ordem.
-	// o teste prova que o output do usecase recebe e retorna os dados solicitados.
 	result, err := useCase.CreateCheckout(ctx, checkoutInput)
 
 	// Assertions
@@ -102,6 +99,6 @@ func TestCreateCheckout(t *testing.T) {
 	assert.NotNil(t, result.ID)
 	assert.NotNil(t, result.GatewayTransactionID)
 	assert.NotNil(t, result.OrderID)
-	assert.Equal(t, order.ID, result.OrderID)                                // #3 Checkout Pedido que deverá receber os produtos solicitados e retornar à identificação do pedido.
-	assert.Equal(t, order.Status, sharedconsts.OrderStatusCheckoutConfirmed) // #4 Checkout O pagamento deve ser confirmado e o ID da transação do gateway deve ser retornado.
+	assert.Equal(t, order.ID, result.OrderID)                                        // #3 Checkout Pedido que deverá receber os produtos solicitados e retornar à identificação do pedido.
+	assert.Equal(t, order.Status.Payment, sharedconsts.OrderStatusCheckoutConfirmed) // #4 Checkout O pagamento deve ser confirmado e o ID da transação do gateway deve ser retornado.
 }

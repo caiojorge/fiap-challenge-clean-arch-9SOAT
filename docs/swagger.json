@@ -64,6 +64,52 @@
                 }
             }
         },
+        "/checkouts/confirmation/payment": {
+            "post": {
+                "description": "Confirma o pagamento do cliente, via fake checkout nesse momento, e libera o pedido para preparação. A ordem muda de status nesse momento, para pagamento aprovado. Req #1 - Webhook para receber confirmação de pagamento aprovado ou recusado. A implementação deve ser clara quanto ao Webhook.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Checkouts"
+                ],
+                "summary": "Webhook to confirm payment",
+                "parameters": [
+                    {
+                        "description": "Webhook para finalizar o Checkout",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/usecase.CheckoutConfirmationInputDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/usecase.CheckoutConfirmationOutputDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/checkouts/{id}/check/payment": {
             "get": {
                 "description": "Get details of an Checkout and Status of Payment by Order id. Req #2 - Consultar status de pagamento pedido, que informa se o pagamento foi aprovado ou não.",
@@ -905,14 +951,22 @@
             "type": "object",
             "required": [
                 "checkout_id",
+                "gateway_transaction_id",
                 "order_id",
+                "qrcode",
                 "status"
             ],
             "properties": {
                 "checkout_id": {
                     "type": "string"
                 },
+                "gateway_transaction_id": {
+                    "type": "string"
+                },
                 "order_id": {
+                    "type": "string"
+                },
+                "qrcode": {
                     "type": "string"
                 },
                 "status": {
@@ -1125,10 +1179,7 @@
                 "order_id": {
                     "type": "string"
                 },
-                "product_name": {
-                    "type": "string"
-                },
-                "responsible": {
+                "queue": {
                     "type": "string"
                 }
             }

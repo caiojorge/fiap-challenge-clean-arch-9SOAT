@@ -84,6 +84,7 @@ func main() {
 		// Gerando um ID único para a ordem de pagamento
 		inStoreOrderID := uuid.New().String()
 		//inStoreOrderID := req.ExternalReference
+		fmt.Println("InStoreOrderID:", inStoreOrderID)
 
 		// Simulando geração do QR Data
 		qrData := fmt.Sprintf("00020101021243650016COM.MERCADOLIBRE020130%s-%s", req.ExternalReference, inStoreOrderID)

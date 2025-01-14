@@ -18,13 +18,12 @@ Agregação: A entidade Order é o ponto central para acompanhar o progresso do 
 
 // Order representa um pedido.
 type Order struct {
-	ID            string
-	Items         []*OrderItem
-	Total         float64
-	Status        string
-	KitchenStatus string
-	CustomerCPF   string
-	CreatedAt     time.Time
+	ID          string
+	Items       []*OrderItem
+	Total       float64
+	Status      Status
+	CustomerCPF string
+	CreatedAt   time.Time
 }
 
 // NewOrder cria um novo pedido. TODO Não esta sendo usada.
@@ -34,7 +33,7 @@ func NewOrder(cpf string, items []*OrderItem) (*Order, error) {
 		ID:          sharedgenerator.NewIDGenerator(),
 		CustomerCPF: cpf,
 		Items:       items,
-		Status:      sharedconsts.OrderStatusConfirmed,
+		Status:      *NewStatus(sharedconsts.OrderStatusConfirmed),
 	}
 
 	if len(order.Items) > 0 {
@@ -68,7 +67,7 @@ func (o *Order) Confirm() error {
 	o.ID = sharedgenerator.NewIDGenerator()
 
 	// o status da ordem é confirmado
-	o.Status = sharedconsts.OrderStatusConfirmed
+	o.Status = *NewStatus(sharedconsts.OrderStatusConfirmed)
 
 	for _, item := range o.Items {
 		item.Confirm()
@@ -98,11 +97,11 @@ func (o *Order) ConfirmItemsPrice(products []*Product) {
 }
 
 func (o *Order) ConfirmCheckout() {
-	o.Status = sharedconsts.OrderStatusCheckoutConfirmed
+	o.Status = *NewStatus(sharedconsts.OrderStatusCheckoutConfirmed)
 }
 
 func (o *Order) ConfirmPayment() {
-	o.Status = sharedconsts.OrderStatusPaymentApproved
+	o.Status = *NewStatus(sharedconsts.OrderStatusPaymentApproved)
 }
 
 func (o *Order) IsCustomerInformed() bool {
@@ -161,13 +160,30 @@ func (o *Order) CalculateTotal() {
 }
 
 func (o *Order) IsPaymentApproved() bool {
-	return o.Status == sharedconsts.OrderStatusPaymentApproved
+	name := o.Status.Payment
+	return name == sharedconsts.OrderStatusPaymentApproved
 }
 
 func (o *Order) InformPaymentApproval() {
-	o.Status = sharedconsts.OrderStatusPaymentApproved
+	o.Status = *NewStatus(sharedconsts.OrderStatusPaymentApproved)
 }
 
 func (o *Order) InformPaymentNotApproval() {
-	o.Status = sharedconsts.OrderStatusNotApproved
+	o.Status = *NewStatus(sharedconsts.OrderStatusNotApproved)
+}
+
+func (o *Order) Received() {
+	o.Status = *o.Status.KitchenFlow(sharedconsts.OrderReceivedByKitchen)
+}
+
+func (o *Order) InPreparation() {
+	o.Status = *o.Status.KitchenFlow(sharedconsts.OrderInPreparationByKitchen)
+}
+
+func (o *Order) Ready() {
+	o.Status = *o.Status.KitchenFlow(sharedconsts.OrderReadyByKitchen)
+}
+
+func (o *Order) Delivered() {
+	o.Status = *o.Status.KitchenFlow(sharedconsts.OrderFinalizedByKitchen)
 }

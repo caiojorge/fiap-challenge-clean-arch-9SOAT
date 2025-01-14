@@ -20,16 +20,16 @@ func NewFindKitchenAllController(ctx context.Context, usecase portsusecase.FindA
 	}
 }
 
-// GetAllOrders returns a list of all orders in the kitchen (just paid orders)
-// @Summary Get all orders in the kitchen
-// @Description Retorna todos os pedidos (orders) que estão na cozinha para inicio de preparação com status pagamento aprovado. Se não houver pedidos, retorna um erro (404).
+// GetAllOrders retorna todas as ordens que estão na cozinha
+// @Summary retorna todas as ordens que estão na cozinha
+// @Description Retorna as ordens que estão na cozinha em alguma etapa do preparo
 // @Tags Kitchens
 // @Accept  json
 // @Produce  json
 // @Success 200 {array} usecase.KitchenFindAllAOutputDTO
 // @Failure 400 {object} string "Bad Request"
 // @Failure 404 {object} string "Not Found"
-// @Router /kitchens/orders/paid [get]
+// @Router /kitchens/orders/flow [get]
 func (r *FindKitchenAllController) GetAllOrdersInKitchen(c *gin.Context) {
 
 	entities, err := r.usecase.FindAllKitchen(r.ctx)

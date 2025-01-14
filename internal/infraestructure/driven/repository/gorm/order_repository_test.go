@@ -13,86 +13,142 @@ import (
 )
 
 func TestCreateOrder(t *testing.T) {
-	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
 
-	//db := setupMysql()
+	t.Run("CreateOrder", func(t *testing.T) {
+		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+		if err != nil {
+			panic("failed to connect database")
+		}
 
-	// Migrar o esquema
-	err = db.AutoMigrate(&model.Customer{}, &model.Product{}, &model.Order{}, &model.OrderItem{})
-	if err != nil {
-		panic("failed to migrate database")
-	}
+		// Migrar o esquema
+		err = db.AutoMigrate(&model.Customer{}, &model.Product{}, &model.Order{}, &model.OrderItem{})
+		if err != nil {
+			panic("failed to migrate database")
+		}
 
-	converter := converter.NewOrderConverter()
-	repo := NewOrderRepositoryGorm(db, converter)
+		converter := converter.NewOrderConverter()
+		repo := NewOrderRepositoryGorm(db, converter)
 
-	// customer
-	customer := model.Customer{
-		CPF:   "75419654059", //75419654059
-		Name:  "John Doe",
-		Email: "email@email.com",
-	}
+		// customer
+		customer := model.Customer{
+			CPF:   "75419654059", //75419654059
+			Name:  "John Doe",
+			Email: "email@email.com",
+		}
 
-	product := model.Product{
-		ID:          "1",
-		Name:        "Product 1",
-		Description: "Description 1",
-		Category:    "Category 1",
-		Price:       10.0,
-	}
+		product := model.Product{
+			ID:          "1",
+			Name:        "Product 1",
+			Description: "Description 1",
+			Category:    "Category 1",
+			Price:       10.0,
+		}
 
-	location, err := time.LoadLocation("America/Sao_Paulo")
-	if err != nil {
-		panic("failed to load location")
-	}
+		location, err := time.LoadLocation("America/Sao_Paulo")
+		if err != nil {
+			panic("failed to load location")
+		}
 
-	orderItem := model.OrderItem{
-		ID:        "111",
-		ProductID: "1",
-		Product:   product,
-		Quantity:  1,
-		Price:     10.0,
-		Status:    "pending",
-	}
+		orderItem := model.OrderItem{
+			ID:        "111",
+			ProductID: "1",
+			Product:   product,
+			Quantity:  1,
+			Price:     10.0,
+			Status:    "pending",
+		}
 
-	order := model.Order{
-		ID: "111",
-		Items: []*model.OrderItem{
-			&orderItem,
-		},
-		Total:       10.0,
-		Status:      "pending",
-		CustomerCPF: &customer.CPF,
-		Customer:    &customer,
-		CreatedAt:   time.Now().In(location),
-	}
+		status := "qq status"
+		order := model.Order{
+			ID: "111",
+			Items: []*model.OrderItem{
+				&orderItem,
+			},
+			Total:       10.0,
+			Status:      status,
+			CustomerCPF: &customer.CPF,
+			Customer:    &customer,
+			CreatedAt:   time.Now().In(location),
+		}
 
-	//log.Default().Println(order)
+		entity := converter.ToEntity(&order)
+		err = repo.Create(context.Background(), entity)
+		assert.Nil(t, err)
+	})
 
-	//result := db.Create(&order)
-	//assert.Nil(t, result.Error)
-	entity := converter.ToEntity(&order)
-	err = repo.Create(context.Background(), entity)
-	assert.Nil(t, err)
+	t.Run("UpdateOrder and UpdateStatus", func(t *testing.T) {
+		db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+		if err != nil {
+			panic("failed to connect database")
+		}
 
+		// Migrar o esquema
+		err = db.AutoMigrate(&model.Customer{}, &model.Product{}, &model.Order{}, &model.OrderItem{})
+		if err != nil {
+			panic("failed to migrate database")
+		}
+
+		converter := converter.NewOrderConverter()
+		repo := NewOrderRepositoryGorm(db, converter)
+
+		// customer
+		customer := model.Customer{
+			CPF:   "75419654059", //75419654059
+			Name:  "John Doe",
+			Email: "email@email.com",
+		}
+
+		product := model.Product{
+			ID:          "1",
+			Name:        "Product 1",
+			Description: "Description 1",
+			Category:    "Category 1",
+			Price:       10.0,
+		}
+
+		location, err := time.LoadLocation("America/Sao_Paulo")
+		if err != nil {
+			panic("failed to load location")
+		}
+
+		orderItem := model.OrderItem{
+			ID:        "111",
+			ProductID: "1",
+			Product:   product,
+			Quantity:  1,
+			Price:     10.0,
+			Status:    "pending",
+		}
+
+		status := "approved"
+		order := model.Order{
+			ID: "111",
+			Items: []*model.OrderItem{
+				&orderItem,
+			},
+			Total:       10.0,
+			Status:      status,
+			CustomerCPF: &customer.CPF,
+			Customer:    &customer,
+			CreatedAt:   time.Now().In(location),
+		}
+
+		entity := converter.ToEntity(&order)
+		err = repo.Create(context.Background(), entity)
+		assert.Nil(t, err)
+
+		//order.Status.Name = "approved"
+		entity = converter.ToEntity(&order)
+		err = repo.Update(context.Background(), entity)
+		assert.Nil(t, err)
+		assert.Equal(t, "approved", entity.Status.Payment)
+
+		canceledStatus := "canceled"
+		order.Status = canceledStatus
+		entity = converter.ToEntity(&order)
+		err = repo.UpdateStatus(context.Background(), entity.ID, entity.Status.Payment)
+		assert.Nil(t, err)
+		assert.Equal(t, "canceled", entity.Status.Payment)
+
+	})
 }
-
-// func setupMysql() *gorm.DB {
-// 	host := "localhost"
-// 	port := "3306"
-// 	user := "root"
-// 	password := "root"
-// 	dbName := "dbcontrol"
-
-// 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, dbName)
-// 	fmt.Println(dsn)
-// 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-// 	if err != nil {
-// 		log.Fatalf("Failed to connect to the database: %v", err)
-// 	}
-
-// 	return db
-// }

@@ -23,7 +23,6 @@ func NewWebhookCheckoutController(ctx context.Context, usecase portsusecase.IChe
 	}
 }
 
-// PutConfirmPayment godoc
 // @Summary Webhook to confirm payment
 // @Schemes
 // @Description Confirma o pagamento do cliente, via fake checkout nesse momento, e libera o pedido para preparação. A ordem muda de status nesse momento, para pagamento aprovado. Req #1 - Webhook para receber confirmação de pagamento aprovado ou recusado. A implementação deve ser clara quanto ao Webhook.
@@ -34,7 +33,7 @@ func NewWebhookCheckoutController(ctx context.Context, usecase portsusecase.IChe
 // @Success 200 {object} usecase.CheckoutConfirmationOutputDTO
 // @Failure 400 {object} string "invalid data"
 // @Failure 500 {object} string "internal server error"
-// @Router /checkouts [post]
+// @Router /checkouts/confirmation/payment [post]
 func (cw *WebhookCheckoutController) PutConfirmPayment(c *gin.Context) {
 	cw.logger.Info("PutConfirmPayment")
 	// a.III Webhook para receber confirmação de pagamento aprovado ou recusado. A implementação deve ser clara quanto ao Webhook.

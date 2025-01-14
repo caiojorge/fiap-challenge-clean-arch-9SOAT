@@ -7,10 +7,10 @@ type Order struct {
 	ID          string       `gorm:"type:char(36);primaryKey"`
 	Items       []*OrderItem `gorm:"foreignKey:OrderID"`
 	Total       float64      `gorm:"not null"`
-	Status      string       `gorm:"type:varchar(36);not null"`
 	CustomerCPF *string      `gorm:"type:varchar(11);index"` // FK
 	Customer    *Customer    `gorm:"foreignKey:CustomerCPF;references:CPF"`
 	CreatedAt   time.Time    `gorm:"not null"`
+	Status      string       `gorm:"not null"`
 }
 
 // OrderItem has one product (acho que belongs funcionaria melhor aqui)

@@ -8,7 +8,7 @@ import (
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/converter"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model"
-	sharedDate "github.com/caiojorge/fiap-challenge-ddd/internal/shared/time"
+	sharedtime "github.com/caiojorge/fiap-challenge-ddd/internal/shared/time"
 	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 )
@@ -35,22 +35,17 @@ func NewOrderRepositoryGorm(db *gorm.DB, converter converter.Converter[entity.Or
 
 // Create creates a new product. It returns an error if something goes wrong.
 func (r *OrderRepositoryGorm) Create(ctx context.Context, entity *entity.Order) error {
-	var model model.Order
-
-	err := copier.Copy(&model, entity)
-	if err != nil {
-		return err
-	}
-
-	if *model.CustomerCPF == "" {
-		model.CustomerCPF = nil
-	}
-
-	model.CreatedAt = sharedDate.GetBRTimeNow()
 
 	db := r.getDB(ctx)
 
-	err = db.Create(model).Error
+	model := parserOrder(entity)
+
+	model.CreatedAt = sharedtime.GetBRTimeNow()
+	if model.CustomerCPF != nil && *model.CustomerCPF == "" {
+		model.CustomerCPF = nil
+	}
+
+	err := db.Create(model).Error
 	if err != nil {
 		fmt.Println("gorm: " + err.Error())
 		return err
@@ -59,10 +54,45 @@ func (r *OrderRepositoryGorm) Create(ctx context.Context, entity *entity.Order) 
 	return nil
 }
 
+func parserOrder(entity *entity.Order) model.Order {
+	modelItems := make([]*model.OrderItem, len(entity.Items))
+	for i, item := range entity.Items {
+		modelItems[i] = &model.OrderItem{
+			ID:        item.ID,
+			ProductID: item.ProductID,
+			Quantity:  item.Quantity,
+			Price:     item.Price,
+			Status:    item.Status,
+			OrderID:   entity.ID,
+		}
+	}
+
+	model := model.Order{
+		ID:          entity.ID,
+		Items:       modelItems,
+		Total:       entity.Total,
+		CustomerCPF: &entity.CustomerCPF,
+		Status:      entity.Status.Payment,
+	}
+
+	if *model.CustomerCPF == "" {
+		model.CustomerCPF = nil
+	}
+	return model
+}
+
 func (r *OrderRepositoryGorm) Update(ctx context.Context, entity *entity.Order) error {
 
 	db := r.getDB(ctx)
-	model := r.converter.FromEntity(entity)
+
+	var retrievedOrder model.Order
+	//err := db.Preload("Status").First(&retrievedOrder, "id = ?", entity.ID).Error
+	err := db.First(&retrievedOrder, "id = ?", entity.ID).Error
+	if err != nil {
+		return err
+	}
+
+	model := parserOrder(entity)
 	if *model.CustomerCPF == "" {
 		model.CustomerCPF = nil
 	}
@@ -77,6 +107,7 @@ func (r *OrderRepositoryGorm) Update(ctx context.Context, entity *entity.Order) 
 
 func (r *OrderRepositoryGorm) UpdateStatus(ctx context.Context, id string, status string) error {
 	db := r.getDB(ctx)
+
 	// Usando RAW SQL para atualizar o status da ordem
 	result := db.Exec("UPDATE orders SET status = ? WHERE id = ?", status, id)
 	if result.Error != nil {

@@ -146,7 +146,7 @@ func (cr *CheckoutCreateUseCase) handlePayment(ctx context.Context, checkout *en
 		order.InformPaymentNotApproval()
 		_ = cr.orderRepository.Update(ctx, order)
 
-		checkout.InformPaymentNotApproval()
+		//checkout.InformPaymentNotApproval()
 		return nil, err
 	}
 
@@ -155,13 +155,6 @@ func (cr *CheckoutCreateUseCase) handlePayment(ctx context.Context, checkout *en
 		_ = cr.orderRepository.Update(ctx, order)
 		return nil, errors.New("failed to create transaction on gateway")
 	}
-
-	// //order.ApprovePayment()
-	// err = cr.orderRepository.Update(ctx, order)
-	// if err != nil {
-	// 	cr.gatewayService.CancelPayment(ctx, payment.ID) // não tem rollback no gateway
-	// 	return nil, err
-	// }
 
 	return payment, nil
 }
@@ -187,24 +180,10 @@ func (cr *CheckoutCreateUseCase) handleCheckout(ctx context.Context, checkout *e
 	return nil
 }
 
-func (cr *CheckoutCreateUseCase) handleKitchen(ctx context.Context, order *entity.Order, productList []*entity.Product, payment entity.Payment) error {
-
-	// Kitchen - cria um item na cozinha para cada produto do pedido
-	for _, item := range productList {
-		kt := entity.NewKitchen(order.ID, item.ID, item.Name, item.Category)
-		err := cr.kitchenRepository.Create(ctx, kt)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 func (cr *CheckoutCreateUseCase) handleOrder(ctx context.Context, order *entity.Order) error {
 	order.ConfirmCheckout()
-	err := cr.orderRepository.Update(ctx, order)
-	//err := cr.orderRepository.UpdateStatus(ctx, order.ID, order.Status)
+	//err := cr.orderRepository.Update(ctx, order)
+	err := cr.orderRepository.UpdateStatus(ctx, order.ID, order.Status.Payment)
 	if err != nil {
 		return err
 	}

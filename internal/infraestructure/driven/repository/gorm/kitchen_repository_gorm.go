@@ -38,18 +38,13 @@ func (r *KitchenRepositoryGorm) Create(ctx context.Context, entity *entity.Kitch
 	return nil
 }
 
-// Update updates the checkout. It returns an error if something goes wrong.
+// Find not implemented
 func (r *KitchenRepositoryGorm) Update(ctx context.Context, entity *entity.Kitchen) error {
-
-	var model model.Checkout
-	copier.Copy(&model, entity)
-
-	return r.DB.Save(model).Error
+	return nil
 }
 
 // Find not implemented
 func (r *KitchenRepositoryGorm) Find(ctx context.Context, id string) (*entity.Kitchen, error) {
-
 	return nil, nil
 }
 

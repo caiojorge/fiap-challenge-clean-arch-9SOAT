@@ -53,13 +53,14 @@ func TestCreateOrder(t *testing.T) {
 		Status:    "pending",
 	}
 
+	status := "qq status"
 	order := Order{
 		ID: "1",
 		Items: []*OrderItem{
 			&orderItem,
 		},
 		Total:       10.0,
-		Status:      "pending",
+		Status:      status,
 		CustomerCPF: &customer.CPF,
 		Customer:    &customer,
 		CreatedAt:   time.Now().In(location),
@@ -109,13 +110,15 @@ func TestCreateOrderWithoutCustomer(t *testing.T) {
 		Status:    "pending",
 	}
 
+	status := "qq status"
+
 	order := Order{
 		ID: "2",
 		Items: []*OrderItem{
 			&orderItem,
 		},
 		Total:       10.0,
-		Status:      "pending",
+		Status:      status,
 		CustomerCPF: nil,
 		Customer:    nil,
 		CreatedAt:   time.Now().In(location),
@@ -171,13 +174,14 @@ func TestCreateOrderWithExistingCustomer(t *testing.T) {
 		Status:    "pending",
 	}
 
+	status := "qq status"
 	order := Order{
 		ID: "3",
 		Items: []*OrderItem{
 			&orderItem,
 		},
 		Total:       10.0,
-		Status:      "pending",
+		Status:      status,
 		CustomerCPF: &customer.CPF,
 		Customer:    &customer,
 		CreatedAt:   time.Now().In(location),
@@ -187,21 +191,10 @@ func TestCreateOrderWithExistingCustomer(t *testing.T) {
 
 	result := db.Create(&order)
 	assert.Nil(t, result.Error)
+
+	var order2 Order
+	db.Find(&order2, "id = ?", "3")
+
+	assert.Equal(t, order.ID, order2.ID)
+
 }
-
-// func setupMysql() *gorm.DB {
-// 	host := "localhost"
-// 	port := "3306"
-// 	user := "root"
-// 	password := "root"
-// 	dbName := "dbcontrol"
-
-// 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, dbName)
-// 	fmt.Println(dsn)
-// 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
-// 	if err != nil {
-// 		log.Fatalf("Failed to connect to the database: %v", err)
-// 	}
-
-// 	return db
-// }

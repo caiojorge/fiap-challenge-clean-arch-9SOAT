@@ -34,7 +34,7 @@ func (cr *OrderFindAllUseCase) FindAllOrders(ctx context.Context) ([]*OrderFindA
 			CustomerCPF: order.CustomerCPF,
 			Total:       order.Total,
 			CreatedAt:   order.CreatedAt,
-			Status:      order.Status,
+			Status:      order.Status.Payment,
 		}
 
 		for _, item := range order.Items {

@@ -34,21 +34,25 @@ func TestConfirmPayment_Success(t *testing.T) {
 	input := &CheckoutConfirmationInputDTO{
 		OrderID: "order123",
 	}
+
+	status := entity.Status{
+		Payment: "confirmed",
+	}
+
 	order := &entity.Order{
 		ID:     "order123",
-		Status: "pending",
+		Status: status,
 	}
 	checkout := &entity.Checkout{
 		ID:      "checkout123",
 		OrderID: "order123",
-		Status:  "pending",
 	}
 
 	// Configuração dos mocks
 	orderRepoMock.EXPECT().Find(ctx, input.OrderID).Return(order, nil)
 	checkoutRepoMock.EXPECT().FindbyOrderID(ctx, input.OrderID).Return(checkout, nil)
 	orderRepoMock.EXPECT().UpdateStatus(ctx, "order123", gomock.Any()).Return(nil)
-	checkoutRepoMock.EXPECT().UpdateStatus(ctx, gomock.Any(), gomock.Any()).Return(nil)
+	// checkoutRepoMock.EXPECT().UpdateStatus(ctx, gomock.Any(), gomock.Any()).Return(nil)
 	transactionManagerMock.EXPECT().
 		RunInTransaction(gomock.Any(), gomock.Any()).
 		DoAndReturn(func(ctx context.Context, fn func(ctx context.Context) error) error {

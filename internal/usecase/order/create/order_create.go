@@ -75,6 +75,8 @@ func (cr *OrderCreateUseCase) CreateOrder(ctx context.Context, input *OrderCreat
 		return nil, err
 	}
 
+	output.Status = order.Status.Payment
+
 	return &output, nil
 }
 

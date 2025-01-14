@@ -17,7 +17,7 @@ func FromEntity(orders []*entity.Order) []*OrderFindByParamOutputDTO {
 			CustomerCPF: order.CustomerCPF,
 			Total:       order.Total,
 			CreatedAt:   order.CreatedAt,
-			Status:      order.Status,
+			Status:      order.Status.Payment,
 		}
 
 		for _, item := range order.Items {

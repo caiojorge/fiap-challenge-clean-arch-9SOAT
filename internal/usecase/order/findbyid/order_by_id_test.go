@@ -12,76 +12,84 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestFindOrderByID_Success(t *testing.T) {
-	// Inicializar o controlador do GoMock
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+func TestFindOrderByID(t *testing.T) {
 
-	// Criar o mock para o repositório de ordem
-	mockOrderRepo := mocksrepository.NewMockOrderRepository(ctrl)
+	t.Run("FindOrderByID_Success", func(t *testing.T) {
+		// Inicializar o controlador do GoMock
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-	// Criar o caso de uso com o mock injetado
-	findOrderByIDUseCase := NewOrderFindByID(mockOrderRepo)
+		// Criar o mock para o repositório de ordem
+		mockOrderRepo := mocksrepository.NewMockOrderRepository(ctrl)
 
-	// Definir o contexto e o ID da ordem
-	ctx := context.Background()
-	orderID := "order-123"
+		// Criar o caso de uso com o mock injetado
+		findOrderByIDUseCase := NewOrderFindByID(mockOrderRepo)
 
-	// Criar uma ordem de teste que o mock retornará
-	testOrder := &entity.Order{
-		ID:          orderID,
-		CustomerCPF: "123.456.789-00",
-		Total:       100.0,
-		CreatedAt:   time.Now(),
-		Status:      "pending",
-		Items: []*entity.OrderItem{
-			{ID: "item-1", ProductID: "prod1", Quantity: 2, Price: 50.00},
-		},
-	}
+		// Definir o contexto e o ID da ordem
+		ctx := context.Background()
+		orderID := "order-123"
 
-	// Configurar o mock para retornar a ordem de teste
-	mockOrderRepo.EXPECT().
-		Find(gomock.Any(), orderID).
-		Return(testOrder, nil).Times(1)
+		status := entity.Status{
+			Payment: "confirmed",
+		}
 
-	// Executar o caso de uso
-	output, err := findOrderByIDUseCase.FindOrderByID(ctx, orderID)
+		// Criar uma ordem de teste que o mock retornará
+		testOrder := &entity.Order{
+			ID:          orderID,
+			CustomerCPF: "123.456.789-00",
+			Total:       100.0,
+			CreatedAt:   time.Now(),
+			Status:      status,
+			Items: []*entity.OrderItem{
+				{ID: "item-1", ProductID: "prod1", Quantity: 2, Price: 50.00},
+			},
+		}
 
-	// Verificar o resultado
-	assert.Nil(t, err)                  // Verificar que não houve erro
-	assert.NotNil(t, output)            // Verificar que o resultado não é nulo
-	assert.Equal(t, orderID, output.ID) // Verificar que o ID da ordem está correto
-	assert.Equal(t, "123.456.789-00", output.CustomerCPF)
-	assert.Len(t, output.Items, 1) // Verificar que há 1 item na ordem
-	assert.Equal(t, "prod1", output.Items[0].ProductID)
-	assert.Equal(t, 100.0, output.Total)
-}
+		// Configurar o mock para retornar a ordem de teste
+		mockOrderRepo.EXPECT().
+			Find(gomock.Any(), orderID).
+			Return(testOrder, nil).Times(1)
 
-func TestFindOrderByID_Error(t *testing.T) {
-	// Inicializar o controlador do GoMock
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+		// Executar o caso de uso
+		output, err := findOrderByIDUseCase.FindOrderByID(ctx, orderID)
 
-	// Criar o mock para o repositório de ordem
-	mockOrderRepo := mocksrepository.NewMockOrderRepository(ctrl)
+		// Verificar o resultado
+		assert.Nil(t, err)                  // Verificar que não houve erro
+		assert.NotNil(t, output)            // Verificar que o resultado não é nulo
+		assert.Equal(t, orderID, output.ID) // Verificar que o ID da ordem está correto
+		assert.Equal(t, "123.456.789-00", output.CustomerCPF)
+		assert.Len(t, output.Items, 1) // Verificar que há 1 item na ordem
+		assert.Equal(t, "prod1", output.Items[0].ProductID)
+		assert.Equal(t, 100.0, output.Total)
+	})
 
-	// Criar o caso de uso com o mock injetado
-	findOrderByIDUseCase := NewOrderFindByID(mockOrderRepo)
+	t.Run("FindOrderByID_Error", func(t *testing.T) {
+		// Inicializar o controlador do GoMock
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
 
-	// Definir o contexto e o ID da ordem
-	ctx := context.Background()
-	orderID := "order-123"
+		// Criar o mock para o repositório de ordem
+		mockOrderRepo := mocksrepository.NewMockOrderRepository(ctrl)
 
-	// Configurar o mock para retornar um erro
-	mockOrderRepo.EXPECT().
-		Find(gomock.Any(), orderID).
-		Return(nil, errors.New("order not found")).Times(1)
+		// Criar o caso de uso com o mock injetado
+		findOrderByIDUseCase := NewOrderFindByID(mockOrderRepo)
 
-	// Executar o caso de uso
-	output, err := findOrderByIDUseCase.FindOrderByID(ctx, orderID)
+		// Definir o contexto e o ID da ordem
+		ctx := context.Background()
+		orderID := "order-123"
 
-	// Verificar o resultado
-	assert.Nil(t, output)                           // Verificar que o resultado é nulo
-	assert.NotNil(t, err)                           // Verificar que houve um erro
-	assert.Equal(t, "order not found", err.Error()) // Verificar a mensagem de erro
+		// Configurar o mock para retornar um erro
+		mockOrderRepo.EXPECT().
+			Find(gomock.Any(), orderID).
+			Return(nil, errors.New("order not found")).Times(1)
+
+		// Executar o caso de uso
+		output, err := findOrderByIDUseCase.FindOrderByID(ctx, orderID)
+
+		// Verificar o resultado
+		assert.Nil(t, output)                           // Verificar que o resultado é nulo
+		assert.NotNil(t, err)                           // Verificar que houve um erro
+		assert.Equal(t, "order not found", err.Error()) // Verificar a mensagem de erro
+	})
+
 }

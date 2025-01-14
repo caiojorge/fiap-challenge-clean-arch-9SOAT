@@ -29,6 +29,10 @@ func TestFindOrdersByParams_Success(t *testing.T) {
 		"status":       "pending",
 	}
 
+	status := entity.Status{
+		Payment: "confirmed",
+	}
+
 	// Criar ordens de teste que o mock retornará
 	testOrders := []*entity.Order{
 		{
@@ -36,7 +40,7 @@ func TestFindOrdersByParams_Success(t *testing.T) {
 			CustomerCPF: "123.456.789-09",
 			Total:       100.0,
 			CreatedAt:   time.Now(),
-			Status:      "pending",
+			Status:      status,
 			Items: []*entity.OrderItem{
 				{ID: "item-1", ProductID: "prod1", Quantity: 2, Price: 50.00},
 			},
@@ -46,7 +50,7 @@ func TestFindOrdersByParams_Success(t *testing.T) {
 			CustomerCPF: "123.456.789-09",
 			Total:       200.0,
 			CreatedAt:   time.Now(),
-			Status:      "pending",
+			Status:      status,
 			Items: []*entity.OrderItem{
 				{ID: "item-2", ProductID: "prod2", Quantity: 1, Price: 200.00},
 			},

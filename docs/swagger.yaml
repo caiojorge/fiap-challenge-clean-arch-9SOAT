@@ -32,13 +32,19 @@ definitions:
     properties:
       checkout_id:
         type: string
+      gateway_transaction_id:
+        type: string
       order_id:
+        type: string
+      qrcode:
         type: string
       status:
         type: string
     required:
     - checkout_id
+    - gateway_transaction_id
     - order_id
+    - qrcode
     - status
     type: object
   usecase.CheckoutInputDTO:
@@ -177,9 +183,7 @@ definitions:
         type: string
       order_id:
         type: string
-      product_name:
-        type: string
-      responsible:
+      queue:
         type: string
     type: object
   usecase.OrderCreateInputDTO:
@@ -409,6 +413,39 @@ paths:
           schema:
             type: string
       summary: Check Payment by Order ID
+      tags:
+      - Checkouts
+  /checkouts/confirmation/payment:
+    post:
+      consumes:
+      - application/json
+      description: 'Confirma o pagamento do cliente, via fake checkout nesse momento,
+        e libera o pedido para preparação. A ordem muda de status nesse momento, para
+        pagamento aprovado. Req #1 - Webhook para receber confirmação de pagamento
+        aprovado ou recusado. A implementação deve ser clara quanto ao Webhook.'
+      parameters:
+      - description: Webhook para finalizar o Checkout
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/usecase.CheckoutConfirmationInputDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/usecase.CheckoutConfirmationOutputDTO'
+        "400":
+          description: invalid data
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Webhook to confirm payment
       tags:
       - Checkouts
   /customers:

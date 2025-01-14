@@ -49,10 +49,13 @@ func TestPayment(t *testing.T) {
 		DiscontCoupon:   0.0,                                           // Não é bem um cupom de desconto, mas sim um valor de desconto
 	}
 
+	status := entity.Status{
+		Payment: sharedconsts.OrderStatusConfirmed,
+	}
 	// Define entities for the mocks to return
 	order := &entity.Order{
 		ID:     "order123",
-		Status: sharedconsts.OrderItemStatusConfirmed,
+		Status: status,
 		Items: []*entity.OrderItem{
 			{ProductID: "prod123", Quantity: 1, Status: sharedconsts.OrderItemStatusConfirmed, Price: 100.0},
 		},
@@ -74,7 +77,7 @@ func TestPayment(t *testing.T) {
 		Return(order, nil).AnyTimes() // Order found and not paid
 
 	mockOrderRepository.EXPECT().
-		Update(ctx, gomock.Any()).
+		UpdateStatus(ctx, gomock.Any(), gomock.Any()).
 		Return(nil) // Order found and not paid
 
 	mockProductRepository.EXPECT().
