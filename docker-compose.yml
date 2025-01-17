@@ -29,18 +29,18 @@ services:
     networks:
       - my-network
 
-  app-payment:
-    build:
-      context: .
-      dockerfile: ./Dockerfile.payment
-    container_name: fiap-go-app-payment
-    ports:
-      - "30090:30090"
-    environment:
-      - HOST2_NAME=localhost
-      - HOST2_PORT=30090  
-    networks:
-      - my-network    
+  # app-payment:
+  #   build:
+  #     context: .
+  #     dockerfile: ./Dockerfile.payment
+  #   container_name: fiap-go-app-payment
+  #   ports:
+  #     - "30090:30090"
+  #   environment:
+  #     - HOST2_NAME=localhost
+  #     - HOST2_PORT=30090  
+  #   networks:
+  #     - my-network    
   
   # app:
   #   build: .

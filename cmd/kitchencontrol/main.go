@@ -1,20 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
-	"github.com/caiojorge/fiap-challenge-ddd/docs"
-	infra "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/db"
-	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model"
+	connection "github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/db/connection"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/db/migration"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/server"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/swagger"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	swaggerfiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
+	"github.com/robfig/cron/v3"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 )
 
 // @title Fiap Fase 2 Challenge Clean Arch API - 9SOAT
@@ -50,7 +47,13 @@ func main() {
 	}
 	defer logger.Sync() // flushes buffer, if any
 
-	db := setupDB(logger)
+	//db := setupDB(logger)
+	conn := connection.NewConnection("mysql", logger)
+	db, err := conn.Execute()
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+
 	server := server.NewServer(db, logger)
 	//server.Initialization()
 
@@ -58,66 +61,85 @@ func main() {
 
 	// Migrate the schema
 	logger.Info("Startin Migration")
-	setupMigration(server)
+	//setupMigration(server)
+
+	m := migration.NewMigration(db)
+	if err := m.Execute(); err != nil {
+		log.Fatalf("Failed to migrate database schema: %v", err)
+	}
+
 	logger.Info("Migration executed successfully")
 
 	//swaggerURL := fmt.Sprintf("http://%s:%s/kitchencontrol/api/v1/docs/*any", hostname, hostport)
 	//server.GetRouter().GET("/kitchencontrol/api/v1/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler, ginSwagger.URL(swaggerURL)))
-	swaggerURL := setupSwagger(hostname, hostport, server)
+	//swaggerURL := setupSwagger(hostname, hostport, server)
+	sw := swagger.NewSwaggo(hostname, hostport, server)
+	swaggerURL := sw.Execute()
 
 	logger.Info("Server running on " + hostname + ":" + hostport)
 	logger.Info("swagger running on " + swaggerURL)
+
+	// Iniciar o "cron"
+	c := cron.New()
+
+	// Simulador do sistema da cozinha que puxa as ordens pagas para inicio do preparo
+	c.AddFunc("@every 20s", func() {
+		logger.Info("Cron running")
+	})
+
+	// Start do cron em background
+	c.Start()
 
 	//server.Run(":8083")
 	server.Run(":" + hostport)
 
 }
 
-func setupMigration(server *server.GinServer) {
-	if err := server.GetDB().AutoMigrate(
-		&model.Customer{},
-		&model.Product{},
-		&model.Order{},
-		&model.OrderItem{},
-		&model.Checkout{},
-		&model.Kitchen{}); err != nil {
-		log.Fatalf("Failed to migrate database schema: %v", err)
-	}
-}
+// func setupMigration(server *server.GinServer) {
+// 	if err := server.GetDB().AutoMigrate(
+// 		&model.Customer{},
+// 		&model.Product{},
+// 		&model.Order{},
+// 		&model.OrderItem{},
+// 		&model.Checkout{},
+// 		&model.Kitchen{}); err != nil {
+// 		log.Fatalf("Failed to migrate database schema: %v", err)
+// 	}
+// }
 
-func setupSwagger(hostname string, hostport string, server *server.GinServer) string {
+// func setupSwagger(hostname string, hostport string, server *server.GinServer) string {
 
-	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", hostname, hostport)
-	docs.SwaggerInfo.BasePath = "/kitchencontrol/api/v1"
+// 	docs.SwaggerInfo.Host = fmt.Sprintf("%s:%s", hostname, hostport)
+// 	docs.SwaggerInfo.BasePath = "/kitchencontrol/api/v1"
 
-	swaggerURL := fmt.Sprintf("http://%s:%s/kitchencontrol/api/v1/docs/doc.json", hostname, hostport)
-	server.GetRouter().GET("/kitchencontrol/api/v1/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
-	return swaggerURL
-}
+// 	swaggerURL := fmt.Sprintf("http://%s:%s/kitchencontrol/api/v1/docs/doc.json", hostname, hostport)
+// 	server.GetRouter().GET("/kitchencontrol/api/v1/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+// 	return swaggerURL
+// }
 
-func setupDB(logger *zap.Logger) *gorm.DB {
+// func setupDB(logger *zap.Logger) *gorm.DB {
 
-	// host := "localhost"
-	// port := "3306"
-	// user := "root"
-	// password := "root"
-	// dbName := "dbcontrolf2"
+// 	// host := "localhost"
+// 	// port := "3306"
+// 	// user := "root"
+// 	// password := "root"
+// 	// dbName := "dbcontrolf2"
 
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	dbName := os.Getenv("DB_NAME")
+// 	host := os.Getenv("DB_HOST")
+// 	port := os.Getenv("DB_PORT")
+// 	user := os.Getenv("DB_USER")
+// 	password := os.Getenv("DB_PASSWORD")
+// 	dbName := os.Getenv("DB_NAME")
 
-	db := infra.NewDB(host, port, user, password, dbName)
+// 	db := infra.NewDB(host, port, user, password, dbName)
 
-	logger.Info("Database connection established")
-	logger.Info(dbName, zap.String("host", host), zap.String("port", port), zap.String("user", user))
-	// get a connection
-	connection := db.GetConnection("mysql")
-	if connection == nil {
-		log.Fatal("Expected a non-nil MySQL connection, but got nil")
-	}
+// 	logger.Info("Database connection established")
+// 	logger.Info(dbName, zap.String("host", host), zap.String("port", port), zap.String("user", user))
+// 	// get a connection
+// 	connection := db.GetConnection("mysql")
+// 	if connection == nil {
+// 		log.Fatal("Expected a non-nil MySQL connection, but got nil")
+// 	}
 
-	return connection
-}
+// 	return connection
+// }

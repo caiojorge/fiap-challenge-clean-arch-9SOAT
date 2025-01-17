@@ -57,6 +57,11 @@ func SetupRouter(container *di.Container) *gin.Engine {
 		kitchenGroup.POST("/orders/cooking", container.CookingKitchenController.PostCookingKitchen)
 	}
 
+	// paymentGroup := r.Group("/instore/orders/qr/seller/collectors/")
+	// {
+	// 	paymentGroup.POST("/:collectorID/pos/:posID/qrs", container.PostPaymentFakeController.PostPaymentFake)
+	// }
+
 	return r
 }
 
