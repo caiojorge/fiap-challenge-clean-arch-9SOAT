@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
+	sharedurl "github.com/caiojorge/fiap-challenge-ddd/internal/shared/url"
 	"github.com/joho/godotenv"
 )
 
@@ -29,7 +30,10 @@ func (s *PaymentService) SendPaymentRequest(collectorID, posID string, payment *
 	hostname := os.Getenv("HOST2_NAME")
 	hostport := os.Getenv("HOST2_PORT")
 
-	url := fmt.Sprintf("http://%s:%s/instore/orders/qr/seller/collectors/%s/pos/%s/qrs", hostname, hostport, collectorID, posID)
+	//url := fmt.Sprintf("http://%s:%s/instore/orders/qr/seller/collectors/%s/pos/%s/qrs", hostname, hostport, collectorID, posID)
+
+	u := sharedurl.NewURL(hostname, hostport)
+	url := u.GetPaymentURL(collectorID, posID)
 
 	// Serializar o payload para JSON
 	body, err := json.Marshal(payment)

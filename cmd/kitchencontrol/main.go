@@ -8,6 +8,7 @@ import (
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/db/migration"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/server"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/swagger"
+	payment "github.com/caiojorge/fiap-challenge-ddd/internal/shared/fake"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/robfig/cron/v3"
@@ -89,6 +90,8 @@ func main() {
 
 	// Start do cron em background
 	c.Start()
+
+	server.GetRouter().POST("/instore/orders/qr/seller/collectors/:collectorID/pos/:posID/qrs", payment.PostPaymentFake)
 
 	//server.Run(":8083")
 	server.Run(":" + hostport)
