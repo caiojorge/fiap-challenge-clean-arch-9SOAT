@@ -92,7 +92,7 @@ func (cr *CheckoutConfirmationUseCase) ConfirmPayment(ctx context.Context, input
 	err = cr.tm.RunInTransaction(ctx, func(ctx context.Context) error {
 		// 5. Salvar novo status da ordem
 		//err := cr.orderRepository.Update(ctx, order)
-		err := cr.orderRepository.UpdateStatus(ctx, order.ID, order.Status.Payment)
+		err := cr.orderRepository.UpdateStatus(ctx, order.ID, order.Status.Name)
 		if err != nil {
 			cr.logger.Error("Error to update order", zap.Error(err))
 			return err
@@ -117,7 +117,7 @@ func (cr *CheckoutConfirmationUseCase) ConfirmPayment(ctx context.Context, input
 	output := &CheckoutConfirmationOutputDTO{
 		CheckoutID:           checkout.ID,
 		OrderID:              order.ID,
-		Status:               order.Status.Payment,
+		Status:               order.Status.Name,
 		GatewayTransactionID: checkout.Gateway.GatewayTransactionID,
 		QRCode:               checkout.QRCode,
 	}

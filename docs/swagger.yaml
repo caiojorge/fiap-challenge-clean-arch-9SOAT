@@ -80,6 +80,33 @@ definitions:
         description: Identificação da ordem (pedido)
         type: string
     type: object
+  usecase.CheckoutReprocessingInputDTO:
+    properties:
+      notification_url:
+        description: webhook para receber a confirmação do pagamento
+        type: string
+      sponsor_id:
+        type: string
+    type: object
+  usecase.CheckoutReprocessingOutputDTO:
+    properties:
+      checkout_id:
+        type: string
+      gateway_transaction_id:
+        type: string
+      order_id:
+        type: string
+      qrcode:
+        type: string
+      status:
+        type: string
+    required:
+    - checkout_id
+    - gateway_transaction_id
+    - order_id
+    - qrcode
+    - status
+    type: object
   usecase.CustomerFindAllOutputDTO:
     properties:
       cpf:
@@ -173,17 +200,61 @@ definitions:
       price:
         type: number
     type: object
-  usecase.KitchenFindAllAOutputDTO:
+  usecase.KitchenCookingInputDTO:
     properties:
-      created_at:
+      order_id:
         type: string
-      id:
+    type: object
+  usecase.KitchenCookingOutputDTO:
+    properties:
+      customer_id:
         type: string
-      item_order_id:
+      estimated_time:
+        type: string
+      items:
+        items:
+          type: string
+        type: array
+      kitchen_id:
         type: string
       order_id:
         type: string
       queue:
+        type: string
+      status:
+        type: string
+    type: object
+  usecase.KitchenFindAllAOutputDTO:
+    properties:
+      created_at:
+        type: string
+      estimated_time:
+        type: string
+      id:
+        type: string
+      order_id:
+        type: string
+      queue:
+        type: string
+    type: object
+  usecase.KitchenNotifierOutputDTO:
+    properties:
+      customer_id:
+        type: string
+      estimated_time:
+        type: string
+      id:
+        type: string
+      items:
+        items:
+          type: string
+        type: array
+      order_id:
+        type: string
+      queue:
+        description: ordem na fila de preparo
+        type: string
+      status:
         type: string
     type: object
   usecase.OrderCreateInputDTO:
@@ -200,6 +271,8 @@ definitions:
       created_at:
         type: string
       customercpf:
+        type: string
+      delivery_number:
         type: string
       id:
         type: string
@@ -218,6 +291,8 @@ definitions:
         type: string
       customercpf:
         type: string
+      delivery_number:
+        type: string
       id:
         type: string
       items:
@@ -235,6 +310,8 @@ definitions:
         type: string
       customercpf:
         type: string
+      delivery_number:
+        type: string
       id:
         type: string
       items:
@@ -251,6 +328,8 @@ definitions:
       created_at:
         type: string
       customercpf:
+        type: string
+      delivery_number:
         type: string
       id:
         type: string
@@ -448,6 +527,38 @@ paths:
       summary: Webhook to confirm payment
       tags:
       - Checkouts
+  /checkouts/reprocessing/payment:
+    post:
+      consumes:
+      - application/json
+      description: Reprocesso o pagamento. Ordens em checkout aprovado, com checkout
+        criado podem ser reprocessadas. O reprocessamento é feito no gateway de pagamento.
+        O checkout é atualizado com o status do pagamento e o pedido é notificado.
+      parameters:
+      - description: reprocessa o Checkout
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/usecase.CheckoutReprocessingInputDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/usecase.CheckoutReprocessingOutputDTO'
+        "400":
+          description: invalid data
+          schema:
+            type: string
+        "500":
+          description: internal server error
+          schema:
+            type: string
+      summary: Reprocessa o Checkout
+      tags:
+      - Checkouts
   /customers:
     get:
       consumes:
@@ -575,13 +686,41 @@ paths:
       summary: Update a customer
       tags:
       - Customers
-  /kitchens/orders/paid:
+  /kitchens/orders/cooking:
+    post:
+      consumes:
+      - application/json
+      description: Busca a ordem e o ticket da cozinha; move o status para o próximo
+        da fase de preparo e faz o delivery se estiver finalizado.
+      parameters:
+      - description: indica a ordem a ser trabalhada pela cozinha
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/usecase.KitchenCookingInputDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/usecase.KitchenCookingOutputDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Busca a ordem e o ticket da cozinha; move o status para o próximo da
+        fase de preparo e faz o delivery se estiver finalizado.
+      tags:
+      - Kitchens
+  /kitchens/orders/flow:
     get:
       consumes:
       - application/json
-      description: Retorna todos os pedidos (orders) que estão na cozinha para inicio
-        de preparação com status pagamento aprovado. Se não houver pedidos, retorna
-        um erro (404).
+      description: Retorna as ordens que estão na cozinha em alguma etapa do preparo
       produces:
       - application/json
       responses:
@@ -599,7 +738,35 @@ paths:
           description: Not Found
           schema:
             type: string
-      summary: Get all orders in the kitchen
+      summary: retorna todas as ordens que estão na cozinha
+      tags:
+      - Kitchens
+  /kitchens/orders/notifier:
+    post:
+      consumes:
+      - application/json
+      description: Retorna as ordens pagas e não notificadas, notifica a cozinha e
+        atualiza o status da ordem para recebida pela cozinha
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/usecase.KitchenNotifierOutputDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      summary: Busca ordens pagas e não notificadas, notifica a cozinha e atualiza
+        o status da ordem para recebida pela cozinha. A ideia é que algum job chame
+        esse endpoint para ficar buscando ordens para a cozinha
       tags:
       - Kitchens
   /orders:

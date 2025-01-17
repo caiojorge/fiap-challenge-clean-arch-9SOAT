@@ -45,7 +45,25 @@ func (r *KitchenRepositoryGorm) Update(ctx context.Context, entity *entity.Kitch
 
 // Find not implemented
 func (r *KitchenRepositoryGorm) Find(ctx context.Context, id string) (*entity.Kitchen, error) {
-	return nil, nil
+	var model model.Kitchen
+	result := r.DB.Preload("Order").First(&model, "id = ?", id)
+	//result := r.DB.Model(&model.Order{}).Where("id = ?", id).First(&orderModel)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, result.Error
+	}
+
+	entity := &entity.Kitchen{
+		ID:            model.ID,
+		OrderID:       model.OrderID,
+		Queue:         model.Queue,
+		EstimatedTime: model.EstimatedTime,
+		CreatedAt:     model.CreatedAt,
+	}
+
+	return entity, nil
 }
 
 // FindAll not implemented
@@ -74,4 +92,47 @@ func (r *KitchenRepositoryGorm) FindAll(ctx context.Context) ([]*entity.Kitchen,
 func (r *KitchenRepositoryGorm) Delete(ctx context.Context, id string) error {
 
 	return nil
+}
+
+func (r *KitchenRepositoryGorm) FindByParams(ctx context.Context, params map[string]interface{}) ([]*entity.Kitchen, error) {
+
+	var kitchen []*entity.Kitchen
+	var models []*model.Kitchen
+
+	query := r.DB.Order("created_at desc")
+	//query := r.DB.Model(&model.Order{})
+
+	// Adiciona condições dinâmicas com base nos parâmetros
+	if id, ok := params["id"]; ok {
+		query = query.Where("id = ?", id)
+	}
+	if orderID, ok := params["order_id"]; ok {
+		query = query.Where("order_id = ?", orderID)
+	}
+	if startDate, ok := params["start_date"]; ok {
+		query = query.Where("created_at >= ?", startDate)
+	}
+	if endDate, ok := params["end_date"]; ok {
+		query = query.Where("created_at <= ?", endDate)
+	}
+
+	// Executa a consulta
+	err := query.Find(&models).Error
+	if err != nil {
+		return nil, err
+	}
+
+	for _, model := range models {
+		entity := entity.Kitchen{
+			ID:            model.ID,
+			OrderID:       model.OrderID,
+			Queue:         model.Queue,
+			EstimatedTime: model.EstimatedTime,
+			CreatedAt:     model.CreatedAt,
+		}
+		kitchen = append(kitchen, &entity)
+	}
+
+	return kitchen, err
+
 }

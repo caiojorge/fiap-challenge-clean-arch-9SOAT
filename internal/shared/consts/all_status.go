@@ -1,5 +1,10 @@
 package sharedconsts
 
+import (
+	"errors"
+	"fmt"
+)
+
 // Order status
 const (
 	OrderStatusNotConfirmed      = "order-not-confirmed"  // status inicial da ordem
@@ -19,3 +24,48 @@ const (
 	OrderItemStatusConfirmed = "item-confirmed"
 	OrderItemStatusCanceled  = "item-canceled"
 )
+
+// Ordem cronológica dos status
+var StatusFlow = []string{
+	OrderStatusNotConfirmed,      // 0
+	OrderStatusConfirmed,         // 1
+	OrderStatusCheckoutConfirmed, // 2
+	OrderStatusPaymentApproved,   // 3
+	OrderReceivedByKitchen,       // 4
+	OrderInPreparationByKitchen,  // 5
+	OrderReadyByKitchen,          // 6
+	OrderFinalizedByKitchen,      // 7
+}
+
+// Função para obter o próximo status
+func GetNextStatus(currentStatus string) (string, error) {
+	for i, status := range StatusFlow {
+		if status == currentStatus {
+			if i+1 < len(StatusFlow) {
+				return StatusFlow[i+1], nil
+			}
+			return "", errors.New("status final já alcançado")
+		}
+	}
+	return "", errors.New("status inválido")
+}
+
+// Função para obter a posição de um status
+func GetStatusIndex(status string) (int, error) {
+	for i, s := range StatusFlow {
+		if s == status {
+			return i, nil
+		}
+	}
+	return -1, fmt.Errorf("status '%s' não encontrado", status)
+}
+
+// Função para validar se o status está entre duas posições
+func IsStatusBetween(status string, start, end int) (bool, error) {
+	index, err := GetStatusIndex(status)
+	if err != nil {
+		return false, err
+	}
+
+	return index >= start && index <= end, nil
+}

@@ -30,7 +30,7 @@ func TestFindOrdersByParams_Success(t *testing.T) {
 	}
 
 	status := entity.Status{
-		Payment: "confirmed",
+		Name: "confirmed",
 	}
 
 	// Criar ordens de teste que o mock retornará

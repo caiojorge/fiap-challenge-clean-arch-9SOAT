@@ -13,4 +13,5 @@ type KitchenRepository interface {
 	Find(ctx context.Context, id string) (*entity.Kitchen, error)
 	FindAll(ctx context.Context) ([]*entity.Kitchen, error)
 	Delete(ctx context.Context, id string) error
+	FindByParams(ctx context.Context, params map[string]interface{}) ([]*entity.Kitchen, error)
 }

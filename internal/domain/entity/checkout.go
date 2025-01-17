@@ -50,10 +50,10 @@ func (c *Checkout) Validate() error {
 	return nil
 }
 
-// func (c *Checkout) ConfirmPayment() {
-// 	c.Status = sharedconsts.CheckoutPaymentConfirmed
-// }
+func (c *Checkout) Reprocessing(gatewayID, QRCode string) error {
 
-// func (c *Checkout) InformPaymentNotApproval() {
-// 	c.Status = sharedconsts.CheckoutStatusNotApproved
-// }
+	c.QRCode = QRCode
+	c.Gateway.GatewayTransactionID = gatewayID
+
+	return nil
+}

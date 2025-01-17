@@ -12,7 +12,7 @@ func FromEntity(order entity.Order) OrderFindByIdOutputDTO {
 		CustomerCPF: order.CustomerCPF,
 		Total:       order.Total,
 		CreatedAt:   order.CreatedAt,
-		Status:      order.Status.Payment,
+		Status:      order.Status.Name,
 	}
 
 	itemsDto := []*shared.OrderItemDTO{}

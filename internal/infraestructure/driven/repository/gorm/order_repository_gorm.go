@@ -9,7 +9,6 @@ import (
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/converter"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model"
 	sharedtime "github.com/caiojorge/fiap-challenge-ddd/internal/shared/time"
-	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 )
 
@@ -41,6 +40,7 @@ func (r *OrderRepositoryGorm) Create(ctx context.Context, entity *entity.Order) 
 	model := parserOrder(entity)
 
 	model.CreatedAt = sharedtime.GetBRTimeNow()
+
 	if model.CustomerCPF != nil && *model.CustomerCPF == "" {
 		model.CustomerCPF = nil
 	}
@@ -68,11 +68,12 @@ func parserOrder(entity *entity.Order) model.Order {
 	}
 
 	model := model.Order{
-		ID:          entity.ID,
-		Items:       modelItems,
-		Total:       entity.Total,
-		CustomerCPF: &entity.CustomerCPF,
-		Status:      entity.Status.Payment,
+		ID:             entity.ID,
+		Items:          modelItems,
+		Total:          entity.Total,
+		CustomerCPF:    &entity.CustomerCPF,
+		Status:         entity.Status.Name,
+		DeliveryNumber: entity.DeliveryNumber,
 	}
 
 	if *model.CustomerCPF == "" {
@@ -203,7 +204,12 @@ func (r *OrderRepositoryGorm) FindByParams(ctx context.Context, params map[strin
 		return nil, err
 	}
 
-	copier.Copy(&orders, &models)
+	//copier.Copy(&orders, &models)
+
+	for _, model := range models {
+		order := r.converter.ToEntity(model)
+		orders = append(orders, order)
+	}
 
 	return orders, err
 

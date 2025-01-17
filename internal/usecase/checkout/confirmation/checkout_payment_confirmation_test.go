@@ -36,7 +36,7 @@ func TestConfirmPayment_Success(t *testing.T) {
 	}
 
 	status := entity.Status{
-		Payment: "confirmed",
+		Name: "confirmed",
 	}
 
 	order := &entity.Order{

@@ -141,14 +141,14 @@ func TestCreateOrder(t *testing.T) {
 		entity = converter.ToEntity(&order)
 		err = repo.Update(context.Background(), entity)
 		assert.Nil(t, err)
-		assert.Equal(t, "approved", entity.Status.Payment)
+		assert.Equal(t, "approved", entity.Status.Name)
 
 		canceledStatus := "canceled"
 		order.Status = canceledStatus
 		entity = converter.ToEntity(&order)
-		err = repo.UpdateStatus(context.Background(), entity.ID, entity.Status.Payment)
+		err = repo.UpdateStatus(context.Background(), entity.ID, entity.Status.Name)
 		assert.Nil(t, err)
-		assert.Equal(t, "canceled", entity.Status.Payment)
+		assert.Equal(t, "canceled", entity.Status.Name)
 
 	})
 }

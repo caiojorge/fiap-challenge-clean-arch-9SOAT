@@ -5,6 +5,7 @@ import (
 	"time"
 
 	sharedconsts "github.com/caiojorge/fiap-challenge-ddd/internal/shared/consts"
+	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/deliver"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/formatter"
 	sharedgenerator "github.com/caiojorge/fiap-challenge-ddd/internal/shared/generator"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/shared/validator"
@@ -18,12 +19,13 @@ Agregação: A entidade Order é o ponto central para acompanhar o progresso do 
 
 // Order representa um pedido.
 type Order struct {
-	ID          string
-	Items       []*OrderItem
-	Total       float64
-	Status      Status
-	CustomerCPF string
-	CreatedAt   time.Time
+	ID             string
+	Items          []*OrderItem
+	Total          float64
+	Status         Status
+	CustomerCPF    string
+	CreatedAt      time.Time
+	DeliveryNumber string
 }
 
 // NewOrder cria um novo pedido. TODO Não esta sendo usada.
@@ -68,6 +70,9 @@ func (o *Order) Confirm() error {
 
 	// o status da ordem é confirmado
 	o.Status = *NewStatus(sharedconsts.OrderStatusConfirmed)
+
+	// o número de entrega é gerado - o cliente usa esse número para retirar o pedido
+	o.DeliveryNumber = deliver.GenerateDeliveryNumber()
 
 	for _, item := range o.Items {
 		item.Confirm()
@@ -160,7 +165,7 @@ func (o *Order) CalculateTotal() {
 }
 
 func (o *Order) IsPaymentApproved() bool {
-	name := o.Status.Payment
+	name := o.Status.Name
 	return name == sharedconsts.OrderStatusPaymentApproved
 }
 
@@ -173,17 +178,18 @@ func (o *Order) InformPaymentNotApproval() {
 }
 
 func (o *Order) Received() {
-	o.Status = *o.Status.KitchenFlow(sharedconsts.OrderReceivedByKitchen)
+	o.Status = *NewStatus(sharedconsts.OrderReceivedByKitchen)
 }
 
 func (o *Order) InPreparation() {
-	o.Status = *o.Status.KitchenFlow(sharedconsts.OrderInPreparationByKitchen)
+	o.Status = *NewStatus(sharedconsts.OrderInPreparationByKitchen)
 }
 
 func (o *Order) Ready() {
-	o.Status = *o.Status.KitchenFlow(sharedconsts.OrderReadyByKitchen)
+	o.Status = *NewStatus(sharedconsts.OrderReadyByKitchen)
 }
 
 func (o *Order) Delivered() {
-	o.Status = *o.Status.KitchenFlow(sharedconsts.OrderFinalizedByKitchen)
+	o.Status = *NewStatus(sharedconsts.OrderFinalizedByKitchen)
+
 }

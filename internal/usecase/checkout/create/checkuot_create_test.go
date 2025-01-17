@@ -50,7 +50,7 @@ func TestCreateCheckout(t *testing.T) {
 	}
 
 	status := entity.Status{
-		Payment: "confirmed",
+		Name: "confirmed",
 	}
 
 	// Define entities for the mocks to return
@@ -99,6 +99,6 @@ func TestCreateCheckout(t *testing.T) {
 	assert.NotNil(t, result.ID)
 	assert.NotNil(t, result.GatewayTransactionID)
 	assert.NotNil(t, result.OrderID)
-	assert.Equal(t, order.ID, result.OrderID)                                        // #3 Checkout Pedido que deverá receber os produtos solicitados e retornar à identificação do pedido.
-	assert.Equal(t, order.Status.Payment, sharedconsts.OrderStatusCheckoutConfirmed) // #4 Checkout O pagamento deve ser confirmado e o ID da transação do gateway deve ser retornado.
+	assert.Equal(t, order.ID, result.OrderID)                                     // #3 Checkout Pedido que deverá receber os produtos solicitados e retornar à identificação do pedido.
+	assert.Equal(t, order.Status.Name, sharedconsts.OrderStatusCheckoutConfirmed) // #4 Checkout O pagamento deve ser confirmado e o ID da transação do gateway deve ser retornado.
 }

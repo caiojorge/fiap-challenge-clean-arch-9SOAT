@@ -58,6 +58,7 @@ func (r *CheckoutRepositoryGorm) Update(ctx context.Context, entity *entity.Chec
 	//var model model.Checkout
 	//copier.Copy(&model, entity)
 	model := model.Checkout{
+		ID:                   entity.ID,
 		OrderID:              entity.OrderID,
 		GatewayName:          entity.Gateway.GatewayName,
 		GatewayToken:         entity.Gateway.GatewayToken,

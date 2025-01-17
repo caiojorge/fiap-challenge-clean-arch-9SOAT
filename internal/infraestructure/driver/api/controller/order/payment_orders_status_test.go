@@ -33,7 +33,7 @@ func TestConfirmedOrder(t *testing.T) {
 
 	t.Run("should return 200 - Confirmed", func(t *testing.T) {
 		status := &entity.Status{
-			Payment: sharedconsts.OrderStatusConfirmed,
+			Name: sharedconsts.OrderStatusConfirmed,
 		}
 
 		testOrders := []*entity.Order{
@@ -99,7 +99,7 @@ func TestConfirmedOrder(t *testing.T) {
 
 	t.Run("should return 200 - Not Confirmed", func(t *testing.T) {
 		status := &entity.Status{
-			Payment: sharedconsts.OrderStatusNotConfirmed,
+			Name: sharedconsts.OrderStatusNotConfirmed,
 		}
 		testOrders := []*entity.Order{
 			{
@@ -163,7 +163,7 @@ func TestConfirmedOrder(t *testing.T) {
 
 	t.Run("should return 200 - Paid", func(t *testing.T) {
 		status := &entity.Status{
-			Payment: sharedconsts.OrderStatusPaymentApproved,
+			Name: sharedconsts.OrderStatusPaymentApproved,
 		}
 		testOrders := []*entity.Order{
 			{

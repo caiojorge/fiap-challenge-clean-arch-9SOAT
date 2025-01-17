@@ -116,6 +116,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/checkouts/reprocessing/payment": {
+            "post": {
+                "description": "Reprocesso o pagamento. Ordens em checkout aprovado, com checkout criado podem ser reprocessadas. O reprocessamento é feito no gateway de pagamento. O checkout é atualizado com o status do pagamento e o pedido é notificado.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Checkouts"
+                ],
+                "summary": "Reprocessa o Checkout",
+                "parameters": [
+                    {
+                        "description": "reprocessa o Checkout",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/usecase.CheckoutReprocessingInputDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/usecase.CheckoutReprocessingOutputDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "invalid data",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/checkouts/{id}/check/payment": {
             "get": {
                 "description": "Get details of an Checkout and Status of Payment by Order id. Req #2 - Consultar status de pagamento pedido, que informa se o pagamento foi aprovado ou não.",
@@ -358,9 +404,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/kitchens/orders/paid": {
-            "get": {
-                "description": "Retorna todos os pedidos (orders) que estão na cozinha para inicio de preparação com status pagamento aprovado. Se não houver pedidos, retorna um erro (404).",
+        "/kitchens/orders/cooking": {
+            "post": {
+                "description": "Busca a ordem e o ticket da cozinha; move o status para o próximo da fase de preparo e faz o delivery se estiver finalizado.",
                 "consumes": [
                     "application/json"
                 ],
@@ -370,7 +416,50 @@ const docTemplate = `{
                 "tags": [
                     "Kitchens"
                 ],
-                "summary": "Get all orders in the kitchen",
+                "summary": "Busca a ordem e o ticket da cozinha; move o status para o próximo da fase de preparo e faz o delivery se estiver finalizado.",
+                "parameters": [
+                    {
+                        "description": "indica a ordem a ser trabalhada pela cozinha",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/usecase.KitchenCookingInputDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/usecase.KitchenCookingOutputDTO"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/kitchens/orders/flow": {
+            "get": {
+                "description": "Retorna as ordens que estão na cozinha em alguma etapa do preparo",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Kitchens"
+                ],
+                "summary": "retorna todas as ordens que estão na cozinha",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -378,6 +467,44 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/usecase.KitchenFindAllAOutputDTO"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/kitchens/orders/notifier": {
+            "post": {
+                "description": "Retorna as ordens pagas e não notificadas, notifica a cozinha e atualiza o status da ordem para recebida pela cozinha",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Kitchens"
+                ],
+                "summary": "Busca ordens pagas e não notificadas, notifica a cozinha e atualiza o status da ordem para recebida pela cozinha. A ideia é que algum job chame esse endpoint para ficar buscando ordens para a cozinha",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/usecase.KitchenNotifierOutputDTO"
                             }
                         }
                     },
@@ -1026,6 +1153,45 @@ const docTemplate = `{
                 }
             }
         },
+        "usecase.CheckoutReprocessingInputDTO": {
+            "type": "object",
+            "properties": {
+                "notification_url": {
+                    "description": "webhook para receber a confirmação do pagamento",
+                    "type": "string"
+                },
+                "sponsor_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecase.CheckoutReprocessingOutputDTO": {
+            "type": "object",
+            "required": [
+                "checkout_id",
+                "gateway_transaction_id",
+                "order_id",
+                "qrcode",
+                "status"
+            ],
+            "properties": {
+                "checkout_id": {
+                    "type": "string"
+                },
+                "gateway_transaction_id": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "qrcode": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "usecase.CustomerFindAllOutputDTO": {
             "type": "object",
             "properties": {
@@ -1170,22 +1336,89 @@ const docTemplate = `{
                 }
             }
         },
-        "usecase.KitchenFindAllAOutputDTO": {
+        "usecase.KitchenCookingInputDTO": {
             "type": "object",
             "properties": {
-                "created_at": {
+                "order_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecase.KitchenCookingOutputDTO": {
+            "type": "object",
+            "properties": {
+                "customer_id": {
                     "type": "string"
                 },
-                "id": {
+                "estimated_time": {
                     "type": "string"
                 },
-                "item_order_id": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "kitchen_id": {
                     "type": "string"
                 },
                 "order_id": {
                     "type": "string"
                 },
                 "queue": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecase.KitchenFindAllAOutputDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "estimated_time": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "queue": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecase.KitchenNotifierOutputDTO": {
+            "type": "object",
+            "properties": {
+                "customer_id": {
+                    "type": "string"
+                },
+                "estimated_time": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "queue": {
+                    "description": "ordem na fila de preparo",
+                    "type": "string"
+                },
+                "status": {
                     "type": "string"
                 }
             }
@@ -1211,6 +1444,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "customercpf": {
+                    "type": "string"
+                },
+                "delivery_number": {
                     "type": "string"
                 },
                 "id": {
@@ -1239,6 +1475,9 @@ const docTemplate = `{
                 "customercpf": {
                     "type": "string"
                 },
+                "delivery_number": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -1265,6 +1504,9 @@ const docTemplate = `{
                 "customercpf": {
                     "type": "string"
                 },
+                "delivery_number": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "string"
                 },
@@ -1289,6 +1531,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "customercpf": {
+                    "type": "string"
+                },
+                "delivery_number": {
                     "type": "string"
                 },
                 "id": {

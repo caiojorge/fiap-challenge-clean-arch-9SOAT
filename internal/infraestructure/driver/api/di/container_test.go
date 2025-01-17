@@ -46,13 +46,13 @@ func TestContainer_Validate(t *testing.T) {
 
 	t.Run("should return error when some object is nil", func(t *testing.T) {
 		container := NewContainer(db, logger)
-		container.CheckoutCreateUseCase = nil
+		container.Logger = nil
 
 		assert.NotNil(t, container)
 
 		err := container.Validate()
 		assert.NotNil(t, err)
-		assert.Equal(t, "checkoutCreateUseCase is not set", err.Error())
+		assert.Equal(t, "logger is not set", err.Error())
 	})
 
 }

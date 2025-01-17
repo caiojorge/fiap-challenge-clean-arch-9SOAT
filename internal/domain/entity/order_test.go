@@ -126,7 +126,7 @@ func TestOrderWithNoRegistration(t *testing.T) {
 	assert.Equal(t, 2, len(order.Items))
 	assert.Equal(t, 10.00, order.Total)
 
-	assert.Equal(t, sharedconsts.OrderStatusConfirmed, order.Status.Payment)
+	assert.Equal(t, sharedconsts.OrderStatusConfirmed, order.Status.Name)
 
 }
 
@@ -169,6 +169,6 @@ func TestConfirmedOrder(t *testing.T) {
 	err := order.Confirm()
 	assert.Nil(t, err)
 
-	assert.Equal(t, sharedconsts.OrderStatusConfirmed, order.Status.Payment)
+	assert.Equal(t, sharedconsts.OrderStatusConfirmed, order.Status.Name)
 
 }

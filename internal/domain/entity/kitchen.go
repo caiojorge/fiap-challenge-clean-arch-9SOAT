@@ -13,6 +13,7 @@ type Kitchen struct { // aqui seria mais um kitchen ticket... um ticket por item
 	Queue         string    // ordem na fila de preparo
 	EstimatedTime string    // tempo estimado para preparo
 	CreatedAt     time.Time // data / hora de qdo o pedido foi recebido pela cozinha
+	Items         []string  // lista de itens do pedido
 }
 
 func NewKitchen(orderID string) *Kitchen {
@@ -29,4 +30,8 @@ func (k *Kitchen) SetQueue(queue string) {
 }
 func (k *Kitchen) SetEstimatedTime(estimatedTime string) {
 	k.EstimatedTime = estimatedTime
+}
+
+func (k *Kitchen) AddItems(items []string) {
+	k.Items = items
 }

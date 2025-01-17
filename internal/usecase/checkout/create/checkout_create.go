@@ -183,7 +183,7 @@ func (cr *CheckoutCreateUseCase) handleCheckout(ctx context.Context, checkout *e
 func (cr *CheckoutCreateUseCase) handleOrder(ctx context.Context, order *entity.Order) error {
 	order.ConfirmCheckout()
 	//err := cr.orderRepository.Update(ctx, order)
-	err := cr.orderRepository.UpdateStatus(ctx, order.ID, order.Status.Payment)
+	err := cr.orderRepository.UpdateStatus(ctx, order.ID, order.Status.Name)
 	if err != nil {
 		return err
 	}

@@ -75,7 +75,7 @@ func (cr *OrderCreateUseCase) CreateOrder(ctx context.Context, input *OrderCreat
 		return nil, err
 	}
 
-	output.Status = order.Status.Payment
+	output.Status = order.Status.Name
 
 	return &output, nil
 }
@@ -124,6 +124,10 @@ func (cr *OrderCreateUseCase) getProductList(ctx context.Context, order *entity.
 		product, err := cr.productRepository.Find(ctx, item.ProductID)
 		if err != nil {
 			return nil, err
+		}
+
+		if product == nil {
+			return nil, fmt.Errorf("product not found: %s", item.ProductID)
 		}
 
 		products = append(products, product)

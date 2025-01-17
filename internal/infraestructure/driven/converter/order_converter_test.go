@@ -25,7 +25,7 @@ func TestOrderConverter_FromEntity(t *testing.T) {
 
 	assert.Equal(t, entityOrder.ID, modelOrder.ID)
 	assert.Equal(t, entityOrder.Total, modelOrder.Total)
-	assert.Equal(t, entityOrder.Status.Payment, modelOrder.Status)
+	assert.Equal(t, entityOrder.Status.Name, modelOrder.Status)
 	assert.Equal(t, entityOrder.CustomerCPF, *modelOrder.CustomerCPF)
 	assert.Len(t, modelOrder.Items, len(entityOrder.Items))
 
@@ -57,7 +57,7 @@ func TestOrderConverter_ToEntity(t *testing.T) {
 
 	assert.Equal(t, modelOrder.ID, entityOrder.ID)
 	assert.Equal(t, modelOrder.Total, entityOrder.Total)
-	assert.Equal(t, modelOrder.Status, entityOrder.Status.Payment)
+	assert.Equal(t, modelOrder.Status, entityOrder.Status.Name)
 	assert.Equal(t, *modelOrder.CustomerCPF, entityOrder.CustomerCPF)
 	assert.Len(t, entityOrder.Items, len(modelOrder.Items))
 

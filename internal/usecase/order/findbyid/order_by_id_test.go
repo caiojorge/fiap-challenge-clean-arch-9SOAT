@@ -30,7 +30,7 @@ func TestFindOrderByID(t *testing.T) {
 		orderID := "order-123"
 
 		status := entity.Status{
-			Payment: "confirmed",
+			Name: "confirmed",
 		}
 
 		// Criar uma ordem de teste que o mock retornará

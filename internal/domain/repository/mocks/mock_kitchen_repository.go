@@ -93,6 +93,21 @@ func (mr *MockKitchenRepositoryMockRecorder) FindAll(ctx interface{}) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindAll", reflect.TypeOf((*MockKitchenRepository)(nil).FindAll), ctx)
 }
 
+// FindByParams mocks base method.
+func (m *MockKitchenRepository) FindByParams(ctx context.Context, params map[string]interface{}) ([]*entity.Kitchen, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindByParams", ctx, params)
+	ret0, _ := ret[0].([]*entity.Kitchen)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindByParams indicates an expected call of FindByParams.
+func (mr *MockKitchenRepositoryMockRecorder) FindByParams(ctx, params interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByParams", reflect.TypeOf((*MockKitchenRepository)(nil).FindByParams), ctx, params)
+}
+
 // Update mocks base method.
 func (m *MockKitchenRepository) Update(ctx context.Context, kt *entity.Kitchen) error {
 	m.ctrl.T.Helper()

@@ -40,7 +40,7 @@ func (cr *CheckPaymentUseCase) CheckPayment(ctx context.Context, orderID string)
 	outputs := &CheckPaymentOutputDTO{
 		OrderID:              checkout.OrderID,
 		GatewayTransactionID: checkout.Gateway.GatewayTransactionID,
-		Status:               order.Status.Payment,
+		Status:               order.Status.Name,
 		PaymentApproved:      order.IsPaymentApproved(),
 	}
 

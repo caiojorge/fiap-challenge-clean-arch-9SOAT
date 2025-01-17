@@ -50,7 +50,7 @@ func TestPayment(t *testing.T) {
 	}
 
 	status := entity.Status{
-		Payment: sharedconsts.OrderStatusConfirmed,
+		Name: sharedconsts.OrderStatusConfirmed,
 	}
 	// Define entities for the mocks to return
 	order := &entity.Order{

@@ -104,4 +104,9 @@ send-payment:
 	curl -X POST "$(URL)" \
 	-H "Content-Type: application/json" \
 	-H "Authorization: $(TOKEN)" \
-	-d '{"external_reference": "721ece5d-62c3-49a2-bc12-919a2486cefd", "title": "Compra de Produtos", "description": "Pagamento na loja física", "notification_url": "http://localhost:30080/kitchencontrol/api/v1/checkouts/confirmtion/payment", "total_amount": 200.50, "items": [{"sku_number": "sku-001", "category": "eletronico", "title": "Fone de Ouvido", "description": "Fone de ouvido com cancelamento de ruído", "unit_price": 100.25, "quantity": 2, "unit_measure": "unidade", "total_amount": 200.50}], "sponsor": {"id": 1}, "cash_out": {"enabled": true, "amount": 50.00, "receiver": "receiver-001"}}'
+	-d '{"external_reference": "721ece5d-62c3-49a2-bc12-919a2486cefd", "title": "Compra de Produtos", "description": "Pagamento na loja física", "notification_url": "http://localhost:30080/kitchencontrol/api/v1/checkouts/confirmation/payment", "total_amount": 200.50, "items": [{"sku_number": "sku-001", "category": "eletronico", "title": "Fone de Ouvido", "description": "Fone de ouvido com cancelamento de ruído", "unit_price": 100.25, "quantity": 2, "unit_measure": "unidade", "total_amount": 200.50}], "sponsor": {"id": 1}, "cash_out": {"enabled": true, "amount": 50.00, "receiver": "receiver-001"}}'
+
+converage:
+	go test ./... -coverprofile=coverage.out
+	go tool cover -func=coverage.out
+	go tool cover -func=coverage.out | grep -E ".*[0-9]+\.[0-9]+%" | awk '{sum+=$3; count++} END {if (count > 0) print "Cobertura Média:", sum/count"%"; else print "Nenhuma cobertura"}'

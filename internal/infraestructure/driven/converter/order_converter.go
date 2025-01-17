@@ -13,28 +13,30 @@ func NewOrderConverter() *OrderConverter {
 
 func (pc *OrderConverter) FromEntity(entity *entity.Order) *model.Order {
 	return &model.Order{
-		ID:          entity.ID,
-		Items:       pc.fromEntityItems(entity.Items),
-		Total:       entity.Total,
-		Status:      entity.Status.Payment,
-		CustomerCPF: &entity.CustomerCPF,
-		CreatedAt:   entity.CreatedAt,
+		ID:             entity.ID,
+		Items:          pc.fromEntityItems(entity.Items),
+		Total:          entity.Total,
+		Status:         entity.Status.Name,
+		CustomerCPF:    &entity.CustomerCPF,
+		CreatedAt:      entity.CreatedAt,
+		DeliveryNumber: entity.DeliveryNumber,
 	}
 }
 
 func (pc *OrderConverter) ToEntity(model *model.Order) *entity.Order {
 
 	status := entity.Status{
-		Payment: model.Status,
+		Name: model.Status,
 	}
 
 	return &entity.Order{
-		ID:          model.ID,
-		Items:       pc.toEntityItems(model.Items),
-		Total:       model.Total,
-		Status:      status,
-		CustomerCPF: pc.checkCustomerCPF(model.CustomerCPF),
-		CreatedAt:   model.CreatedAt,
+		ID:             model.ID,
+		Items:          pc.toEntityItems(model.Items),
+		Total:          model.Total,
+		Status:         status,
+		CustomerCPF:    pc.checkCustomerCPF(model.CustomerCPF),
+		CreatedAt:      model.CreatedAt,
+		DeliveryNumber: model.DeliveryNumber,
 	}
 }
 
