@@ -46,7 +46,6 @@ func (r *ProductRepositoryGorm) Update(ctx context.Context, entity *entity.Produ
 
 func (r *ProductRepositoryGorm) Find(ctx context.Context, id string) (*entity.Product, error) {
 	var productModel model.Product
-	fmt.Println("repositorygorm: Find product: " + id)
 	result := r.DB.Model(&model.Product{}).Where("id = ?", id).First(&productModel)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {

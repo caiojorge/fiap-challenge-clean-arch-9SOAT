@@ -55,12 +55,9 @@ func SetupRouter(container *di.Container) *gin.Engine {
 		kitchenGroup.GET("/orders/flow", container.FindKitchenAllController.GetAllOrdersInKitchen)
 		kitchenGroup.POST("/orders/notifier", container.NotifierKitchenController.PostNotifyKitchen)
 		kitchenGroup.POST("/orders/cooking", container.CookingKitchenController.PostCookingKitchen)
+		kitchenGroup.GET("/orders/monitor", container.MonitorKitchenController.GetMonitorKitchen)
+		kitchenGroup.POST("/orders/delivery", container.DeliveryKitchenController.PostDeliveryKitchen)
 	}
-
-	// paymentGroup := r.Group("/instore/orders/qr/seller/collectors/")
-	// {
-	// 	paymentGroup.POST("/:collectorID/pos/:posID/qrs", container.PostPaymentFakeController.PostPaymentFake)
-	// }
 
 	return r
 }

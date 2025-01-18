@@ -3,9 +3,11 @@ package repositorygorm
 import (
 	"context"
 	"errors"
+	"sort"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
 	"github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model"
+	sharedconsts "github.com/caiojorge/fiap-challenge-ddd/internal/shared/consts"
 	sharedDate "github.com/caiojorge/fiap-challenge-ddd/internal/shared/time"
 	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
@@ -135,4 +137,58 @@ func (r *KitchenRepositoryGorm) FindByParams(ctx context.Context, params map[str
 
 	return kitchen, err
 
+}
+
+func (r *KitchenRepositoryGorm) Monitor(ctx context.Context) ([]*entity.Kitchen, error) {
+	var models []model.Kitchen
+
+	statuses := []string{
+		sharedconsts.OrderReadyByKitchen,
+		sharedconsts.OrderInPreparationByKitchen,
+		sharedconsts.OrderReceivedByKitchen,
+	}
+
+	result := r.DB.Preload("Order").
+		Joins("JOIN orders ON orders.id = kitchens.order_id").
+		Where("orders.status IN ?", statuses).
+		Order("orders.status ASC").
+		Order("kitchens.created_at DESC").
+		Find(&models)
+
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nil, nil
+		}
+		return nil, result.Error
+	}
+
+	var entities []*entity.Kitchen
+
+	for _, model := range models {
+		entity := &entity.Kitchen{
+			ID:             model.ID,
+			OrderID:        model.OrderID,
+			Queue:          model.Queue,
+			EstimatedTime:  model.EstimatedTime,
+			CreatedAt:      model.CreatedAt,
+			Status:         model.Order.Status,
+			DeliveryNumber: model.Order.DeliveryNumber,
+		}
+
+		entities = append(entities, entity)
+	}
+
+	statusOrder := make(map[string]int)
+	for i, status := range statuses {
+		statusOrder[status] = i
+	}
+
+	sort.SliceStable(entities, func(i, j int) bool {
+		if statusOrder[entities[i].Status] != statusOrder[entities[j].Status] {
+			return statusOrder[entities[i].Status] < statusOrder[entities[j].Status]
+		}
+		return entities[i].CreatedAt.Before(entities[j].CreatedAt)
+	})
+
+	return entities, nil
 }

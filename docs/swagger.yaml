@@ -224,6 +224,30 @@ definitions:
       status:
         type: string
     type: object
+  usecase.KitchenDeliveryInputDTO:
+    properties:
+      order_id:
+        type: string
+    type: object
+  usecase.KitchenDeliveryOutputDTO:
+    properties:
+      customer_id:
+        type: string
+      estimated_time:
+        type: string
+      items:
+        items:
+          type: string
+        type: array
+      kitchen_id:
+        type: string
+      order_id:
+        type: string
+      queue:
+        type: string
+      status:
+        type: string
+    type: object
   usecase.KitchenFindAllAOutputDTO:
     properties:
       created_at:
@@ -253,6 +277,23 @@ definitions:
         type: string
       queue:
         description: ordem na fila de preparo
+        type: string
+      status:
+        type: string
+    type: object
+  usecase.MonitorKitchenOutputDTO:
+    properties:
+      created_at:
+        type: string
+      delivery_number:
+        type: string
+      estimated_time:
+        type: string
+      id:
+        type: string
+      order_id:
+        type: string
+      queue:
         type: string
       status:
         type: string
@@ -412,7 +453,6 @@ definitions:
       price:
         type: number
     type: object
-host: localhost:30080
 info:
   contact:
     email: support@swagger.io
@@ -716,6 +756,34 @@ paths:
         fase de preparo e faz o delivery se estiver finalizado.
       tags:
       - Kitchens
+  /kitchens/orders/delivery:
+    post:
+      consumes:
+      - application/json
+      description: Busca ordem que esta pronta, registra o delivery e finaliza a ordem
+      parameters:
+      - description: indica a ordem que será finalizada
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/usecase.KitchenDeliveryInputDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/usecase.KitchenDeliveryOutputDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+      summary: Busca ordem que esta pronta, registra o delivery e finaliza a ordem
+      tags:
+      - Kitchens
   /kitchens/orders/flow:
     get:
       consumes:
@@ -739,6 +807,34 @@ paths:
           schema:
             type: string
       summary: retorna todas as ordens que estão na cozinha
+      tags:
+      - Kitchens
+  /kitchens/orders/monitor:
+    get:
+      consumes:
+      - application/json
+      description: Retorna uma lista de ordens e seus status, ordenado por recebido,
+        em preparo e pronto, e por ordem de chegada tbm, e o tempo estimado e o delivery
+        number para retirada do pedido
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/usecase.MonitorKitchenOutputDTO'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+      summary: Busca ordens que estão na cozinha e estão sendo preparadas (ou na fila
+        de preparo)
       tags:
       - Kitchens
   /kitchens/orders/notifier:

@@ -447,6 +447,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/kitchens/orders/delivery": {
+            "post": {
+                "description": "Busca ordem que esta pronta, registra o delivery e finaliza a ordem",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Kitchens"
+                ],
+                "summary": "Busca ordem que esta pronta, registra o delivery e finaliza a ordem",
+                "parameters": [
+                    {
+                        "description": "indica a ordem que será finalizada",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/usecase.KitchenDeliveryInputDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/usecase.KitchenDeliveryOutputDTO"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/kitchens/orders/flow": {
             "get": {
                 "description": "Retorna as ordens que estão na cozinha em alguma etapa do preparo",
@@ -467,6 +510,44 @@ const docTemplate = `{
                             "type": "array",
                             "items": {
                                 "$ref": "#/definitions/usecase.KitchenFindAllAOutputDTO"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/kitchens/orders/monitor": {
+            "get": {
+                "description": "Retorna uma lista de ordens e seus status, ordenado por recebido, em preparo e pronto, e por ordem de chegada tbm, e o tempo estimado e o delivery number para retirada do pedido",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Kitchens"
+                ],
+                "summary": "Busca ordens que estão na cozinha e estão sendo preparadas (ou na fila de preparo)",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/usecase.MonitorKitchenOutputDTO"
                             }
                         }
                     },
@@ -1373,6 +1454,43 @@ const docTemplate = `{
                 }
             }
         },
+        "usecase.KitchenDeliveryInputDTO": {
+            "type": "object",
+            "properties": {
+                "order_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecase.KitchenDeliveryOutputDTO": {
+            "type": "object",
+            "properties": {
+                "customer_id": {
+                    "type": "string"
+                },
+                "estimated_time": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "kitchen_id": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "queue": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "usecase.KitchenFindAllAOutputDTO": {
             "type": "object",
             "properties": {
@@ -1416,6 +1534,32 @@ const docTemplate = `{
                 },
                 "queue": {
                     "description": "ordem na fila de preparo",
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "usecase.MonitorKitchenOutputDTO": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "delivery_number": {
+                    "type": "string"
+                },
+                "estimated_time": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "queue": {
                     "type": "string"
                 },
                 "status": {
@@ -1667,7 +1811,7 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:30080",
+	Host:             "",
 	BasePath:         "/kitchencontrol/api/v1",
 	Schemes:          []string{},
 	Title:            "Fiap Fase 2 Challenge Clean Arch API - 9SOAT",

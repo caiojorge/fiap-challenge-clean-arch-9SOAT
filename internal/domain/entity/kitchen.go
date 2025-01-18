@@ -8,12 +8,14 @@ import (
 )
 
 type Kitchen struct { // aqui seria mais um kitchen ticket... um ticket por item
-	ID            string
-	OrderID       string    // id do pedido
-	Queue         string    // ordem na fila de preparo
-	EstimatedTime string    // tempo estimado para preparo
-	CreatedAt     time.Time // data / hora de qdo o pedido foi recebido pela cozinha
-	Items         []string  // lista de itens do pedido
+	ID             string
+	OrderID        string    // id do pedido
+	Queue          string    // ordem na fila de preparo
+	EstimatedTime  string    // tempo estimado para preparo
+	CreatedAt      time.Time // data / hora de qdo o pedido foi recebido pela cozinha
+	Items          []string  // lista de itens do pedido
+	Status         string    // status do pedido na cozinha
+	DeliveryNumber string    // numero do pedido de entrega
 }
 
 func NewKitchen(orderID string) *Kitchen {

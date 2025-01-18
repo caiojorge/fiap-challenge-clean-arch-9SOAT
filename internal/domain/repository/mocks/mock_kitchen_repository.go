@@ -108,6 +108,21 @@ func (mr *MockKitchenRepositoryMockRecorder) FindByParams(ctx, params interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByParams", reflect.TypeOf((*MockKitchenRepository)(nil).FindByParams), ctx, params)
 }
 
+// Monitor mocks base method.
+func (m *MockKitchenRepository) Monitor(ctx context.Context) ([]*entity.Kitchen, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Monitor", ctx)
+	ret0, _ := ret[0].([]*entity.Kitchen)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Monitor indicates an expected call of Monitor.
+func (mr *MockKitchenRepositoryMockRecorder) Monitor(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Monitor", reflect.TypeOf((*MockKitchenRepository)(nil).Monitor), ctx)
+}
+
 // Update mocks base method.
 func (m *MockKitchenRepository) Update(ctx context.Context, kt *entity.Kitchen) error {
 	m.ctrl.T.Helper()

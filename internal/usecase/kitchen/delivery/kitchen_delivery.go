@@ -9,11 +9,11 @@ import (
 	customerrors "github.com/caiojorge/fiap-challenge-ddd/internal/shared/error"
 )
 
-type KitchenCookingInputDTO struct {
+type KitchenDeliveryInputDTO struct {
 	OrderID string `json:"order_id"`
 }
 
-type KitchenCookingOutputDTO struct {
+type KitchenDeliveryOutputDTO struct {
 	OrderID       string   `json:"order_id"`
 	KitchenID     string   `json:"kitchen_id"`
 	CustomerID    string   `json:"customer_id"`
@@ -23,21 +23,21 @@ type KitchenCookingOutputDTO struct {
 	Items         []string `json:"items"`
 }
 
-// IKitchenCookingUseCase é uma interface para o caso de uso de notificação da cozinha
-type IKitchenCookingUseCase interface {
-	Cook(ctx context.Context, input KitchenCookingInputDTO) (*KitchenCookingOutputDTO, error)
+// IKitchenDeliveryUseCase é uma interface para o caso de uso de notificação da cozinha
+type IKitchenDeliveryUseCase interface {
+	Delivery(ctx context.Context, input KitchenDeliveryInputDTO) (*KitchenDeliveryOutputDTO, error)
 }
 
-// KitchenCookingUseCase é responsável por notificar a cozinha
-type KitchenCookingUseCase struct {
+// KitchenDeliveryUseCase é responsável por notificar a cozinha
+type KitchenDeliveryUseCase struct {
 	repoKitchen ports.KitchenRepository
 	repoOrder   ports.OrderRepository
 	repoProduct ports.ProductRepository
 }
 
-// NewKitchenCookingUseCase cria um novo caso de uso de notificação da cozinha
-func NewKitchenCookingUseCase(repoKitchen ports.KitchenRepository, repoOrder ports.OrderRepository, repoProduct ports.ProductRepository) *KitchenCookingUseCase {
-	return &KitchenCookingUseCase{
+// NewKitchenDeliveryUseCase cria um novo caso de uso de notificação da cozinha
+func NewKitchenDeliveryUseCase(repoKitchen ports.KitchenRepository, repoOrder ports.OrderRepository, repoProduct ports.ProductRepository) *KitchenDeliveryUseCase {
+	return &KitchenDeliveryUseCase{
 		repoKitchen: repoKitchen,
 		repoOrder:   repoOrder,
 		repoProduct: repoProduct,
@@ -45,9 +45,9 @@ func NewKitchenCookingUseCase(repoKitchen ports.KitchenRepository, repoOrder por
 }
 
 /*
-Cook é responsável por buscar a ordem e o ticket da cozinha; mover o status para o próximo da fase de preparo e fazer o delivery se estiver finalizado.
+Delivery é responsável por buscar a ordem e o ticket da cozinha; mover o status para o próximo da fase de preparo e fazer o delivery se estiver finalizado.
 */
-func (uc *KitchenCookingUseCase) Cook(ctx context.Context, input KitchenCookingInputDTO) (*KitchenCookingOutputDTO, error) {
+func (uc *KitchenDeliveryUseCase) Delivery(ctx context.Context, input KitchenDeliveryInputDTO) (*KitchenDeliveryOutputDTO, error) {
 
 	// 1. busca a ordem especifica
 	orders, err := uc.repoOrder.Find(ctx, input.OrderID)
@@ -59,24 +59,19 @@ func (uc *KitchenCookingUseCase) Cook(ctx context.Context, input KitchenCookingI
 		return nil, customerrors.ErrOrderNotFound
 	}
 
-	if orders.Status.Name == sharedconsts.OrderReadyByKitchen {
-		return nil, errors.New("this order is already ready")
-
-	}
-
 	if orders.Status.Name == sharedconsts.OrderFinalizedByKitchen {
 		return nil, errors.New("this order is already finalized")
 	}
 
 	// 2. verifica se o status esta no range correto (a partir de recebido pela cozinha)
 	// vai até OrderReadyByKitchen
-	isOk, err := sharedconsts.IsStatusBetween(orders.Status.Name, 4, 5)
+	isOk, err := sharedconsts.IsStatusBetween(orders.Status.Name, 6, 6)
 	if err != nil {
 		return nil, err
 	}
 
 	if !isOk {
-		return nil, errors.New("order not in the right phase")
+		return nil, errors.New("order not in the right phase for delivery")
 	}
 
 	var outputItems []string
@@ -88,18 +83,8 @@ func (uc *KitchenCookingUseCase) Cook(ctx context.Context, input KitchenCookingI
 		outputItems = append(outputItems, product.Name)
 	}
 
-	// 3. pega a próxima fase da ordem no fluxo da cozinha
-	nextPhase, err := sharedconsts.GetNextStatus(orders.Status.Name)
-	if err != nil {
-		return nil, errors.New("final status already reached " + err.Error())
-	}
-
-	if nextPhase == "" {
-		return nil, errors.New("final status already reached")
-	}
-
 	// 4. atualiza o status da ordem
-	err = uc.repoOrder.UpdateStatus(ctx, input.OrderID, nextPhase)
+	err = uc.repoOrder.UpdateStatus(ctx, input.OrderID, sharedconsts.OrderFinalizedByKitchen)
 	if err != nil {
 		return nil, err
 	}
@@ -111,12 +96,12 @@ func (uc *KitchenCookingUseCase) Cook(ctx context.Context, input KitchenCookingI
 	}
 
 	// 6. cria a saida
-	output := KitchenCookingOutputDTO{
+	output := KitchenDeliveryOutputDTO{
 		OrderID:       orders.ID,
 		KitchenID:     kitchens[0].ID,
 		Queue:         kitchens[0].Queue,
 		EstimatedTime: kitchens[0].EstimatedTime,
-		Status:        nextPhase,
+		Status:        sharedconsts.OrderFinalizedByKitchen,
 		Items:         outputItems,
 		CustomerID:    orders.CustomerCPF,
 	}
