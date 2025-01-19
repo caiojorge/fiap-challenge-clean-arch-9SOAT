@@ -276,12 +276,13 @@ obs: Nesse caso (exercício) não implementei um processo real de pagamento, usa
 
 O processo vai ficar mais ou menos assim:
 ```mermaid
-flowchart TD
+flowchart LR
     A[Cria a ordem] --> B[Faz o checkout da ordem]
     B --> C[Informa a URL de confirmação]
     C --> D[Apresenta QR code para pagamento]
     D --> E[Pagamento confirmado]
     E --> F[Chama o webhook de confirmação]
+    F --G G[Ordem fica com status payment-confirmed]
 ```
 
 ## Requisitos da Fase 2
