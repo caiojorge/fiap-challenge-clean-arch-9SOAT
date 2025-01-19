@@ -282,7 +282,7 @@ flowchart LR
     C --> D[Apresenta QR code para pagamento]
     D --> E[Pagamento confirmado]
     E --> F[Chama o webhook de confirmação]
-    F --G G[Ordem fica com status payment-confirmed]
+    F --> G[Ordem fica com status payment-confirmed]
 ```
 
 ## Requisitos da Fase 2
