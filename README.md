@@ -278,11 +278,12 @@ O processo vai ficar mais ou menos assim:
 ```mermaid
 flowchart TD
     A[Cria a ordem] --> B[Faz o checkout da ordem]
-    B --> C[Informa a URL de confirmação]
-    C --> D[Apresenta QR code para pagamento]
-    D --> E[Pagamento confirmado]
-    E --> F[Chama o webhook de confirmação]
-    F --> G[Ordem fica com status payment-confirmed]
+    B --> C[Informa a URL de confirmação durante o checkout]
+    C --> D[O checkout envia o pedido e seus itens para o gateway de pagamento]
+    D --> E[O Gateway de pagamento retorna o  QR code]
+    E --> F[Pagamento confirmado]
+    F --> G[Chama o webhook de confirmação]
+    G --> H[Ordem fica com status payment-confirmed]
 ```
 - Vamos realizar o processo passo a passo 
 
