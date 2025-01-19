@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	portsrepository "github.com/caiojorge/fiap-challenge-ddd/internal/domain/repository"
+	sharedconsts "github.com/caiojorge/fiap-challenge-ddd/internal/shared/consts"
 )
 
 type ProductUpdateUseCase struct {
@@ -19,6 +20,11 @@ func NewProductUpdate(repository portsrepository.ProductRepository) *ProductUpda
 
 // UpdateProduct atualiza um novo produto.
 func (cr *ProductUpdateUseCase) UpdateProduct(ctx context.Context, product UpdateProductInputDTO) (*UpdateProductOutputDTO, error) {
+
+	isOK := sharedconsts.IsCategoryValid(product.Category)
+	if !isOK {
+		return nil, errors.New("invalid category")
+	}
 
 	prd, err := cr.repository.Find(ctx, product.ID)
 	if err != nil {

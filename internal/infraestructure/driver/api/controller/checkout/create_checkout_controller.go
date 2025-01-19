@@ -25,7 +25,7 @@ func NewCreateCheckoutController(ctx context.Context,
 }
 
 // PostCreateCheckout godoc
-// @Summary Create Checkout
+// @Summary Cria o checkout da ordem (inicia o processo de pagamento e comunicação com o gateway)
 // @Schemes
 // @Description Efetiva o pagamento do cliente, via fake checkout nesse momento, e deixa o pedindo em espera da confirmação do pagamento. A ordem muda de status nesse momento para checkout-confirmado. Req #1 - Checkout Pedido que deverá receber os produtos solicitados e retornar à identificação do pedido.
 // @Tags Checkouts
@@ -56,5 +56,5 @@ func (r *CreateCheckoutController) PostCreateCheckout(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, output.GatewayTransactionID)
+	c.JSON(http.StatusOK, output)
 }

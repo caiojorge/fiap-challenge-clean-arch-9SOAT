@@ -36,7 +36,18 @@ func (r *ProductRepositoryGorm) Create(ctx context.Context, entity *entity.Produ
 
 func (r *ProductRepositoryGorm) Update(ctx context.Context, entity *entity.Product) error {
 
-	result := r.DB.Save(r.converter.FromEntity(entity))
+	var productModel model.Product
+	result := r.DB.Model(&model.Product{}).Where("id = ?", entity.ID).First(&productModel)
+	if result.Error != nil {
+		return result.Error
+	}
+
+	productModel.Category = entity.Category
+	productModel.Description = entity.Description
+	productModel.Name = entity.Name
+	productModel.Price = entity.Price
+
+	result = r.DB.Save(&productModel)
 	if result.Error != nil {
 		return result.Error
 	}

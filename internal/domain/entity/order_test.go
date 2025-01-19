@@ -20,7 +20,7 @@ func TestOrder(t *testing.T) {
 	assert.Equal(t, "Caio", customer.Name)
 
 	// Product
-	product, err := NewProduct("Lanche xpto", "Pão, carne e queijo", "lanche", 10)
+	product, err := NewProduct("Lanche xpto", "Pão, carne e queijo", "lanches", 10)
 	assert.Nil(t, err)
 	assert.NotNil(t, product)
 	product2, err := NewProduct("Coca Cola", "Água com gás e xarope de coca", "refrigerante", 10)
@@ -53,7 +53,7 @@ func TestOrderWithNoItens(t *testing.T) {
 	assert.Equal(t, "Caio", customer.Name)
 
 	// Product
-	product, err := NewProduct("Lanche xpto", "Pão, carne e queijo", "lanche", 10)
+	product, err := NewProduct("Lanche xpto", "Pão, carne e queijo", "lanches", 10)
 	assert.Nil(t, err)
 	assert.NotNil(t, product)
 	product2, err := NewProduct("Coca Cola", "Água com gás e xarope de coca", "refrigerante", 10)
@@ -70,7 +70,7 @@ func TestOrderWithNoItens(t *testing.T) {
 func TestOrderWithNoCustomer(t *testing.T) {
 
 	// Product
-	product, err := NewProduct("Lanche xpto", "Pão, carne e queijo", "lanche", 10)
+	product, err := NewProduct("Lanche xpto", "Pão, carne e queijo", "lanches", 10)
 	assert.Nil(t, err)
 	assert.NotNil(t, product)
 	product2, err := NewProduct("Coca Cola", "Água com gás e xarope de coca", "refrigerante", 10)
@@ -100,7 +100,7 @@ func TestOrderWithNoRegistration(t *testing.T) {
 	assert.Nil(t, err)
 
 	// Product
-	product, err := NewProduct("Lanche xpto", "Pão, carne e queijo", "lanche", 10)
+	product, err := NewProduct("Lanche xpto", "Pão, carne e queijo", "lanches", 10)
 	assert.Nil(t, err)
 	assert.NotNil(t, product)
 	product2, err := NewProduct("Coca Cola", "Água com gás e xarope de coca", "refrigerante", 10)
@@ -137,7 +137,7 @@ func TestConfirmedOrder(t *testing.T) {
 		ID:          sharedgenerator.NewIDGenerator(),
 		Name:        "Burger Kong",
 		Description: "Pão, carne e queijo",
-		Category:    "lanche",
+		Category:    "lanches",
 		Price:       50.0,
 	}
 

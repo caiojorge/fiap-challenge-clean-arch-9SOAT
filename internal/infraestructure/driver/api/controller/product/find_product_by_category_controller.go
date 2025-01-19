@@ -21,15 +21,15 @@ func NewFindProductByCategoryController(ctx context.Context, usecase portsusecas
 	}
 }
 
-// @Summary Get a Product by category
-// @Description Get details of a Product by category
+// @Summary Busca produtos por categoria
+// @Description Busca produtos por categoria
 // @Tags Products
 // @Accept  json
 // @Produce  json
-// @Param id path string true "Product category"
+// @Param category path string true "Busca pelo nome da categoria; São aceitos apenas: Lanches, Bebidas, Sobremesas e Acompanhamentos"
 // @Success 200 {array} usecase.FindProductByCategoryOutputDTO
 // @Failure 404 {object} string "Product not found"
-// @Failure 500 {object} string "Product not found"
+// @Failure 500 {object} string "Problems processing the request"
 // @Router /products/category/{id} [get]
 func (cr *FindProductByCategoryController) GetProductByCategory(c *gin.Context) {
 	//id, ok := c.GetQuery("id")

@@ -27,7 +27,7 @@ func TestProductRegisterAndUpdater(t *testing.T) {
 		ID:          sharedgenerator.NewIDGenerator(),
 		Name:        "Lanche XPTO 2",
 		Description: "Pão queijo e carne",
-		Category:    "Lanche",
+		Category:    "Lanches",
 		Price:       30.00,
 	}
 

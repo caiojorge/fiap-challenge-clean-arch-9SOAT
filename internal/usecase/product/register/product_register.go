@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	portsrepository "github.com/caiojorge/fiap-challenge-ddd/internal/domain/repository"
+	sharedconsts "github.com/caiojorge/fiap-challenge-ddd/internal/shared/consts"
 )
 
 type ProductRegisterUseCase struct {
@@ -20,6 +21,11 @@ func NewProductRegister(repository portsrepository.ProductRepository) *ProductRe
 
 // RegisterProduct registra um novo cliente.
 func (cr *ProductRegisterUseCase) RegisterProduct(ctx context.Context, product *RegisterProductInputDTO) (*RegisterProductOutputDTO, error) {
+
+	isOK := sharedconsts.IsCategoryValid(product.Category)
+	if !isOK {
+		return nil, errors.New("invalid category")
+	}
 
 	fmt.Println("usecase: verifica se o produto existe: " + product.Name)
 	entityFound, err := cr.repository.FindByName(ctx, product.Name)

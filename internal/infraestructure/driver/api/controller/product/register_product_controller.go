@@ -27,14 +27,14 @@ func NewRegisterProductController(ctx context.Context, usecase portsusecase.Regi
 }
 
 // PostRegisterProduct godoc
-// @Summary Create a new product
+// @Summary Cria um novo produto
 // @Schemes http
-// @Description Creates a new product in the database
+// @Description Cria um novo produto; As categorias são fixas: Lanches, Bebidas, Acompanhamentos e Sobremesas
 // @Tags Products
 // @Accept json
 // @Produce json
-// @Param        request   body     usecase.RegisterProductInputDTO  true  "New Product Data"
-// @Success 200 {object} usecase.RegisterProductOutputDTO "Successfully created"
+// @Param        request   body     usecase.RegisterProductInputDTO  true  "Novo produto"
+// @Success 200 {object} usecase.RegisterProductOutputDTO "Criado com sucesso"
 // @Failure 400 {object} shared.ErrorResponse "Invalid data format or missing fields"
 // @Failure 409 {object} shared.ErrorResponse "Product already exists"
 // @Failure 500 {object} shared.ErrorResponse "Internal server error"

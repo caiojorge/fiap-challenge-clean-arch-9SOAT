@@ -23,6 +23,11 @@ func (cr *CustomerRegisterUseCase) RegisterCustomer(ctx context.Context, custome
 
 	entity := customer.ToEntity()
 
+	err := entity.Validate()
+	if err != nil {
+		return err
+	}
+
 	fmt.Println("usecase: verifica se o cliente existe: " + entity.GetCPF().Value)
 	customerFound, err := cr.repository.Find(ctx, entity.GetCPF().Value)
 	if err != nil && err.Error() != "customer not found" {

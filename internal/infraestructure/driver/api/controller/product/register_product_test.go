@@ -46,7 +46,7 @@ func TestRegisterProductController(t *testing.T) {
 	r.POST("/register", controller.PostRegisterProduct)
 
 	// Create a JSON body
-	requestBody := bytes.NewBuffer([]byte(`{"name":"Lanche XPTO","description":"Pão, carne, queijo e presunto","category":"Lanche","price": 100}`))
+	requestBody := bytes.NewBuffer([]byte(`{"name":"Lanche XPTO","description":"Pão, carne, queijo e presunto","category":"Lanches","price": 100}`))
 
 	// Create the HTTP request with JSON body
 	req, err := http.NewRequest("POST", "/register", requestBody)
@@ -79,7 +79,7 @@ func TestFindAllProductsController(t *testing.T) {
 	product := &entity.Product{
 		Name:        "Lanche XPTO",
 		Description: "Pão, carne, queijo e presunto",
-		Category:    "Lanche",
+		Category:    "Lanches",
 		Price:       100,
 	}
 
@@ -105,7 +105,7 @@ func TestFindAllProductsController(t *testing.T) {
 	productDto := usecaseregister.RegisterProductInputDTO{
 		Name:        "Lanche XPTO",
 		Description: "Pão, carne, queijo e presunto",
-		Category:    "Lanche",
+		Category:    "Lanches",
 		Price:       100,
 	}
 
@@ -164,7 +164,7 @@ func TestFindProductByIDController(t *testing.T) {
 	productDto := usecaseregister.RegisterProductInputDTO{
 		Name:        "Lanche XPTO",
 		Description: "Pão, carne, queijo e presunto",
-		Category:    "Lanche",
+		Category:    "Lanches",
 		Price:       100,
 	}
 
@@ -175,7 +175,7 @@ func TestFindProductByIDController(t *testing.T) {
 		ID:          output.ID,
 		Name:        "Lanche XPTO",
 		Description: "Pão, carne, queijo e presunto",
-		Category:    "Lanche",
+		Category:    "Lanches",
 		Price:       100,
 	}
 
@@ -204,19 +204,5 @@ func TestFindProductByIDController(t *testing.T) {
 
 	// Check the response
 	assert.Equal(t, http.StatusOK, w.Code)
-
-	// var result entity.Product
-	// err = json.Unmarshal(w.Body.Bytes(), &result)
-	// assert.Nil(t, err)
-
-	// expected := entity.Product{
-	// 	ID:          "1",
-	// 	Name:        "Lanche XPTO",
-	// 	Description: "Pão, carne, queijo e presunto",
-	// 	Category:    "Lanche",
-	// 	Price:       100,
-	// }
-
-	// assert.Equal(t, result, expected)
 
 }

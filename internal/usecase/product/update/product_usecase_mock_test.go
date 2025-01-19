@@ -30,7 +30,7 @@ func TestProductRegisterAndUpdater(t *testing.T) {
 	productDto := registerusecase.RegisterProductInputDTO{
 		Name:        "Lanche XPTO",
 		Description: "Pão queijo e carne",
-		Category:    "Lanche",
+		Category:    "Lanches",
 		Price:       30.00,
 	}
 
@@ -44,7 +44,7 @@ func TestProductRegisterAndUpdater(t *testing.T) {
 		ID:          output.ID,
 		Name:        "Lanche XPTO",
 		Description: "Pão, carne, queijo e presunto",
-		Category:    "Lanche",
+		Category:    "Lanches",
 		Price:       100,
 	}
 
@@ -65,7 +65,7 @@ func TestProductRegisterAndUpdater(t *testing.T) {
 		ID:          output.ID,
 		Name:        "Lanche XPTO 2",
 		Description: "Pão queijo e carne",
-		Category:    "Lanche",
+		Category:    "Lanches",
 		Price:       30.00,
 	}
 

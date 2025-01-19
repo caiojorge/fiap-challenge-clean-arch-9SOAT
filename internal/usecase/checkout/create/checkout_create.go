@@ -3,10 +3,13 @@ package usecase
 import (
 	"context"
 	"errors"
+	"os"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
 	portsservice "github.com/caiojorge/fiap-challenge-ddd/internal/domain/gateway"
 	repository "github.com/caiojorge/fiap-challenge-ddd/internal/domain/repository"
+	sharedurl "github.com/caiojorge/fiap-challenge-ddd/internal/shared/url"
+	"github.com/joho/godotenv"
 )
 
 // CheckoutCreateUseCase é a implementação da interface CheckoutCreateUseCase.
@@ -38,6 +41,17 @@ func NewCheckoutCreate(orderRepository repository.OrderRepository,
 // o checkout recebe alguns parametros, sendo um deles, o id da ordem. Esse id, é usado para retornar a ordem com seus items, que por sua vez, tem os produtos.
 // É dessa forma que penso em atender o requisito indicado acima
 func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkoutDTO *CheckoutInputDTO) (*CheckoutOutputDTO, error) {
+
+	if checkoutDTO.NotificationURL == "" {
+		_ = godotenv.Load() // Carrega o .env se não estiver definido em variáveis de ambiente
+
+		hostname := os.Getenv("HOST_NAME")
+		hostport := os.Getenv("HOST_PORT")
+
+		u := sharedurl.NewURL(hostname, hostport)
+		url := u.GetWebhookURL()
+		checkoutDTO.NotificationURL = url
+	}
 
 	err := cr.validateDuplicatedCheckout(ctx, checkoutDTO)
 	if err != nil {
@@ -76,13 +90,6 @@ func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkoutDTO
 	if err != nil {
 		return nil, err
 	}
-
-	// TODO: confirmar a implementação do envio do pedido para a cozinha
-	// Kitchen - cria um item na cozinha para cada produto do pedido
-	// err = cr.handleKitchen(ctx, order, productList, *payment)
-	// if err != nil {
-	// 	return nil, err
-	// }
 
 	output := &CheckoutOutputDTO{
 		ID:                   checkout.ID,

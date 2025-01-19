@@ -19,6 +19,11 @@ func NewCustomerUpdate(repository portsrepository.CustomerRepository) *CustomerU
 
 // RegisterCustomer registra um novo cliente.
 func (cr *CustomerUpdateUseCase) UpdateCustomer(ctx context.Context, customer CustomerUpdateInputDTO) error {
+	entity := customer.ToEntity()
+	err := entity.Validate()
+	if err != nil {
+		return err
+	}
 
 	fmt.Println("usecase: verifica se o cliente existe: " + customer.CPF)
 	c, err := cr.repository.Find(ctx, customer.CPF)

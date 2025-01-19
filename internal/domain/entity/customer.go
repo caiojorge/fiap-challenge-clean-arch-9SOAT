@@ -88,6 +88,11 @@ func (c *Customer) Validate() error {
 		return errors.New("CPF is required")
 	}
 
+	err := c.CPF.Validate()
+	if err != nil {
+		return err
+	}
+
 	if c.Name == "" {
 		return errors.New("name is required")
 	}
