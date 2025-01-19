@@ -281,11 +281,42 @@ flowchart TD
     B --> C[Informa a URL de confirmação durante o checkout]
     C --> D[O checkout envia o pedido e seus itens para o gateway de pagamento]
     D --> E[O Gateway de pagamento retorna o  QR code]
-    E --> F[Pagamento confirmado]
-    F --> G[Chama o webhook de confirmação]
+    E --> F[O cliente efetiva o pagamento e ele é confirmado]
+    F --> G[O Gateway chama o webhook de confirmação]
     G --> H[Ordem fica com status payment-confirmed]
 ```
-- Vamos realizar o processo passo a passo 
+- É o processo mais complexo; envolve a criação do checkou, mudança de status da ordem (pedido), chamada do gateway de pagamento, e resposta do gateway de pagamento.
+- A ordem confirmada, vai para checkout confirmado, e depois, se der certo, pagamento confirmado. A partir desse status, a ordem pode seguir para a cozinha, para ser recebida, preparada, pronta e por fim, finalizada com o delivery ao cliente.
+
+```json
+{
+  "id": "9d4c3128-bf61-43a8-a969-38759d2a9e9c",
+  "items": [
+    {
+      "id": "121e0349-6c6e-483c-9db0-f1186e6d3d9d",
+      "productid": "078d174f-8e40-4397-a634-26933082fa4d",
+      "quantity": 2,
+      "price": 15,
+      "status": "item-confirmed"
+    },
+    {
+      "id": "4ffa67be-6d14-446f-8e72-7005ac033c9a",
+      "productid": "26c98e85-626d-48ce-98bc-85fea61e241b",
+      "quantity": 1,
+      "price": 13,
+      "status": "item-confirmed"
+    }
+  ],
+  "total": 43,
+  "status": "order-confirmed",
+  "customercpf": "08345449549",
+  "created_at": "0001-01-01T00:00:00Z",
+  "delivery_number": "QT139"
+}
+```
+
+- Acima, temos a ordem que foi criada. O checkout é baseado na Ordem. Precisamos do ID da ordem para buscarmos todos os dados da ordem, e ai teremos a lista de produtos, preço, status e tudo mais que é necessário para fazer o checkout.
+
 
 ## Requisitos da Fase 2
 
