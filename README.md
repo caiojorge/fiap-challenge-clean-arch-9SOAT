@@ -318,8 +318,187 @@ flowchart TD
 - Acima, temos a ordem que foi criada. O checkout é baseado na Ordem. Precisamos do ID da ordem para buscarmos todos os dados da ordem, e ai teremos a lista de produtos, preço, status e tudo mais que é necessário para fazer o checkout.
 
 
-## Requisitos da Fase 2
+## Requisitos funcionais da Fase 2
+### RQ01: Entrega: Quando pedido estiver pronto, avisar o cliente para que ele possa retirar o pedido
+#### Monitor com informações sobre a ordem; aqui o cliente pode ver que sua ordem esta pronta
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/get_kitchens_orders_monitor
+#### Delivery
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/post_kitchens_orders_delivery
+- Busca a ordem pronta, e finaliza a ordem, indicando a entrega.
 
+### RQ02: Acompanhamento: Deve ser possível acompanhar os pedidos, com tempo de espera
+#### Monitor com informações sobre a ordem; aqui o cliente pode ver que sua ordem esta pronta
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/get_kitchens_orders_monitor
+
+### RQ03: Gerenciar produtos e categorias
+#### Criar produto
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Products/post_products
+- Cria o produto e valida a categoria informada. A documentação deixa claro que existe um domínio fixo que deve ser respeitado.
+- É possível manter o produto (busca, updates...)
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Products/get_products
+
+### RQ04: Gerenciar Clientes
+#### Criar Clientes
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Customers/post_customers
+- A ideia desse endpoint é servir de cadastro para o usuário caso ele queira se cadastrar quando estiver fazendo o pedido.
+- Os demais endpoints de clientes, são para a administração dos clientes.
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Customers/get_customers
+
+### RQ05: Acompanhamento do pedidos; quando o pedido é pago ele é enviado para a cozinha, e deve seguir o fluxo: Recebido, em preparação, pronto e finalizado
+#### Retorna as ordens pagas e não notificadas, notifica a cozinha, e atualiza o status da ordem para recebida.
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/post_kitchens_orders_notifier
+#### Busca a ordem e o ticket da cozinha; move o status para o próximo da fase de preparo e faz o delivery se estiver finalizado.
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/post_kitchens_orders_cooking
+
+#### Robô de notificação de ordens (pagamento confirmado para recebida)
+- Para simular alguém buscando ordens ou até mesmo um sistema orientado à eventos, criei um robo que puxa as ordens pagas para a cozinha. Não é necessário ficar usando o endpoint. Pode ser usado claro, mas o robô vai fazer exatamente a mesma coisa que o endpoint rest faz.
+- Roda a cada 30s; Ele é acionado no main do projeto.
+
+```code
+	// Iniciar o "cron"
+	c := cron.New()
+
+	robot := robot.NewNotifierRobot(server, logger)
+
+	// Simulador do sistema da cozinha que puxa as ordens pagas para inicio do preparo
+	c.AddFunc("@every 30s", func() {
+		logger.Info("Notify kitchen")
+		//server.GetContainer().NotifierKitchenUseCase.Notify(context.Background())
+		err := robot.Notify(context.Background())
+		if err != nil {
+			logger.Error("Failed to notify kitchen", zap.Error(err))
+		}
+	})
+```
+### RQ06: Pedidos: O Cliente faz o pedido e pode se cadastrar (se quiser) informando CPF, nome e email. Os produtos são opcionais, mas ele pode combinar produtos como: lanche, bebida e sobremesa.
+#### Efetiva o pagamento do cliente, via fake checkout nesse momento, e deixa o pedindo em espera da confirmação do pagamento. A ordem muda de status nesse momento para checkout-confirmado. Checkout Pedido que deverá receber os produtos solicitados e retornar à identificação do pedido.
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Checkouts/post_checkouts
+- Esse é o processo mais complexo do sistema. O checkout chama o gateway, e o gateway confirma o pagamento chamando a url de notificação informada.
+#### Confirma o pagamento do cliente, via fake checkout nesse momento, e libera o pedido para preparação. A ordem muda de status nesse momento, para pagamento aprovado. Req #1 - Webhook para receber confirmação de pagamento aprovado ou recusado. A implementação deve ser clara quanto ao Webhook.
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Checkouts/post_checkouts_confirmation_payment
+#### Reprocesso o pagamento. Ordens em checkout aprovado, com checkout criado podem ser reprocessadas. O reprocessamento é feito no gateway de pagamento. O checkout é atualizado com o status do pagamento e o pedido é notificado.
+- Caso a integração falhe, é possível reprocessar a integração com o gateway.
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Checkouts/post_checkouts_reprocessing_payment
+
+```code
+server.GetRouter().POST("/instore/orders/qr/seller/collectors/:collectorID/pos/:posID/qrs", payment.PostPaymentFake)
+
+// ... executa as regras de negócio do gateway... 
+func PostPaymentFake(c *gin.Context) {
+	var req PaymentRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Gerando um ID único para a ordem de pagamento
+	inStoreOrderID := uuid.New().String()
+	//inStoreOrderID := req.ExternalReference
+	fmt.Println("InStoreOrderID:", inStoreOrderID)
+
+	// Simulando geração do QR Data
+	qrData := fmt.Sprintf("00020101021243650016COM.MERCADOLIBRE020130%s-%s", req.ExternalReference, inStoreOrderID)
+
+	// Retornando o QR Code e ID da ordem de pagamento
+	c.JSON(http.StatusOK, QrResponse{
+		QrData:            qrData,
+		InStoreOrderID:    inStoreOrderID,
+		ExternalReference: req.ExternalReference,
+	})
+
+	// Simulando pagamento após um tempo
+	go func() {
+		time.Sleep(15 * time.Second)
+		callWebhook(req.NotificationURL, req.ExternalReference)
+	}()
+}
+
+```
+
+### RQ07: Atualizar solução desenvolvida na FASE 1 para Clean Arch.
+```
+
+internal/
+
+    ├── domain/
+
+    │   └── (Entidades, objetos de valor, interafaces para repositório e gateway)
+
+    │
+
+    ├── infraestructure/
+
+    │   └── (Implementações específicas de tecnologias, como repositórios, gateways e controllers)
+
+    │
+
+    ├── shared/
+
+    │   └── (Pacotes compartilhados, helpers e utilitários usados em várias partes do projeto)
+
+    │
+
+    └── usecase/
+
+        └── (Casos de uso que orquestram a lógica de negócios da aplicação e seus objetos de dados (dto's) de input e output)
+
+  
+```
+
+### RQ08: Checkout do pedido que deverá receber os produtos solicitados e retornar a identificação do pedido
+
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Orders/post_orders
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Checkouts/post_checkouts
+
+### RQ09: Consultar status de pagamento de pedidos
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Checkouts/get_checkouts__id__check_payment
+
+### RQ10: Webhook para confirmação do pagamento (o gateway chama a url de notificação)
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Checkouts/post_checkouts_confirmation_payment
+- É possível reprocessar o pagamento em caso de falha na comunicação
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Checkouts/post_checkouts_reprocessing_payment
+
+### RQ11: Monitoramento: Lista de pedidos na ordem: Pronto, Em preparação e Recebido.
+#### Além da ordem indicada, os pedidos devem ser apresentados na ordem crescente, do mais antigo até o mais novo. Pedidos com status finalizados não entram na listagem.
+- Retorna uma lista de ordens e seus status, ordenado por recebido, em preparo e pronto, e por ordem de chegada tbm, e o tempo estimado e o delivery number para retirada do pedido
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/get_kitchens_orders_monitor
+
+### RQ12: Atualizar statuso do pedido; Essa atualização deve seguir um fluxo, desde a criação até a finalização
+
+```code
+// Order status
+const (
+	OrderStatusNotConfirmed      = "order-not-confirmed"  // status inicial da ordem
+	OrderStatusConfirmed         = "order-confirmed"      // order confirmed by the customer
+	OrderStatusCheckoutConfirmed = "checkout-confirmed"   // checkout confirmado e aguardando pagamento
+	OrderStatusPaymentApproved   = "payment-approved"     // payment approved by the payment gateway
+	OrderStatusNotApproved       = "payment-not-approved" // em caso de recusa do pagamento pelo gateway
+
+	OrderReceivedByKitchen      = "order-received-by-kitchen"       // pedido recebido pela cozinha (recebido)
+	OrderInPreparationByKitchen = "order-in-preparation-by-kitchen" // pedido em preparo na cozinha (em preparo)
+	OrderReadyByKitchen         = "order-ready-by-kitchen"          // pedido pronto na cozinha (pronto)
+	OrderFinalizedByKitchen     = "order-finalized-by-kitchen"      // pedido finalizado na cozinha (finalizado)
+)
+```
+- Retorna as ordens pagas e não notificadas, notifica a cozinha e atualiza o status da ordem para recebida pela cozinha
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/post_kitchens_orders_notifier
+- Move o status para a próxima fase, em preparação e pronto.
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/post_kitchens_orders_cooking
+- Busca ordem que esta pronta, registra o delivery e finaliza a ordem
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/post_kitchens_orders_delivery
+
+### RQ13: Opcional: implementar a integração com mercado pago, gerando o QR Code e chamando o webhook
+#### ou fazer o mock da parte de pagamento e usar a api do mercado como referência.
+```code
+server.GetRouter().POST("/instore/orders/qr/seller/collectors/:collectorID/pos/:posID/qrs", payment.PostPaymentFake)
+```
+```code
+	// Simulando pagamento após um tempo
+	go func() {
+		time.Sleep(15 * time.Second)
+		callWebhook(req.NotificationURL, req.ExternalReference)
+	}()
+```
 
 ## Problema para criar o banco de dados (just in case)
 

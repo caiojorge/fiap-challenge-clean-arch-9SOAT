@@ -18,8 +18,11 @@ var AllCategories = []string{
 
 // GetCategoryIndex returns the index of the category in the AllCategories slice
 func GetCategoryIndex(category string) int {
+	categoryWithS := ToPlural(category)
+	upperStr := strings.ToUpper(categoryWithS)
+
 	for i, c := range AllCategories {
-		if c == category {
+		if c == upperStr {
 			return i
 		}
 	}
@@ -28,7 +31,8 @@ func GetCategoryIndex(category string) int {
 
 // IsCategoryValid checks if the category is valid
 func IsCategoryValid(category string) bool {
-	upperStr := strings.ToUpper(category)
+	categoryWithS := ToPlural(category)
+	upperStr := strings.ToUpper(categoryWithS)
 
 	for _, c := range AllCategories {
 		if c == upperStr {
@@ -36,4 +40,13 @@ func IsCategoryValid(category string) bool {
 		}
 	}
 	return false
+}
+
+func ToPlural(category string) string {
+
+	upperStr := strings.ToUpper(category)
+	if len(upperStr) > 0 && upperStr[len(upperStr)-1] != 'S' {
+		upperStr += "S"
+	}
+	return upperStr
 }

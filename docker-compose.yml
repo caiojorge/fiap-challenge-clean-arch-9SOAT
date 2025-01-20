@@ -42,23 +42,23 @@ services:
   #   networks:
   #     - my-network    
   
-  # app:
-  #   build: .
-  #   container_name: fiap-go-app
-  #   depends_on:
-  #     - mysql
-  #   ports:
-  #     - "30080:30080"
-  #   environment:
-  #     - HOST_NAME=localhost
-  #     - HOST_PORT=30080  
-  #     - DB_HOST=mysql
-  #     - DB_PORT=3306
-  #     - DB_USER=root
-  #     - DB_PASS=root
-  #     - DB_NAME=dbcontrolf2
-  #   networks:
-  #     - my-network
+  app:
+    build: .
+    container_name: fiap-go-app
+    depends_on:
+      - mysql
+    ports:
+      - "30080:30080"
+    environment:
+      - HOST_NAME=localhost
+      - HOST_PORT=30080  
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_PASS=root
+      - DB_NAME=dbcontrolf2
+    networks:
+      - my-network
             
 volumes:
   mysql-data:

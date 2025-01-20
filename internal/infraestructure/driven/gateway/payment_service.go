@@ -31,7 +31,6 @@ func (s *PaymentService) SendPaymentRequest(collectorID, posID string, payment *
 	hostport := os.Getenv("HOST2_PORT")
 
 	//url := fmt.Sprintf("http://%s:%s/instore/orders/qr/seller/collectors/%s/pos/%s/qrs", hostname, hostport, collectorID, posID)
-
 	u := sharedurl.NewURL(hostname, hostport)
 	url := u.GetPaymentURL(collectorID, posID)
 
