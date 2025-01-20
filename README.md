@@ -272,7 +272,8 @@ curl -X 'POST' \
 - Nesse momento, a ordem é considerada confirmada, e pronta para o checkout. Como se ele estivesse no sistema fazendo o pedido, e a próxima etapa seria o pagamento.
 
 #### 15. Fazer o pagamento
-obs: Nesse caso (exercício) não implementei um processo real de pagamento, usando um gateway externo, mas, tentei simular ao máximo essa integração e processo.
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Checkouts/post_checkouts
+- Nesse caso (exercício) não implementei um processo real de pagamento, usando um gateway externo, mas, tentei simular ao máximo essa integração e processo.
 
 O processo vai ficar mais ou menos assim:
 ```mermaid
@@ -316,6 +317,74 @@ flowchart TD
 ```
 
 - Acima, temos a ordem que foi criada. O checkout é baseado na Ordem. Precisamos do ID da ordem para buscarmos todos os dados da ordem, e ai teremos a lista de produtos, preço, status e tudo mais que é necessário para fazer o checkout.
+
+- O checkout vai precisar de algumas informações: nome do gateway, token (só para deixar o processo mais parecido com o a realidade, mas, de fato, não existe um gateway ou necessidade de token... ), url de notificação (webhook) e claro, precisamos do ID da ordem que será paga pelo cliente.
+
+segue um exemplo do payload do checkout:
+```json
+{
+  "discont_coupon": 0,
+  "gateway_name": "mercado livre fake",
+  "gateway_token": "token 123",
+  "notification_url": "http://localhost:30080/kitchencontrol/api/v1/checkouts/confirmation/payment",
+  "order_id": "1ba9e084-1abe-42c7-8331-72220ba9ae8a",
+  "sponsor_id": 0
+}
+```
+- O campo notification_url é muito importante porque a confirmação do processo de compra depende dessa comunicação entre a nossa api e o gateway de pagamento. Claro que é tudo simulado, mas as chamadas de endpoints existem e as etapas vão acontecendo e o status da ordem vai mudando / progredindo dentro do fluxo esperado.
+```code
+"notification_url": "http://localhost:30080/kitchencontrol/api/v1/checkouts/confirmation/payment"
+```
+- Feito o checkout, a ordem fica em payment-confirmed e depois que o gateway chamar o webhook, o status muda para payment-approved.
+- O callback do gateway fake foi configurado para "dormir" por alguns segundos, e depois chamar a url informada para confirmar o pagamento.
+
+```bash
+[GIN] 
+2025/01/20 - 16:51:00 | 200 |   11.033173ms |    192.168.64.1 | POST     "/kitchencontrol/api/v1/checkouts/"
+2025-01-20T16:51:15.452Z        INFO    confirmation/checkout_payment_confirmation.go:62        Order found     {"order": {"ID":"486dbbbe-ff41-44ad-842e-41a7451cd345"...
+2025-01-20T16:51:30.051Z        INFO    robot/notifier_robot.go:33      Kitchen notified        {"output": [{"id":"476cd31d-6378-483b-bd3f-beda45f9bb60","order_id":"486dbbbe-ff41-44ad-842e-41a7451cd345"...
+```
+#### 16. Buscar ordens pagas e movê-las para a cozinha (notificar a cozinha)
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/post_kitchens_orders_notifier
+- Esse processo busca todas as ordens com status: payment-confirmed e as coloca na fila de preparo, com status order-received-by-kitchen
+- Eu criei um robô para simular uma comunicação entre o processo de pagamento e o da cozinha. Como se estivessemos usando uma fila ou algo do tipo. O robô roda a cada 30s.
+```code
+	c := cron.New()
+
+	robot := robot.NewNotifierRobot(server, logger)
+
+	// Simulador do sistema da cozinha que puxa as ordens pagas para inicio do preparo
+	c.AddFunc("@every 30s", func() {
+		logger.Info("Notify kitchen")
+		//server.GetContainer().NotifierKitchenUseCase.Notify(context.Background())
+		err := robot.Notify(context.Background())
+		if err != nil {
+			logger.Error("Failed to notify kitchen", zap.Error(err))
+		}
+	})
+
+	// Start do cron em background
+	c.Start()
+```
+- Não é necessário chamar / usar o endpoint para a avaliação de vcs. A notificação da cozinha vai acontecer de forma automática.
+
+#### 17. Ordem em preparo
+##### Busca a ordem e o ticket da cozinha; move o status para o próximo da fase de preparo e faz o delivery se estiver finalizado.
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/post_kitchens_orders_cooking
+- É necessário informar o ID da ordem (pedido); a ideia aqui é o time da cozinha sinalizar que começou o preparo de uma ordem especifica.
+- Quando a ordem vai para a cozinha ela recebe o tempo de espera, que será apresentado no monitor (que consumir a api)
+- O mesmo endpoint é usado para indicar que a ordem esta pronta. Basta executar mais uma vez, com o mesmo ID de ordem, o sistema sabe que precisa mover o status para pronto.
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/get_kitchens_orders_monitor
+
+#### 18. Ordem finalizada
+- O monitor vai apresentar as ordens e suas fases de preparo; quando o cliente for retirar seu pedido, ele será atualizado para finalizado.
+- Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/post_kitchens_orders_delivery
+- Também é necessário passar o id da ordem para finalizar o pedido / ordem
+- No contexto desse sistema, ordem e pedido representam a mesma coisa.
+- O monitor não mostra ordens finalizadas, mas é possivel acessá-las em http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Orders/get_orders
+
+#### Resumo
+- os 18 steps apresentados aqui representam o ciclo de criação de produto / cliente, criação de ordens, pagamento, e preparo na cozinha, até a entrega ao cliente.
 
 
 ## Requisitos funcionais da Fase 2

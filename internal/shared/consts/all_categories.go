@@ -1,6 +1,9 @@
 package sharedconsts
 
-import "strings"
+import (
+	"strings"
+	"unicode"
+)
 
 const (
 	Snacks     = "LANCHES"
@@ -43,10 +46,24 @@ func IsCategoryValid(category string) bool {
 }
 
 func ToPlural(category string) string {
-
+	pluralCategory := category
 	upperStr := strings.ToUpper(category)
 	if len(upperStr) > 0 && upperStr[len(upperStr)-1] != 'S' {
 		upperStr += "S"
+		pluralCategory += "s"
 	}
-	return upperStr
+
+	return pluralCategory
+}
+
+func CapitalizeFirstLetter(s string) string {
+	if len(s) == 0 {
+		return s
+	}
+	runes := []rune(s)
+	runes[0] = unicode.ToUpper(runes[0])
+	for i := 1; i < len(runes); i++ {
+		runes[i] = unicode.ToLower(runes[i])
+	}
+	return string(runes)
 }

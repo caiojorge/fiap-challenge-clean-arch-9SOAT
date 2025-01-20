@@ -43,6 +43,7 @@ func (cr *ProductRegisterUseCase) RegisterProduct(ctx context.Context, product *
 	entity := product.ToEntity()
 
 	entity.DefineID()
+	entity.FormatCategory()
 
 	err = cr.repository.Create(ctx, entity)
 	if err != nil {

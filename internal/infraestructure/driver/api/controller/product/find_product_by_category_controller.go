@@ -22,7 +22,7 @@ func NewFindProductByCategoryController(ctx context.Context, usecase portsusecas
 }
 
 // @Summary Busca produtos por categoria
-// @Description Busca produtos por categoria
+// @Description Busca produtos por categoria, ajusta a categoria para o plural e a primeira letra maiúscula
 // @Tags Products
 // @Accept  json
 // @Produce  json

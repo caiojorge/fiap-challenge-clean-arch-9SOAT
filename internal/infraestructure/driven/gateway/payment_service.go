@@ -27,8 +27,8 @@ func NewPaymentService() *PaymentService {
 func (s *PaymentService) SendPaymentRequest(collectorID, posID string, payment *entity.Payment) error {
 	_ = godotenv.Load() // Carrega o .env se não estiver definido em variáveis de ambiente
 
-	hostname := os.Getenv("HOST2_NAME")
-	hostport := os.Getenv("HOST2_PORT")
+	hostname := os.Getenv("HOST_NAME")
+	hostport := os.Getenv("HOST_PORT")
 
 	//url := fmt.Sprintf("http://%s:%s/instore/orders/qr/seller/collectors/%s/pos/%s/qrs", hostname, hostport, collectorID, posID)
 	u := sharedurl.NewURL(hostname, hostport)

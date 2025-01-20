@@ -34,6 +34,16 @@ func NewOrderCreate(orderRepository domainRepository.OrderRepository,
 // CreateOrder registra um novo pedido.
 func (cr *OrderCreateUseCase) CreateOrder(ctx context.Context, input *OrderCreateInputDTO) (*OrderCreateOutputDTO, error) {
 
+	if input.Items == nil || len(input.Items) == 0 {
+		return nil, fmt.Errorf("order items not informed")
+	}
+
+	for _, item := range input.Items {
+		if item.Quantity <= 0 {
+			return nil, fmt.Errorf("invalid quantity for product %s", item.ProductID)
+		}
+	}
+
 	wrapper := &CreateOrderWrapper{
 		dto: input,
 	}

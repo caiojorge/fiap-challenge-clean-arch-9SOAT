@@ -27,4 +27,13 @@ func TestCategories(t *testing.T) {
 	index = GetCategoryIndex(category)
 	assert.Equal(t, index, -1)
 
+	category = "Sobremesa"
+	pluralCategory := ToPlural(category)
+	assert.Equal(t, "Sobremesas", pluralCategory)
+
+	category = "sobremesa"
+	pluralCategory = ToPlural(category)
+	assert.Equal(t, "sobremesas", pluralCategory)
+	assert.Equal(t, "Sobremesas", CapitalizeFirstLetter(pluralCategory))
+
 }

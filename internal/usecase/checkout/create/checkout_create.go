@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"errors"
+	"log"
 	"os"
 
 	"github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity"
@@ -42,6 +43,8 @@ func NewCheckoutCreate(orderRepository repository.OrderRepository,
 // É dessa forma que penso em atender o requisito indicado acima
 func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkoutDTO *CheckoutInputDTO) (*CheckoutOutputDTO, error) {
 
+	log.Default().Println("CreateCheckout")
+
 	if checkoutDTO.NotificationURL == "" {
 		_ = godotenv.Load() // Carrega o .env se não estiver definido em variáveis de ambiente
 
@@ -53,43 +56,58 @@ func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkoutDTO
 		checkoutDTO.NotificationURL = url
 	}
 
+	log.Default().Println("validou url")
+
 	err := cr.validateDuplicatedCheckout(ctx, checkoutDTO)
 	if err != nil {
+		log.Default().Println("erro:" + err.Error())
 		return nil, err
 	}
+	log.Default().Println("validou checkout duplicado")
 
 	// Order- o pedido deve existir e não pode estar pago
 	order, err := cr.validateAndReturnOrder(ctx, checkoutDTO)
 	if err != nil {
+		log.Default().Println("erro:" + err.Error())
 		return nil, err
 	}
+	log.Default().Println("validou ordem")
 
 	// via orderitems podemos pegar os produtos do pedido
 	productList, err := cr.getProductList(ctx, order)
 	if err != nil {
+		log.Default().Println("erro:" + err.Error())
 		return nil, errors.New("no products to send to checkout")
 	}
+	log.Default().Println("buscou produtos")
 
 	// converte dto para entidade
 	checkout := checkoutDTO.ToEntity()
+	log.Default().Println("to entity...")
 
 	// integração com o gateway de pagamento e confirmação do pagamento na ordem
 	payment, err := cr.handlePayment(ctx, checkout, order, productList, checkoutDTO.NotificationURL, checkoutDTO.SponsorID, checkoutDTO.DiscontCoupon)
 	if err != nil {
+		log.Default().Println("erro:" + err.Error())
 		return nil, err
 	}
+	log.Default().Println("integração com gateway")
 
 	// confirma a transação e grava o checkout
 	err = cr.handleCheckout(ctx, checkout, order.Total, payment.InStoreOrderID, payment.QrData)
 	if err != nil {
+		log.Default().Println("erro:" + err.Error())
 		return nil, err
 	}
+	log.Default().Println("grava o checkout")
 
 	// muda o status para checkout-confirmado
 	err = cr.handleOrder(ctx, order)
 	if err != nil {
+		log.Default().Println("erro:" + err.Error())
 		return nil, err
 	}
+	log.Default().Println("muda o status da ordem")
 
 	output := &CheckoutOutputDTO{
 		ID:                   checkout.ID,

@@ -3,6 +3,7 @@ package entity
 import (
 	"errors"
 
+	sharedconsts "github.com/caiojorge/fiap-challenge-ddd/internal/shared/consts"
 	sharedgenerator "github.com/caiojorge/fiap-challenge-ddd/internal/shared/generator"
 )
 
@@ -101,4 +102,11 @@ func (p *Product) RedifneID(id string) {
 
 func (p *Product) ChangePrice(price float64) {
 	p.Price = price
+}
+
+// Formata a categoria para o plural e garante que a primeira letra seja maiúscula e o restante minúscula
+func (p *Product) FormatCategory() {
+	pluralCategory := sharedconsts.ToPlural(p.Category)
+	pluralCategory = sharedconsts.CapitalizeFirstLetter(pluralCategory)
+	p.Category = pluralCategory
 }

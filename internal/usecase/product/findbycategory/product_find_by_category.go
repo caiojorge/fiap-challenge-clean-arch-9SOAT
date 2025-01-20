@@ -4,6 +4,7 @@ import (
 	"context"
 
 	ports "github.com/caiojorge/fiap-challenge-ddd/internal/domain/repository"
+	sharedconsts "github.com/caiojorge/fiap-challenge-ddd/internal/shared/consts"
 )
 
 type ProductFindByCategoryUseCase struct {
@@ -18,7 +19,10 @@ func NewProductFindByCategory(repository ports.ProductRepository) *ProductFindBy
 
 func (cr *ProductFindByCategoryUseCase) FindProductByCategory(ctx context.Context, category string) ([]*FindProductByCategoryOutputDTO, error) {
 
-	products, err := cr.repository.FindByCategory(ctx, category)
+	pCategory := sharedconsts.ToPlural(category)
+	pCategory = sharedconsts.CapitalizeFirstLetter(pCategory)
+
+	products, err := cr.repository.FindByCategory(ctx, pCategory)
 	if err != nil {
 		return nil, err
 	}
