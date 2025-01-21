@@ -24,12 +24,20 @@ spec:
       - name: fiap-rocks-server
         image: caiojorge/fiap-rocks:latest
         env:
+        - name: HOST_NAME
+          value: localhost
+        - name: HOST_PORT_CONTAINER
+          value: "8083"
+        - name: HOST_PORT_K8S
+          value: "30080"
+        - name: APP_HOST_K8S
+          value: "fiap-rocks-server"    
         - name: DB_HOST
           value: mysql
         - name: DB_PORT
           value: "3306"
         - name: DB_NAME
-          value: dbcontrolf2
+          value: dbcontrol
         - name: DB_USER
           value: myuser
         - name: DB_PASS
@@ -37,5 +45,12 @@ spec:
             secretKeyRef:
               name: mysql-secret
               key: user-password
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
         ports:
-        - containerPort: 8083
+        - containerPort: 30080 #8083

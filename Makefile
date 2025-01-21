@@ -15,8 +15,7 @@ run-kitchen-api:
 run-payment-api:
 	go run cmd/fakepaymentservice/main.go	
 
-# FASE 2
-# Local enviroment with kind (kubernetes)
+# Local Dev support
 test-coverage:
 	go test -coverprofile=coverage.out ./...
 coverage: test-coverage
@@ -38,6 +37,9 @@ mocks:
 	mockgen -source=internal/domain/repository/checkout_repository.go -destination=internal/domain/repository/mocks/mock_checkout_repository.go -package=mocksrepository
 	mockgen -source=internal/domain/repository/kitchen_repository.go -destination=internal/domain/repository/mocks/mock_kitchen_repository.go -package=mocksrepository
 	mockgen -source=internal/domain/repository/transaction_manager.go -destination=internal/domain/repository/mocks/mock_transaction_manager.go -package=mocksrepository
+
+# FASE 2
+# Local enviroment with kind (kubernetes)
 
 # CONFIGURAÇÃO do K8S e seus recursos
 # cria as imagens que usaremos no kind
@@ -72,6 +74,7 @@ setup-k8s:
 	kubectl apply -f k8s/adminer-service.yaml
 	kubectl apply -f k8s/server-deployment.yaml
 	kubectl apply -f k8s/server-service.yaml
+	kubectl apply -f k8s/server-hpa.yaml
 
 	kubectl get pods
 	kubectl get svc

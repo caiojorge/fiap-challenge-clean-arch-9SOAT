@@ -35,6 +35,12 @@ func (cr *ProductUpdateUseCase) UpdateProduct(ctx context.Context, product Updat
 		return nil, errors.New("product not found")
 	}
 
+	entity := product.ToEntity()
+	err = entity.Validate()
+	if err != nil {
+		return nil, err
+	}
+
 	err = cr.repository.Update(ctx, product.ToEntity())
 	if err != nil {
 		return nil, err

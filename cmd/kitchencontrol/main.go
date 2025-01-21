@@ -38,7 +38,8 @@ func main() {
 	_ = godotenv.Load() // Carrega o .env se não estiver definido em variáveis de ambiente
 
 	hostname := os.Getenv("HOST_NAME")
-	hostport := os.Getenv("HOST_PORT")
+	hostport := os.Getenv("HOST_PORT_K8S")
+	hostportContainer := os.Getenv("HOST_PORT_CONTAINER")
 
 	gin.SetMode(gin.ReleaseMode)
 
@@ -90,7 +91,7 @@ func main() {
 
 	server.GetRouter().POST("/instore/orders/qr/seller/collectors/:collectorID/pos/:posID/qrs", payment.PostPaymentFake)
 
-	server.Run(":" + hostport)
+	server.Run(":" + hostportContainer)
 
 }
 

@@ -1,3 +1,3 @@
 -- init.sql
-CREATE DATABASE IF NOT EXISTS dbcontrolf2;
+CREATE DATABASE IF NOT EXISTS dbcontrol;
 

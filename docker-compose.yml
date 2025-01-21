@@ -51,12 +51,13 @@ services:
       - "30080:30080"
     environment:
       - HOST_NAME=localhost
-      - HOST_PORT=30080  
+      - HOST_PORT_CONTAINER=30080  
+      - HOST_PORT_K8S=30080  
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_USER=root
       - DB_PASS=root
-      - DB_NAME=dbcontrolf2
+      - DB_NAME=dbcontrol
     networks:
       - my-network
             

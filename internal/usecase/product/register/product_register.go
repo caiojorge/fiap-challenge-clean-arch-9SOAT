@@ -44,6 +44,10 @@ func (cr *ProductRegisterUseCase) RegisterProduct(ctx context.Context, product *
 
 	entity.DefineID()
 	entity.FormatCategory()
+	err = entity.Validate()
+	if err != nil {
+		return nil, err
+	}
 
 	err = cr.repository.Create(ctx, entity)
 	if err != nil {

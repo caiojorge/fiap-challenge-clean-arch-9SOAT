@@ -1,5 +1,21 @@
 # Kitchen Control | fase 2
 
+## Índice
+
+- [Descrição](#descrição)
+- [Tecnologias usadas no projeto](#tecnologias-usadas-no-projeto)
+- [Instalação e acesso ao swagger](#instalação-e-acesso-ao-swagger)
+  - [Pré-requisitos](#pré-requisitos)
+  - [Como instalar e executar o Kitchen Control](#como-instalar-e-executar-o-kitchen-control)
+- [Endpoints (acesso via swagger)](#endpoints-acesso-via-swagger)
+- [Client para DB - Adminer](#client-para-db---adminer)
+- [Gerador de CPF para os testes](#gerador-de-cpf-para-os-testes)
+- [Como usar o swagger da api](#como-usar-o-kitchen-control)
+  - [Cadastros Básicos](#cadastros-básicos)
+    - [Criar produtos](#criar-produtos)
+  - [Criar ordem, fazer o pagamento e cozinha](#criar-pedidos-fazer-pagamentos-e-cozinha)
+- [Requisitos](#requisitos-funcionais-da-fase-2)
+
 ## Descrição
 
 A Kitchen Control API é uma aplicação para gerenciar clientes, produtos, pedidos e itens de pedidos. Esta API fornece endpoints para criar, buscar, atualizar e deletar registros.
@@ -286,7 +302,7 @@ flowchart TD
     F --> G[O Gateway chama o webhook de confirmação]
     G --> H[Ordem fica com status payment-confirmed]
 ```
-- É o processo mais complexo; envolve a criação do checkou, mudança de status da ordem (pedido), chamada do gateway de pagamento, e resposta do gateway de pagamento.
+- É o processo mais complexo; envolve a criação do checkout, mudança de status da ordem (pedido), chamada do gateway de pagamento, e resposta do gateway de pagamento.
 - A ordem confirmada, vai para checkout confirmado, e depois, se der certo, pagamento confirmado. A partir desse status, a ordem pode seguir para a cozinha, para ser recebida, preparada, pronta e por fim, finalizada com o delivery ao cliente.
 
 ```json
@@ -326,14 +342,14 @@ segue um exemplo do payload do checkout:
   "discont_coupon": 0,
   "gateway_name": "mercado livre fake",
   "gateway_token": "token 123",
-  "notification_url": "http://localhost:30080/kitchencontrol/api/v1/checkouts/confirmation/payment",
+  "notification_url": "http://fiap-rocks-server:8083/kitchencontrol/api/v1/checkouts/confirmation/payment",
   "order_id": "1ba9e084-1abe-42c7-8331-72220ba9ae8a",
   "sponsor_id": 0
 }
 ```
 - O campo notification_url é muito importante porque a confirmação do processo de compra depende dessa comunicação entre a nossa api e o gateway de pagamento. Claro que é tudo simulado, mas as chamadas de endpoints existem e as etapas vão acontecendo e o status da ordem vai mudando / progredindo dentro do fluxo esperado.
 ```code
-"notification_url": "http://localhost:30080/kitchencontrol/api/v1/checkouts/confirmation/payment"
+ "notification_url": "http://fiap-rocks-server:8083/kitchencontrol/api/v1/checkouts/confirmation/payment",
 ```
 - Feito o checkout, a ordem fica em payment-confirmed e depois que o gateway chamar o webhook, o status muda para payment-approved.
 - O callback do gateway fake foi configurado para "dormir" por alguns segundos, e depois chamar a url informada para confirmar o pagamento.

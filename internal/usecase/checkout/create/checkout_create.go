@@ -49,7 +49,7 @@ func (cr *CheckoutCreateUseCase) CreateCheckout(ctx context.Context, checkoutDTO
 		_ = godotenv.Load() // Carrega o .env se não estiver definido em variáveis de ambiente
 
 		hostname := os.Getenv("HOST_NAME")
-		hostport := os.Getenv("HOST_PORT")
+		hostport := os.Getenv("HOST_PORT_K8S")
 
 		u := sharedurl.NewURL(hostname, hostport)
 		url := u.GetWebhookURL()
