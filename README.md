@@ -15,6 +15,8 @@
     - [Criar produtos](#criar-produtos)
   - [Criar ordem, fazer o pagamento e cozinha](#criar-pedidos-fazer-pagamentos-e-cozinha)
 - [Requisitos](#requisitos-funcionais-da-fase-2)
+- [Arquitetura](#arquitetura)
+- [Testes](#testes)
 
 ## Descrição
 
@@ -290,6 +292,20 @@ curl -X 'POST' \
 #### 15. Fazer o pagamento
 - Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Checkouts/post_checkouts
 - Nesse caso (exercício) não implementei um processo real de pagamento, usando um gateway externo, mas, tentei simular ao máximo essa integração e processo.
+```bash
+curl -X 'POST' \
+  'http://localhost:30080/kitchencontrol/api/v1/checkouts' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "discont_coupon": 0,
+  "gateway_name": "teste",
+  "gateway_token": "teste",
+  "notification_url": "http://fiap-rocks-server:8083/kitchencontrol/api/v1/checkouts/confirmation/payment",
+  "order_id": "4e6f0c89-f634-4674-8184-f01ed6cd8462",
+  "sponsor_id": 0
+}'
+```
 
 O processo vai ficar mais ou menos assim:
 ```mermaid
@@ -362,6 +378,12 @@ segue um exemplo do payload do checkout:
 ```
 #### 16. Buscar ordens pagas e movê-las para a cozinha (notificar a cozinha)
 - Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/post_kitchens_orders_notifier
+```bash
+curl -X 'POST' \
+  'http://localhost:30080/kitchencontrol/api/v1/kitchens/orders/notifier' \
+  -H 'accept: application/json' \
+  -d ''
+```
 - Esse processo busca todas as ordens com status: payment-confirmed e as coloca na fila de preparo, com status order-received-by-kitchen
 - Eu criei um robô para simular uma comunicação entre o processo de pagamento e o da cozinha. Como se estivessemos usando uma fila ou algo do tipo. O robô roda a cada 30s.
 ```code
@@ -387,6 +409,15 @@ segue um exemplo do payload do checkout:
 #### 17. Ordem em preparo
 ##### Busca a ordem e o ticket da cozinha; move o status para o próximo da fase de preparo e faz o delivery se estiver finalizado.
 - Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/post_kitchens_orders_cooking
+```bash
+curl -X 'POST' \
+  'http://localhost:30080/kitchencontrol/api/v1/kitchens/orders/cooking' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "order_id": "4e6f0c89-f634-4674-8184-f01ed6cd8462"
+}'
+```
 - É necessário informar o ID da ordem (pedido); a ideia aqui é o time da cozinha sinalizar que começou o preparo de uma ordem especifica.
 - Quando a ordem vai para a cozinha ela recebe o tempo de espera, que será apresentado no monitor (que consumir a api)
 - O mesmo endpoint é usado para indicar que a ordem esta pronta. Basta executar mais uma vez, com o mesmo ID de ordem, o sistema sabe que precisa mover o status para pronto.
@@ -395,12 +426,22 @@ segue um exemplo do payload do checkout:
 #### 18. Ordem finalizada
 - O monitor vai apresentar as ordens e suas fases de preparo; quando o cliente for retirar seu pedido, ele será atualizado para finalizado.
 - Swagger: http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Kitchens/post_kitchens_orders_delivery
+```bash
+curl -X 'POST' \
+  'http://localhost:30080/kitchencontrol/api/v1/kitchens/orders/delivery' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "order_id": "e33319a8-1d43-4ab6-8502-7607df0b8670"
+}'
+```
 - Também é necessário passar o id da ordem para finalizar o pedido / ordem
 - No contexto desse sistema, ordem e pedido representam a mesma coisa.
 - O monitor não mostra ordens finalizadas, mas é possivel acessá-las em http://localhost:30080/kitchencontrol/api/v1/docs/index.html#/Orders/get_orders
 
 #### Resumo
-- os 18 steps apresentados aqui representam o ciclo de criação de produto / cliente, criação de ordens, pagamento, e preparo na cozinha, até a entrega ao cliente.
+- Os 18 steps apresentados aqui representam o ciclo de criação de produto / cliente, criação de ordens, pagamento, e preparo na cozinha, até a entrega ao cliente.
+- Os blocos com exemplos curl são apenas para demonstrar como a chamada funciona, mas os dados precisam ser informados. Os Ids indicados não estão na base de dados sendo assim o comando não vai funcionar.
 
 
 ## Requisitos funcionais da Fase 2
@@ -584,6 +625,59 @@ server.GetRouter().POST("/instore/orders/qr/seller/collectors/:collectorID/pos/:
 		callWebhook(req.NotificationURL, req.ExternalReference)
 	}()
 ```
+
+## Arquitetura
+### Modelos
+
+- O diagrama de arquitetura tem expressar a ideia de como os pods estão distribuidos dentro do cluster kind 
+- O mock do sistema de pagamento esta em fiap-rocks-server
+![Arquitetura](diagrams/arquitetura_k8s.png)
+
+- Apresenta uma visão com um pouco mais de detalhes sobre o pod principal
+![fiap-rocks-server pod](diagrams/arquitetura-visao-fiap-rocks-pod.png)
+
+- Apenas uma visão macro do modelo de domínio
+![Domínio](diagrams/modelo-de-dominio.png)
+
+## Testes
+- Como explicado, é possível rodar o teste usando o make ou go test
+- Não foi possível testar (auto) 100% mas acredito que ter uma boa cobertura de testes
+```bash
+go test ./... 
+```
+
+```bash
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/domain/entity  (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/domain/valueobject     (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/converter       (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/db      (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/gateway (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/model   (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driven/repository/gorm (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/checkout (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/customer (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/order    (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/controller/product  (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/di  (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/infraestructure/driver/api/server      0.013s
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/shared/consts  (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/shared/deliver (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/shared/formatter       (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/shared/validator       (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/usecase/checkout/checkpayment  (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/usecase/checkout/confirmation  (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/usecase/checkout/create        (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/usecase/customer/findbycpf     (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/usecase/customer/register      (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/usecase/order/create   (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/usecase/order/findbyid (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/usecase/order/findbyparam      (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/usecase/product/findall        (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/usecase/product/register       (cached)
+ok      github.com/caiojorge/fiap-challenge-ddd/internal/usecase/product/update (cached)
+```
+
+
 
 ## Problema para criar o banco de dados (just in case)
 
